@@ -132,7 +132,7 @@ pre:hover .copy-btn{opacity:1}
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <h1>📐 嵌入式开发教程</h1>
-    <p>从零到实战 · 9篇深度教程</p>
+    <p>从零到实战 · 12篇深度教程</p>
   </div>
   <div class="sidebar-nav" id="sidebarNav">
     <div class="nav-group">
@@ -164,9 +164,14 @@ pre:hover .copy-btn{opacity:1}
       <div class="nav-group-title">📡 通信协议</div>
       <a class="nav-item" data-page="protocols" onclick="loadPage('protocols')">I2C/SPI/UART/CAN</a>
     </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🚀 实战与前沿</div>
+      <a class="nav-item" data-page="practice-projects" onclick="loadPage('practice-projects')">练手方向 <span class="badge badge-new">新</span></a>
+      <a class="nav-item" data-page="bci-2026" onclick="loadPage('bci-2026')">脑机接口2026 <span class="badge badge-hot">热点</span></a>
+    </div>
   </div>
   <div class="sidebar-footer">
-    v1.0.0 · 2026-06-16 · 暗色主题
+    v1.1.0 · 2026-06-16 · 暗色主题
   </div>
 </nav>
 
@@ -201,7 +206,9 @@ const PAGES = {
   stm32: { title: 'STM32 开发', breadcrumb: '📐 首页 / 🔵 STM32', type: 'tutorial', file: 'tutorials/stm32.html' },
   esp32: { title: 'ESP32 开发', breadcrumb: '📐 首页 / 🟢 ESP32', type: 'tutorial', file: 'tutorials/esp32.html' },
   freertos: { title: 'FreeRTOS 入门', breadcrumb: '📐 首页 / 🔄 FreeRTOS', type: 'tutorial', file: 'tutorials/freertos.html' },
-  protocols: { title: '通信协议', breadcrumb: '📐 首页 / 🔌 通信协议', type: 'tutorial', file: 'tutorials/protocols.html' }
+  protocols: { title: '通信协议', breadcrumb: '📐 首页 / 🔌 通信协议', type: 'tutorial', file: 'tutorials/protocols.html' },
+  'practice-projects': { title: '练手方向大全', breadcrumb: '📐 首页 / 🔬 练手方向', type: 'tutorial', file: 'tutorials/practice-projects.html' },
+  'bci-2026': { title: '脑机接口2026全球进展', breadcrumb: '📐 首页 / 🧠 脑机接口2026', type: 'tutorial', file: 'tutorials/bci-2026.html' }
 };
 
 let currentPage = 'home';
@@ -219,14 +226,16 @@ function renderHome() {
     { page:'stm32', icon:'🔵', title:'STM32 开发', desc:'HAL/LL/寄存器，CubeMX，GPIO/UART/TIM/ADC/NVIC，时钟树', tags:['必学','MCU'], size:'65KB', hot:true },
     { page:'esp32', icon:'🟢', title:'ESP32 开发', desc:'Arduino/ESP-IDF双框架，WiFi/BLE，OTA，深度睡眠，esptool', tags:['进阶','WiFi'], size:'28KB' },
     { page:'freertos', icon:'🔄', title:'FreeRTOS 入门', desc:'任务/队列/信号量/互斥量，中断安全，与HAL共存，内存管理', tags:['进阶','RTOS'], size:'111KB' },
-    { page:'protocols', icon:'🔌', title:'通信协议', desc:'I2C/SPI/UART/CAN协议原理，硬件接线，HAL代码，逻辑分析仪', tags:['进阶','通信'], size:'23KB' }
+    { page:'protocols', icon:'🔌', title:'通信协议', desc:'I2C/SPI/UART/CAN协议原理，硬件接线，HAL代码，逻辑分析仪', tags:['进阶','通信'], size:'23KB' },
+    { page:'practice-projects', icon:'🔬', title:'练手方向大全', desc:'20个分级项目：LED跑马灯→FreeRTOS多任务→智能小车→Bootloader→USB开发', tags:['实战','必看'], size:'6KB', hot:true },
+    { page:'bci-2026', icon:'🧠', title:'脑机接口2026全球进展', desc:'Neuralink/Synchron/博睿康最新突破，三星4nm芯片，大模型+BCI融合架构', tags:['前沿','热点'], size:'6KB', hot:true }
   ];
   let html = `<div class="home-hero">
     <h1>📐 嵌入式开发教程</h1>
-    <p>从零到实战的完整学习路线，10篇深度教程覆盖编译、调试、MCU、RTOS、通信协议全部核心技能</p>
+    <p>从零到实战的完整学习路线，12篇深度教程覆盖编译、调试、MCU、RTOS、通信协议、练手项目、前沿技术</p>
   </div>
   <div class="home-stats">
-    <div class="home-stat"><div class="num">10</div><div class="label">篇教程</div></div>
+    <div class="home-stat"><div class="num">12</div><div class="label">篇教程</div></div>
     <div class="home-stat"><div class="num">500+</div><div class="label">KB 内容</div></div>
     <div class="home-stat"><div class="num">200+</div><div class="label">代码示例</div></div>
     <div class="home-stat"><div class="num">50+</div><div class="label">常见问题</div></div>

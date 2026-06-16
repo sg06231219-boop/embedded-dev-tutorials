@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>嵌入式练手方向</title></head>
+<body>
+
+<h1>🔬 嵌入式开发练手方向大全</h1>
+<p>从零开始，用真实项目练出真本事——按难度分级，每个方向都有具体项目建议</p>
+
+<h2>🟢 入门级（0-3个月）</h2>
+<p>目标：点亮第一个LED，理解GPIO，学会用串口看输出</p>
+
+<h3>1. LED跑马灯 + 按键控制</h3>
+<div class="step">
+<strong>硬件</strong>：STM32F103C8T6最小系统板（约¥10-15）<br>
+<strong>目标</strong>：流水灯、按键中断、按键消抖（软件延时 vs 硬件定时器）<br>
+<strong>学到了什么</strong>：GPIO输入/输出、外部中断、定时器基本用法、HAL库 vs 直接寄存器
+</div>
+
+<h3>2. 串口打印"Hello World"</h3>
+<div class="step">
+<strong>硬件</strong>：同上 + USB-TTL模块（CH340，约¥5）<br>
+<strong>目标</strong>：printf重定向到串口，在PC端PuTTY看输出；发送指令控制LED<br>
+<strong>学到了什么</strong>：UART通信、重定向_write/_io_putchar、中断接收 vs 轮询
+</div>
+
+<h3>3. 数码管/OLCD显示</h3>
+<div class="step">
+<strong>硬件</strong>：0.96寸OLCD（I2C接口，约¥5）<br>
+<strong>目标</strong>：显示文字、数字、滚动效果；用按键切换显示内容<br>
+<strong>学到了什么</strong>：I2C协议、OLCD驱动（SSD1306）、字库取模
+</div>
+
+<h3>4. 温湿度监测</h3>
+<div class="step">
+<strong>硬件</strong>：DHT11（数字温湿度，约¥5）或 DS18B20（数字温度）<br>
+<strong>目标</strong>：读取温湿度，串口打印，OLCD显示<br>
+<strong>学到了什么</strong>：单总线协议（时序很重要！）、延时精度、传感器数据格式
+</div>
+
+<h2>🟡 进阶级（3-6个月）</h2>
+<p>目标：多外设协同，引入RTOS，开始用示波器看波形</p>
+
+<h3>5. 直流电机 PWM 控制</h3>
+<div class="step">
+<strong>硬件</strong>：L298N电机驱动模块 + 直流电机（约¥15-20）<br>
+<strong>目标</strong>：PWM调速、正反转控制、按键调速、串口设定目标转速<br>
+<strong>学到了什么</strong>：定时器PWM模式、占空比计算、电机驱动原理、H桥
+</div>
+
+<h3>6. 舵机控制（机械臂/云台）</h3>
+<div class="step">
+<strong>硬件</strong>：SG90舵机（约¥5）× 2-4个<br>
+<strong>目标</strong>：PWM控制角度（0.5-2.5ms脉冲对应0-180°）；多舵机协同做简单机械臂<br>
+<strong>学到了什么</strong>：PWM精准时序、多通道定时器、舵机控制信号格式
+</div>
+
+<h3>7. 红外遥控 + 解码</h3>
+<div class="step">
+<strong>硬件</strong>：红外接收模块 + 遥控器（约¥5）<br>
+<strong>目标</strong>：解码NEC协议，用遥控器控制LED/电机/OLCD显示<br>
+<strong>学到了什么</strong>：外部中断+定时器测量脉冲宽度、红外协议、状态机编程
+</div>
+
+<h3>8. 超声波测距（智能小车基础）</h3>
+<div class="step">
+<strong>硬件</strong>：HC-SR04超声波模块（约¥5）<br>
+<strong>目标</strong>：Trig触发 + Echo脉冲宽度测距；OLCD显示距离；距离<10cm报警<br>
+<strong>学到了什么</strong>：输入捕获（Input Capture）、定时器测量脉冲宽度、单位换算
+</div>
+
+<h3>9. 步进电机精确控制</h3>
+<div class="step">
+<strong>硬件</strong>：28BYJ-48步进电机 + ULN2003驱动（约¥8）<br>
+<strong>目标</strong>：精确角度控制、加速/减速曲线（梯形/S曲线）<br>
+<strong>学到了什么什么</strong>：步进电机相序、脉冲序列生成、加减速算法
+</div>
+
+<h2>🟠 实战级（6-12个月）</h2>
+<p>目标：综合项目，RTOS，通信协议，嵌入式软件架构</p>
+
+<h3>10. FreeRTOS多任务协同项目</h3>
+<div class="step">
+<strong>项目</strong>：环境监测站<br>
+<strong>任务划分</strong>：
+<ul>
+    <li>Task1：DHT11采集温湿度（每2秒）</li>
+    <li>Task2：OLCD刷新显示（每500ms）</li>
+    <li>Task3：UART命令解析（接收PC指令）</li>
+    <li>Task4：报警判断（超阈值蜂鸣器）</li>
+</ul>
+<strong>学到了什么</strong>：任务创建/删除、队列（Queue）传数据、信号量同步、临界区保护
+</div>
+
+<h3>11. 智能小车（经典综合项目）</h3>
+<div class="step">
+<strong>硬件</strong>：STM32 + L298N×2 + 直流电机×4 + HC-SR04 + OLCD + 红外遥控<br>
+<strong>功能</strong>：红外遥控前进/后退/转向、超声波避障、OLCD显示状态<br>
+<strong>进阶</strong>：加入蓝牙模块（HC-05），用手机APP控制<br>
+<strong>学到了什么</strong>：多外设协同、电机PID速度闭环、系统架构设计
+</div>
+
+<h3>12. CAN总线通信（汽车电子入门）</h3>
+<div class="step">
+<strong>硬件</strong>：两块STM32F103C8T6 + TJA1050 CAN模块（约¥10）<br>
+<strong>目标</strong>：一块板发CAN帧，另一块接收并控制LED；扩展为多节点网络<br>
+<strong>学到了什么</strong>：CAN协议帧格式、过滤器配置、总线仲裁、汽车电子基础
+</div>
+
+<h3>13. SD卡数据记录仪</h3>
+<div class="step">
+<strong>硬件</strong>：SD卡模块（SPI接口，约¥10）<br>
+<strong>目标</strong>：FATFS文件系统挂载、温湿度数据按日期写入CSV、串口导出文件列表<br>
+<strong>学到了什么</strong>：SPI协议、FATFS移植、文件系统操作、数据持久化
+</div>
+
+<h3>14. WiFi物联网（ESP32专项）</h3>
+<div class="step">
+<strong>硬件</strong>：ESP32开发板（约¥20-30）<br>
+<strong>项目A</strong>：温湿度数据上传ThingSpeak/MQTT（Arduino框架，上手快）<br>
+<strong>项目B</strong>：ESP32作为HTTP服务器，手机浏览器控制LED（ESP-IDF框架，更底层）<br>
+<strong>学到了什么</strong>：WiFi连接、TCP/IP基础、HTTP/MQTT协议、OTA升级
+</div>
+
+<h2>🔴 高级（1年以上）</h2>
+<p>目标：低功耗设计、RTOS深入、Bootloader、产线思维</p>
+
+<h3>15. 低功耗电池设备（睡眠/唤醒）</h3>
+<div class="step">
+<strong>硬件</strong>：STM32L系列（低功耗）+ 纽扣电池<br>
+<strong>目标</strong>：STOP模式睡眠（uA级）、RTC定时唤醒、外部中断唤醒、OLCD在唤醒时刷新<br>
+<strong>学到了什么</strong>：低功耗模式、RTC配置、唤醒源管理、功耗测量（万用表uA档）
+</div>
+
+<h3>16. Bootloader + 串口升级（IAP）</h3>
+<div class="step">
+<strong>目标</strong>：写一个简单的Bootloader，串口接收.bin文件，写入Flash，跳转执行<br>
+<strong>进阶</strong>：加入CRC校验、版本号管理、回滚机制<br>
+<strong>学到了什么</strong>：Flash读写、中断向量表重定位、链接脚本（.ld）、hex/bin文件格式
+</div>
+
+<h3>17. DMA + 双缓冲（高速数据采集）</h3>
+<div class="step">
+<strong>硬件</strong>：STM32F4 + ADC + DMA<br>
+<strong>目标</strong>：用DMA连续采集ADC，双缓冲切换，不丢点地测电压波形<br>
+<strong>学到了什么</strong>：DMA传输、双缓冲机制、ADC连续采样、中断 vs DMA的效率差异
+</div>
+
+<h3>18. USB设备开发</h3>
+<div class="step">
+<strong>目标</strong>：STM32模拟USB HID设备（键盘/鼠标），或USB CDC（虚拟串口）<br>
+<strong>学到了什么</strong>：USB协议栈、描述符、端点、HID报告、CubeMX USB中间件配置
+</div>
+
+<h3>19. Freescale/NXP S32K（汽车级MCU进阶）</h3>
+<div class="step">
+<strong>硬件</strong>：S32K144开发板<br>
+<strong>目标</strong>：用S32DS（Eclipse）开发，配置时钟/FLEXCAN/LPIT，理解汽车级MCU开发流程<br>
+<strong>学到了什么</strong>：汽车电子开发环境、AUTOSAR基础概念、功能安全（ISO 26262）意识
+</div>
+
+<h3>20. 用示波器调试嵌入式系统</h3>
+<div class="step">
+<strong>练习</strong>：
+<ul>
+    <li>翻转GPIO，测量代码执行时间</li>
+    <li>看I2C/SPI时序是否符合数据手册</li>
+    <li>测量PWM占空比和频率</li>
+    <li>看UART波形，验证波特率</li>
+    <li>用触发功能捕捉偶发BUG（中断冲突）</li>
+</ul>
+<strong>学到了什么</strong>：示波器使用、时序分析、硬件调试思维
+</div>
+
+<h2>📦 装备清单（入门推荐）</h2>
+<table>
+<tr><th>类别</th><th>推荐型号</th><th>价格</th><th>用途</th></tr>
+<tr><td>主控</td><td>STM32F103C8T6最小系统板</td><td>¥10-15</td><td>入门主力</td></tr>
+<tr><td>调试器</td><td>ST-Link V2 或 DAP-Link</td><td>¥15-25</td><td>烧录+调试</td></tr>
+<tr><td>串口</td><td>CH340G USB-TTL模块</td><td>¥5</td><td>串口通信</td></tr>
+<tr><td>显示</td><td>0.96寸OLCD（I2C）</td><td>¥5-8</td><td>显示输出</td></tr>
+<tr><td>传感器</td><td>DHT11温湿度</td><td>¥5</td><td>数字传感器入门</td></tr>
+<tr><td>电机</td><td>L298N + 直流电机</td><td>¥20</td><td>运动控制</td></tr>
+<tr><td>逻辑分析</td><td>24MHz 8CH逻辑分析仪</td><td>¥15</td><td>I2C/SPI/UART波形</td></tr>
+<tr><td>示波器</td><td>普源（Rigol）DS1102Z-E</td><td>¥1800</td><td>专业调试（可选）</td></tr>
+<tr><td>电源</td><td>可调直流稳压电源 或 USB供电</td><td>¥50起</td><td>供电</td></tr>
+</table>
+<div class="tip">💡 总预算：约¥100-150就能完成入门级全部项目！示波器可以等进阶级再买。</div>
+
+<h2>🎯 学习路线建议</h2>
+<ol>
+<li><strong>第1个月</strong>：环境搭建（教程第0-2章）→ LED跑马灯 → 串口Hello World</li>
+<li><strong>第2个月</strong>：按键中断 → OLCD显示 → I2C协议理解</li>
+<li><strong>第3个月</strong>：温湿度传感器 → 定时器PWM → 电机控制</li>
+<li><strong>第4-6个月</strong>：FreeRTOS入门 → 多任务项目 → 通信协议（I2C/SPI/CAN）</li>
+<li><strong>第6-12个月</strong>：综合项目（智能小车/环境监测站）→ Bootloader → 低功耗设计</li>
+<li><strong>1年以上</strong>：ESP32物联网 → USB开发 → 汽车电子（S32K/CAN） → 嵌入式软件架构</li>
+</ol>
+
+<h2>📚 每个项目练完后自测</h2>
+<ul>
+<li>能否不看教程，从零重写这个功能的代码？</li>
+<li>能否用示波器/逻辑分析仪看到信号波形，并解释每一步？</li>
+<li>如果换个传感器（比如DHT11换成SHT30），能否快速适配？</li>
+<li>如果代码跑不起来，能否用排除法定位问题（硬件？接线？代码？电源？）？</li>
+<li>能否给没有嵌入式基础的人讲清楚这个项目？</li>
+</ul>
+
+<div class="analogy">🎯 核心原则：<strong>先跑通，再深究；先模仿，再创造；先单片机，再RTOS，再架构。</strong>不要一开始就啃数据手册——用项目驱动学习，卡在哪里学哪里，效率最高。</div>
+
+</body>
+</html>
