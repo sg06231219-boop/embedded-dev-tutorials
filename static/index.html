@@ -132,7 +132,7 @@ pre:hover .copy-btn{opacity:1}
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <h1>📐 嵌入式开发教程</h1>
-    <p>从零到实战 · 12篇深度教程</p>
+    <p>从零到实战 · 32篇深度教程</p>
   </div>
   <div class="sidebar-nav" id="sidebarNav">
     <div class="nav-group">
@@ -169,9 +169,41 @@ pre:hover .copy-btn{opacity:1}
       <a class="nav-item" data-page="practice-projects" onclick="loadPage('practice-projects')">练手方向 <span class="badge badge-new">新</span></a>
       <a class="nav-item" data-page="bci-2026" onclick="loadPage('bci-2026')">脑机接口2026 <span class="badge badge-hot">热点</span></a>
     </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🟢 入门项目</div>
+      <a class="nav-item" data-page="proj-led-button" onclick="loadPage('proj-led-button')">LED+按键</a>
+      <a class="nav-item" data-page="proj-uart-hello" onclick="loadPage('proj-uart-hello')">串口Hello</a>
+      <a class="nav-item" data-page="proj-oled-display" onclick="loadPage('proj-oled-display')">OLED显示</a>
+      <a class="nav-item" data-page="proj-dht11-monitor" onclick="loadPage('proj-dht11-monitor')">温湿度监测</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🟡 进阶项目</div>
+      <a class="nav-item" data-page="proj-pwm-motor" onclick="loadPage('proj-pwm-motor')">PWM电机</a>
+      <a class="nav-item" data-page="proj-servo-control" onclick="loadPage('proj-servo-control')">舵机控制</a>
+      <a class="nav-item" data-page="proj-ir-remote" onclick="loadPage('proj-ir-remote')">红外遥控</a>
+      <a class="nav-item" data-page="proj-ultrasonic" onclick="loadPage('proj-ultrasonic')">超声波测距</a>
+      <a class="nav-item" data-page="proj-stepper-motor" onclick="loadPage('proj-stepper-motor')">步进电机</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🟠 实战项目</div>
+      <a class="nav-item" data-page="proj-freertos-station" onclick="loadPage('proj-freertos-station')">FreeRTOS站</a>
+      <a class="nav-item" data-page="proj-smart-car" onclick="loadPage('proj-smart-car')">智能小车</a>
+      <a class="nav-item" data-page="proj-can-bus" onclick="loadPage('proj-can-bus')">CAN总线</a>
+      <a class="nav-item" data-page="proj-sd-logger" onclick="loadPage('proj-sd-logger')">SD卡记录仪</a>
+      <a class="nav-item" data-page="proj-esp32-iot" onclick="loadPage('proj-esp32-iot')">ESP32物联网</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🔴 高级项目</div>
+      <a class="nav-item" data-page="proj-low-power" onclick="loadPage('proj-low-power')">低功耗</a>
+      <a class="nav-item" data-page="proj-bootloader-iap" onclick="loadPage('proj-bootloader-iap')">IAP升级</a>
+      <a class="nav-item" data-page="proj-dma-adc" onclick="loadPage('proj-dma-adc')">DMA+ADC</a>
+      <a class="nav-item" data-page="proj-usb-hid" onclick="loadPage('proj-usb-hid')">USB HID</a>
+      <a class="nav-item" data-page="proj-s32k144-auto" onclick="loadPage('proj-s32k144-auto')">汽车电子</a>
+      <a class="nav-item" data-page="proj-oscilloscope-debug" onclick="loadPage('proj-oscilloscope-debug')">示波器调试</a>
+    </div>
   </div>
   <div class="sidebar-footer">
-    v1.1.0 · 2026-06-16 · 暗色主题
+    v1.2.0 · 2026-06-16 · 暗色主题
   </div>
 </nav>
 
@@ -208,7 +240,27 @@ const PAGES = {
   freertos: { title: 'FreeRTOS 入门', breadcrumb: '📐 首页 / 🔄 FreeRTOS', type: 'tutorial', file: 'tutorials/freertos.html' },
   protocols: { title: '通信协议', breadcrumb: '📐 首页 / 🔌 通信协议', type: 'tutorial', file: 'tutorials/protocols.html' },
   'practice-projects': { title: '练手方向大全', breadcrumb: '📐 首页 / 🔬 练手方向', type: 'tutorial', file: 'tutorials/practice-projects.html' },
-  'bci-2026': { title: '脑机接口2026全球进展', breadcrumb: '📐 首页 / 🧠 脑机接口2026', type: 'tutorial', file: 'tutorials/bci-2026.html' }
+  'bci-2026': { title: '脑机接口2026全球进展', breadcrumb: '📐 首页 / 🧠 脑机接口2026', type: 'tutorial', file: 'tutorials/bci-2026.html' },
+  'proj-led-button': { title: 'LED跑马灯+按键控制', breadcrumb: '📐 首页 / 🟢 LED+按键', type: 'tutorial', file: 'tutorials/proj-led-button.html' },
+  'proj-uart-hello': { title: '串口Hello World', breadcrumb: '📐 首页 / 🟢 串口Hello', type: 'tutorial', file: 'tutorials/proj-uart-hello.html' },
+  'proj-oled-display': { title: 'OLED显示', breadcrumb: '📐 首页 / 🟢 OLED显示', type: 'tutorial', file: 'tutorials/proj-oled-display.html' },
+  'proj-dht11-monitor': { title: '温湿度监测', breadcrumb: '📐 首页 / 🟢 温湿度', type: 'tutorial', file: 'tutorials/proj-dht11-monitor.html' },
+  'proj-pwm-motor': { title: 'PWM电机控制', breadcrumb: '📐 首页 / 🟡 PWM电机', type: 'tutorial', file: 'tutorials/proj-pwm-motor.html' },
+  'proj-servo-control': { title: '舵机控制', breadcrumb: '📐 首页 / 🟡 舵机控制', type: 'tutorial', file: 'tutorials/proj-servo-control.html' },
+  'proj-ir-remote': { title: '红外遥控解码', breadcrumb: '📐 首页 / 🟡 红外遥控', type: 'tutorial', file: 'tutorials/proj-ir-remote.html' },
+  'proj-ultrasonic': { title: '超声波测距', breadcrumb: '📐 首页 / 🟡 超声波测距', type: 'tutorial', file: 'tutorials/proj-ultrasonic.html' },
+  'proj-stepper-motor': { title: '步进电机控制', breadcrumb: '📐 首页 / 🟡 步进电机', type: 'tutorial', file: 'tutorials/proj-stepper-motor.html' },
+  'proj-freertos-station': { title: 'FreeRTOS环境监测站', breadcrumb: '📐 首页 / 🟠 FreeRTOS站', type: 'tutorial', file: 'tutorials/proj-freertos-station.html' },
+  'proj-smart-car': { title: '智能小车', breadcrumb: '📐 首页 / 🟠 智能小车', type: 'tutorial', file: 'tutorials/proj-smart-car.html' },
+  'proj-can-bus': { title: 'CAN总线通信', breadcrumb: '📐 首页 / 🟠 CAN总线', type: 'tutorial', file: 'tutorials/proj-can-bus.html' },
+  'proj-sd-logger': { title: 'SD卡数据记录仪', breadcrumb: '📐 首页 / 🟠 SD卡记录仪', type: 'tutorial', file: 'tutorials/proj-sd-logger.html' },
+  'proj-esp32-iot': { title: 'ESP32 WiFi物联网', breadcrumb: '📐 首页 / 🟠 ESP32物联网', type: 'tutorial', file: 'tutorials/proj-esp32-iot.html' },
+  'proj-low-power': { title: '低功耗电池设备', breadcrumb: '📐 首页 / 🔴 低功耗', type: 'tutorial', file: 'tutorials/proj-low-power.html' },
+  'proj-bootloader-iap': { title: 'Bootloader IAP升级', breadcrumb: '📐 首页 / 🔴 IAP升级', type: 'tutorial', file: 'tutorials/proj-bootloader-iap.html' },
+  'proj-dma-adc': { title: 'DMA双缓冲ADC', breadcrumb: '📐 首页 / 🔴 DMA+ADC', type: 'tutorial', file: 'tutorials/proj-dma-adc.html' },
+  'proj-usb-hid': { title: 'USB HID键盘鼠标', breadcrumb: '📐 首页 / 🔴 USB HID', type: 'tutorial', file: 'tutorials/proj-usb-hid.html' },
+  'proj-s32k144-auto': { title: 'S32K144汽车电子', breadcrumb: '📐 首页 / 🔴 汽车电子', type: 'tutorial', file: 'tutorials/proj-s32k144-auto.html' },
+  'proj-oscilloscope-debug': { title: '示波器调试实战', breadcrumb: '📐 首页 / 🔴 示波器调试', type: 'tutorial', file: 'tutorials/proj-oscilloscope-debug.html' }
 };
 
 let currentPage = 'home';
@@ -228,17 +280,37 @@ function renderHome() {
     { page:'freertos', icon:'🔄', title:'FreeRTOS 入门', desc:'任务/队列/信号量/互斥量，中断安全，与HAL共存，内存管理', tags:['进阶','RTOS'], size:'111KB' },
     { page:'protocols', icon:'🔌', title:'通信协议', desc:'I2C/SPI/UART/CAN协议原理，硬件接线，HAL代码，逻辑分析仪', tags:['进阶','通信'], size:'23KB' },
     { page:'practice-projects', icon:'🔬', title:'练手方向大全', desc:'20个分级项目：LED跑马灯→FreeRTOS多任务→智能小车→Bootloader→USB开发', tags:['实战','必看'], size:'6KB', hot:true },
-    { page:'bci-2026', icon:'🧠', title:'脑机接口2026全球进展', desc:'Neuralink/Synchron/博睿康最新突破，三星4nm芯片，大模型+BCI融合架构', tags:['前沿','热点'], size:'6KB', hot:true }
+    { page:'bci-2026', icon:'🧠', title:'脑机接口2026全球进展', desc:'Neuralink/Synchron/博睿康最新突破，三星4nm芯片，大模型+BCI融合架构', tags:['前沿','热点'], size:'6KB', hot:true },
+    { page:'proj-led-button', icon:'💡', title:'LED跑马灯+按键控制', desc:'GPIO输出流水灯，按键输入，外部中断，软件/硬件消抖，第一个完整项目', tags:['入门','GPIO'], size:'25KB' },
+    { page:'proj-uart-hello', icon:'🖥️', title:'串口Hello World', desc:'UART配置，printf重定向，中断接收，命令解析控制LED，DMA接收', tags:['入门','UART'], size:'28KB' },
+    { page:'proj-oled-display', icon:'📱', title:'OLED显示屏驱动', desc:'I2C通信，SSD1306驱动，字符/数字/图形显示，字库取模，滚动效果', tags:['入门','I2C'], size:'30KB' },
+    { page:'proj-dht11-monitor', icon:'🌡️', title:'DHT11温湿度监测', desc:'单总线时序，GPIO模式切换，微秒延时，数据校验，OLED+串口显示', tags:['入门','传感器'], size:'22KB' },
+    { page:'proj-pwm-motor', icon:'⚙️', title:'直流电机PWM控制', desc:'定时器PWM原理，L298N驱动，占空比调速，正反转，按键/串口控速', tags:['进阶','PWM'], size:'15KB' },
+    { page:'proj-servo-control', icon:'🦾', title:'舵机控制', desc:'50Hz PWM信号，角度计算公式，多路舵机，机械臂协同控制', tags:['进阶','PWM'], size:'17KB' },
+    { page:'proj-ir-remote', icon:'📺', title:'红外遥控解码', desc:'NEC协议，外部中断+定时器测脉宽，状态机解码，键值映射控制', tags:['进阶','中断'], size:'21KB' },
+    { page:'proj-ultrasonic', icon:'📡', title:'超声波测距', desc:'HC-SR04 Trig/Echo，输入捕获测脉宽，距离计算，报警阈值', tags:['进阶','定时器'], size:'18KB' },
+    { page:'proj-stepper-motor', icon:'🔄', title:'步进电机控制', desc:'四相八拍相序，28BYJ-48减速比计算，梯形加减速曲线，精确位置', tags:['进阶','电机'], size:'20KB' },
+    { page:'proj-freertos-station', icon:'📊', title:'FreeRTOS环境监测站', desc:'4任务协同，队列传数据，信号量同步，互斥量保护I2C，报警判断', tags:['实战','RTOS'], size:'25KB', hot:true },
+    { page:'proj-smart-car', icon:'🚗', title:'智能小车', desc:'电机驱动+超声波避障+红外遥控+蓝牙APP+PID速度闭环+状态机', tags:['实战','综合'], size:'26KB', hot:true },
+    { page:'proj-can-bus', icon:'🔌', title:'CAN总线通信', desc:'CAN协议帧格式，HAL_CAN收发，过滤器配置，双节点通信，终端电阻', tags:['实战','CAN'], size:'22KB' },
+    { page:'proj-sd-logger', icon:'💾', title:'SD卡数据记录仪', desc:'SPI+FatFS，文件创建/写入/读取，CSV格式，串口导出，时间戳', tags:['实战','文件系统'], size:'20KB' },
+    { page:'proj-esp32-iot', icon:'🌐', title:'ESP32 WiFi物联网', desc:'Arduino框架，WiFi连接，HTTP请求，MQTT发布订阅，ThingSpeak，OTA', tags:['实战','IoT'], size:'22KB' },
+    { page:'proj-low-power', icon:'🔋', title:'低功耗电池设备', desc:'Sleep/Stop/Standby模式，RTC定时唤醒，外部中断唤醒，μA级优化', tags:['高级','低功耗'], size:'22KB' },
+    { page:'proj-bootloader-iap', icon:'⬆️', title:'Bootloader IAP升级', desc:'Flash分区，向量表重定位，串口接收bin，CRC校验，版本管理', tags:['高级','Bootloader'], size:'26KB' },
+    { page:'proj-dma-adc', icon:'📈', title:'DMA双缓冲ADC采集', desc:'ADC连续采样+DMA传输，双缓冲切换，不丢点采集，波形显示', tags:['高级','DMA'], size:'22KB' },
+    { page:'proj-usb-hid', icon:'⌨️', title:'USB HID键盘鼠标', desc:'USB协议栈，HID描述符，报表描述符，模拟键盘/鼠标，按键触发', tags:['高级','USB'], size:'20KB' },
+    { page:'proj-s32k144-auto', icon:'🚙', title:'S32K144汽车电子', desc:'S32DS环境，FLEXCAN，LPIT定时器，AUTOSAR概念，功能安全意识', tags:['高级','汽车'], size:'18KB' },
+    { page:'proj-oscilloscope-debug', icon:'🔭', title:'示波器调试实战', desc:'GPIO翻转测量，I2C/SPI/UART时序分析，PWM测量，中断延迟，偶发BUG捕捉', tags:['高级','调试'], size:'20KB' }
   ];
   let html = `<div class="home-hero">
     <h1>📐 嵌入式开发教程</h1>
-    <p>从零到实战的完整学习路线，12篇深度教程覆盖编译、调试、MCU、RTOS、通信协议、练手项目、前沿技术</p>
+    <p>从零到实战的完整学习路线，32篇深度教程覆盖编译、调试、MCU、RTOS、通信协议、20个练手项目、前沿技术</p>
   </div>
   <div class="home-stats">
-    <div class="home-stat"><div class="num">12</div><div class="label">篇教程</div></div>
-    <div class="home-stat"><div class="num">500+</div><div class="label">KB 内容</div></div>
-    <div class="home-stat"><div class="num">200+</div><div class="label">代码示例</div></div>
-    <div class="home-stat"><div class="num">50+</div><div class="label">常见问题</div></div>
+    <div class="home-stat"><div class="num">32</div><div class="label">篇教程</div></div>
+    <div class="home-stat"><div class="num">1MB+</div><div class="label">KB 内容</div></div>
+    <div class="home-stat"><div class="num">400+</div><div class="label">代码示例</div></div>
+    <div class="home-stat"><div class="num">100+</div><div class="label">常见问题</div></div>
   </div>
   <div class="home-grid">`;
   cards.forEach(c => {

@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 
-app = FastAPI(title="嵌入式开发教程", version="1.0.0")
+app = FastAPI(title="嵌入式开发教程", version="1.2.0")
 
 # 静态文件
 static_dir = os.path.join(os.path.dirname(__file__), "static")
@@ -22,7 +22,7 @@ async def index():
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "version": "1.0.0", "service": "embedded-dev-tutorials"}
+    return {"status": "ok", "version": "1.2.0", "service": "embedded-dev-tutorials"}
 
 
 if __name__ == "__main__":
