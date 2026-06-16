@@ -79,6 +79,11 @@ body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--
 .home-hero h1{font-size:2em;margin-bottom:8px}
 .home-hero p{color:var(--t2);font-size:1.05em;max-width:600px;margin:0 auto}
 .home-section-title{font-size:1.15em;color:var(--a);margin:28px 0 10px;padding-left:4px;border-left:3px solid var(--a);padding-bottom:2px}
+.page-nav{display:flex;justify-content:space-between;margin:32px 0 16px;padding:14px 0;border-top:1px solid var(--br);gap:12px}
+.page-nav a{color:var(--a);cursor:pointer;font-size:.9em;padding:8px 14px;border-radius:8px;background:var(--bg2);text-decoration:none;transition:background .2s}
+.page-nav a:hover{background:var(--bg3)}
+.page-nav-prev{margin-right:auto}
+.page-nav-next{margin-left:auto}
 .home-stats{display:flex;gap:16px;justify-content:center;margin:24px 0;flex-wrap:wrap}
 .home-stat{background:var(--bg2);border:1px solid var(--br);border-radius:10px;padding:16px 24px;text-align:center;min-width:120px}
 .home-stat .num{font-size:1.8em;font-weight:700;background:linear-gradient(135deg,var(--a),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -421,6 +426,25 @@ async function loadPage(pageId) {
 
     document.title = pageConfig.title + ' - 嵌入式开发教程';
     history.pushState({page:pageId}, '', `#/${pageId}`);
+
+    // 添加上/下篇导航
+    const pageOrder = Object.keys(PAGES).filter(k => k !== 'home');
+    const idx = pageOrder.indexOf(pageId);
+    if (idx >= 0) {
+      const navHtml = document.createElement('div');
+      navHtml.className = 'page-nav';
+      let links = '';
+      if (idx > 0) {
+        const prev = PAGES[pageOrder[idx-1]];
+        links += `<a class="page-nav-prev" onclick="loadPage('${pageOrder[idx-1]}')">← ${prev.title}</a>`;
+      }
+      if (idx < pageOrder.length - 1) {
+        const next = PAGES[pageOrder[idx+1]];
+        links += `<a class="page-nav-next" onclick="loadPage('${pageOrder[idx+1]}')">${next.title} →</a>`;
+      }
+      navHtml.innerHTML = links;
+      content.appendChild(navHtml);
+    }
   } catch(e) {
     content.innerHTML = `<div class="warn">⚠️ 加载失败: ${e.message}，请刷新重试。</div>`;
   }
