@@ -18,6 +18,11 @@ body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--
 .sidebar-nav{flex:1;overflow-y:auto;padding:8px 0}
 .nav-group{margin-bottom:4px}
 .nav-group-title{padding:8px 16px;font-size:.72em;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em}
+.nav-group.collapsible .nav-group-title{cursor:pointer;user-select:none}
+.nav-group.collapsible .toggle-icon{float:right;transition:transform .2s}
+.nav-group.collapsible.open .toggle-icon{transform:rotate(90deg)}
+.nav-group.collapsible .nav-item{display:none}
+.nav-group.collapsible.open .nav-item{display:block}
 .nav-item{display:block;padding:6px 16px 6px 24px;font-size:.85em;color:var(--t2);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
 .nav-item:hover{color:var(--t);background:var(--bg3);border-left-color:var(--a)}
 .nav-item.active{color:var(--a);background:rgba(88,166,255,.08);border-left-color:var(--a);font-weight:600}
@@ -73,6 +78,7 @@ body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--
 .home-hero{text-align:center;padding:40px 20px 30px}
 .home-hero h1{font-size:2em;margin-bottom:8px}
 .home-hero p{color:var(--t2);font-size:1.05em;max-width:600px;margin:0 auto}
+.home-section-title{font-size:1.15em;color:var(--a);margin:28px 0 10px;padding-left:4px;border-left:3px solid var(--a);padding-bottom:2px}
 .home-stats{display:flex;gap:16px;justify-content:center;margin:24px 0;flex-wrap:wrap}
 .home-stat{background:var(--bg2);border:1px solid var(--br);border-radius:10px;padding:16px 24px;text-align:center;min-width:120px}
 .home-stat .num{font-size:1.8em;font-weight:700;background:linear-gradient(135deg,var(--a),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -169,31 +175,31 @@ pre:hover .copy-btn{opacity:1}
       <a class="nav-item" data-page="practice-projects" onclick="loadPage('practice-projects')">练手方向 <span class="badge badge-new">新</span></a>
       <a class="nav-item" data-page="bci-2026" onclick="loadPage('bci-2026')">脑机接口2026 <span class="badge badge-hot">热点</span></a>
     </div>
-    <div class="nav-group">
-      <div class="nav-group-title">🟢 入门项目</div>
+    <div class="nav-group collapsible">
+      <div class="nav-group-title" onclick="toggleNavGroup(this)">🟢 入门项目 <span class="toggle-icon">▸</span></div>
       <a class="nav-item" data-page="proj-led-button" onclick="loadPage('proj-led-button')">LED+按键</a>
       <a class="nav-item" data-page="proj-uart-hello" onclick="loadPage('proj-uart-hello')">串口Hello</a>
       <a class="nav-item" data-page="proj-oled-display" onclick="loadPage('proj-oled-display')">OLED显示</a>
       <a class="nav-item" data-page="proj-dht11-monitor" onclick="loadPage('proj-dht11-monitor')">温湿度监测</a>
     </div>
-    <div class="nav-group">
-      <div class="nav-group-title">🟡 进阶项目</div>
+    <div class="nav-group collapsible">
+      <div class="nav-group-title" onclick="toggleNavGroup(this)">🟡 进阶项目 <span class="toggle-icon">▸</span></div>
       <a class="nav-item" data-page="proj-pwm-motor" onclick="loadPage('proj-pwm-motor')">PWM电机</a>
       <a class="nav-item" data-page="proj-servo-control" onclick="loadPage('proj-servo-control')">舵机控制</a>
       <a class="nav-item" data-page="proj-ir-remote" onclick="loadPage('proj-ir-remote')">红外遥控</a>
       <a class="nav-item" data-page="proj-ultrasonic" onclick="loadPage('proj-ultrasonic')">超声波测距</a>
       <a class="nav-item" data-page="proj-stepper-motor" onclick="loadPage('proj-stepper-motor')">步进电机</a>
     </div>
-    <div class="nav-group">
-      <div class="nav-group-title">🟠 实战项目</div>
+    <div class="nav-group collapsible">
+      <div class="nav-group-title" onclick="toggleNavGroup(this)">🟠 实战项目 <span class="toggle-icon">▸</span></div>
       <a class="nav-item" data-page="proj-freertos-station" onclick="loadPage('proj-freertos-station')">FreeRTOS站</a>
       <a class="nav-item" data-page="proj-smart-car" onclick="loadPage('proj-smart-car')">智能小车</a>
       <a class="nav-item" data-page="proj-can-bus" onclick="loadPage('proj-can-bus')">CAN总线</a>
       <a class="nav-item" data-page="proj-sd-logger" onclick="loadPage('proj-sd-logger')">SD卡记录仪</a>
       <a class="nav-item" data-page="proj-esp32-iot" onclick="loadPage('proj-esp32-iot')">ESP32物联网</a>
     </div>
-    <div class="nav-group">
-      <div class="nav-group-title">🔴 高级项目</div>
+    <div class="nav-group collapsible">
+      <div class="nav-group-title" onclick="toggleNavGroup(this)">🔴 高级项目 <span class="toggle-icon">▸</span></div>
       <a class="nav-item" data-page="proj-low-power" onclick="loadPage('proj-low-power')">低功耗</a>
       <a class="nav-item" data-page="proj-bootloader-iap" onclick="loadPage('proj-bootloader-iap')">IAP升级</a>
       <a class="nav-item" data-page="proj-dma-adc" onclick="loadPage('proj-dma-adc')">DMA+ADC</a>
@@ -268,7 +274,8 @@ let searchMode = false;
 
 // === 加载首页 ===
 function renderHome() {
-  const cards = [
+// === 全局教程卡片数据 ===
+const cardsData = [
     { page:'main', icon:'📖', title:'小白完全指南', desc:'从环境搭建到项目实战的完整路线图，14章覆盖嵌入式开发全流程', tags:['必读','全流程'], size:'112KB', hot:true },
     { page:'arm-gcc', icon:'🔧', title:'ARM GCC 工具链', desc:'gcc/as/ld/objcopy/objdump全命令详解，编译参数速查，链接脚本原理', tags:['核心','编译'], size:'28KB' },
     { page:'cmake', icon:'📦', title:'CMake 构建系统', desc:'CMakeLists.txt全语法，工具链文件，CubeMX集成，VS Code配置', tags:['自动化','构建'], size:'25KB' },
@@ -305,25 +312,47 @@ function renderHome() {
   let html = `<div class="home-hero">
     <h1>📐 嵌入式开发教程</h1>
     <p>从零到实战的完整学习路线，32篇深度教程覆盖编译、调试、MCU、RTOS、通信协议、20个练手项目、前沿技术</p>
+    <div class="quick-start" onclick="loadPage('main')" style="margin-top:18px;padding:14px 28px;background:linear-gradient(135deg,#238636,#1f6feb);border-radius:12px;cursor:pointer;text-align:center;font-size:1.05em;font-weight:700;color:#fff;display:inline-block">🚀 我是新手，从哪里开始？→ 小白完全指南</div>
   </div>
   <div class="home-stats">
     <div class="home-stat"><div class="num">32</div><div class="label">篇教程</div></div>
-    <div class="home-stat"><div class="num">1MB+</div><div class="label">KB 内容</div></div>
+    <div class="home-stat"><div class="num">1.2MB</div><div class="label">总内容</div></div>
     <div class="home-stat"><div class="num">400+</div><div class="label">代码示例</div></div>
     <div class="home-stat"><div class="num">100+</div><div class="label">常见问题</div></div>
-  </div>
-  <div class="home-grid">`;
-  cards.forEach(c => {
-    const tagHtml = c.tags.map((t,i) => `<span class="tag ${i===0?'g':'b'}">${t}</span>`).join('');
-    html += `<a class="home-card" onclick="loadPage('${c.page}')">
-      <div class="icon">${c.icon}</div>
-      <div class="title">${c.title}${c.hot?' 🔥':''}</div>
-      <div class="desc">${c.desc}</div>
-      <div class="tags">${tagHtml}</div>
-      <div class="size">${c.size}</div>
-    </a>`;
+  </div>`;
+
+  // 分组：基础教程 + 项目教程
+  const baseCards = cardsData.filter(c => !c.page.startsWith('proj-'));
+  const projCards = cardsData.filter(c => c.page.startsWith('proj-'));
+  const projGroups = [
+    {title:'🟢 入门项目（0~3个月，硬件¥25起）', filter:c => c.tags.includes('入门')},
+    {title:'🟡 进阶项目（3~6个月）', filter:c => c.tags.includes('进阶') && c.page.startsWith('proj-')},
+    {title:'🟠 实战项目（6~12个月）', filter:c => c.tags.includes('实战')},
+    {title:'🔴 高级项目（1年+）', filter:c => c.tags.includes('高级')}
+  ];
+
+  function renderCardGroup(title, items) {
+    let h = `<div class="home-section-title">${title}</div><div class="home-grid">`;
+    items.forEach(c => {
+      const tagHtml = c.tags.map((t,i) => `<span class="tag ${i===0?'g':'b'}">${t}</span>`).join('');
+      h += `<a class="home-card" onclick="loadPage('${c.page}')">
+        <div class="icon">${c.icon}</div>
+        <div class="title">${c.title}${c.hot?' 🔥':''}</div>
+        <div class="desc">${c.desc}</div>
+        <div class="tags">${tagHtml}</div>
+        <div class="size">${c.size}</div>
+      </a>`;
+    });
+    h += '</div>';
+    return h;
+  }
+
+  html += renderCardGroup('📚 基础教程', baseCards);
+  projGroups.forEach(g => {
+    const filtered = projCards.filter(g.filter);
+    if (filtered.length > 0) html += renderCardGroup(g.title, filtered);
   });
-  html += '</div>';
+
   return html;
 }
 
@@ -336,7 +365,12 @@ async function loadPage(pageId) {
   // 更新导航高亮
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   const navItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
-  if (navItem) navItem.classList.add('active');
+  if (navItem) {
+    navItem.classList.add('active');
+    // 如果是项目教程，自动展开对应的导航组
+    const navGroup = navItem.closest('.nav-group.collapsible');
+    if (navGroup && !navGroup.classList.contains('open')) navGroup.classList.add('open');
+  }
 
   // 更新面包屑
   const pageConfig = PAGES[pageId];
@@ -404,9 +438,11 @@ function handleSearch(query) {
   const results = [];
   Object.entries(PAGES).forEach(([id, cfg]) => {
     if (id === 'home') return;
-    const text = cfg.title.toLowerCase() + ' ' + cfg.breadcrumb.toLowerCase();
+    const card = cardsData.find(c => c.page === id);
+    const desc = card ? card.desc.toLowerCase() : '';
+    const text = cfg.title.toLowerCase() + ' ' + cfg.breadcrumb.toLowerCase() + ' ' + desc;
     if (text.includes(q)) {
-      results.push({ id, title: cfg.title });
+      results.push({ id, title: cfg.title, desc: card ? card.desc : '' });
     }
   });
   let html = `<h2>🔍 搜索结果: "${query}"</h2>`;
@@ -414,7 +450,7 @@ function handleSearch(query) {
     html += '<p style="color:var(--t2)">未找到匹配的教程，试试其他关键词。</p>';
   } else {
     results.forEach(r => {
-      html += `<div class="card" style="cursor:pointer" onclick="loadPage('${r.id}')"><div class="b"><strong style="color:var(--a)">${r.title}</strong><br><span style="color:var(--t2);font-size:.85em">${PAGES[r.id].breadcrumb}</span></div></div>`;
+      html += `<div class="card" style="cursor:pointer" onclick="loadPage('${r.id}')"><div class="b"><strong style="color:var(--a)">${r.title}</strong>${r.desc ? '<br><span style="color:var(--t2);font-size:.85em">'+r.desc+'</span>' : ''}</div></div>`;
     });
   }
   content.innerHTML = html;
@@ -423,6 +459,11 @@ function handleSearch(query) {
 // === 侧边栏切换 ===
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
+}
+
+// === 导航组折叠 ===
+function toggleNavGroup(el) {
+  el.parentElement.classList.toggle('open');
 }
 
 // === 阅读进度条 ===
