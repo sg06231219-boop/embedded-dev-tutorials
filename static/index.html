@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>嵌入式开发教程</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf;--sidebar-w:280px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--t);display:flex;min-height:100vh}
+
+/* === 侧边栏 === */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--br);overflow-y:auto;z-index:100;transition:transform .3s;display:flex;flex-direction:column}
+.sidebar-header{padding:16px;border-bottom:1px solid var(--br);flex-shrink:0}
+.sidebar-header h1{font-size:1.1em;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+.sidebar-header p{font-size:.72em;color:var(--t2)}
+.sidebar-nav{flex:1;overflow-y:auto;padding:8px 0}
+.nav-group{margin-bottom:4px}
+.nav-group-title{padding:8px 16px;font-size:.72em;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em}
+.nav-item{display:block;padding:6px 16px 6px 24px;font-size:.85em;color:var(--t2);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.nav-item:hover{color:var(--t);background:var(--bg3);border-left-color:var(--a)}
+.nav-item.active{color:var(--a);background:rgba(88,166,255,.08);border-left-color:var(--a);font-weight:600}
+.nav-item .badge{display:inline-block;font-size:.65em;padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:middle}
+.badge-new{background:rgba(63,185,80,.15);color:var(--g)}
+.badge-hot{background:rgba(248,81,73,.15);color:var(--r)}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--br);font-size:.7em;color:var(--t2);flex-shrink:0}
+
+/* === 主内容区 === */
+.main{margin-left:var(--sidebar-w);flex:1;min-width:0}
+.topbar{position:sticky;top:0;z-index:50;background:var(--bg2);border-bottom:1px solid var(--br);padding:10px 20px;display:flex;align-items:center;gap:12px}
+.topbar .menu-btn{display:none;background:none;border:1px solid var(--br);color:var(--t);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:1.1em}
+.topbar .breadcrumb{font-size:.85em;color:var(--t2)}
+.topbar .breadcrumb a{color:var(--a);text-decoration:none}
+.topbar .search-box{margin-left:auto;position:relative}
+.topbar .search-box input{background:var(--bg3);border:1px solid var(--br);color:var(--t);padding:6px 12px 6px 32px;border-radius:6px;font-size:.85em;width:200px;outline:none;transition:border-color .2s}
+.topbar .search-box input:focus{border-color:var(--a)}
+.topbar .search-box .icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t2);font-size:.85em}
+
+/* === 内容 === */
+.content{max-width:900px;margin:0 auto;padding:24px 28px 60px}
+.content h1{font-size:1.6em;text-align:center;padding:20px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
+.content h2{font-size:1.25em;color:var(--a);margin:32px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--br)}
+.content h3{font-size:1.08em;color:var(--c1);margin:22px 0 8px}
+.content h4{font-size:.98em;color:var(--o);margin:16px 0 6px}
+.content p{margin:8px 0;line-height:1.9}
+.content pre{background:#1c2128;border:1px solid var(--br);border-radius:8px;padding:14px;overflow-x:auto;margin:10px 0;font-size:.84em;line-height:1.6;position:relative}
+.content pre code{color:#e6edf3;font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace}
+.content code{font-family:'SF Mono','Fira Code',monospace;font-size:.9em}
+.content :not(pre)>code{background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--c1)}
+.content table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.88em}
+.content th{background:var(--bg3);color:var(--a);padding:8px 12px;text-align:left;border:1px solid var(--br)}
+.content td{padding:8px 12px;border:1px solid var(--br)}
+.content tr:nth-child(even){background:var(--bg2)}
+.content .note,.content .tip,.content .warn,.content .analogy{border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.88em}
+.content .note{background:rgba(88,166,255,.08);border-left:3px solid var(--a)}
+.content .warn{background:rgba(248,81,73,.08);border-left:3px solid var(--r)}
+.content .tip{background:rgba(63,185,80,.08);border-left:3px solid var(--g)}
+.content .analogy{background:rgba(163,113,247,.08);border-left:3px solid var(--p)}
+.content .step{background:var(--bg2);border:1px solid var(--br);border-radius:8px;padding:10px 14px;margin:8px 0}
+.content .card{background:var(--bg2);border:1px solid var(--br);border-radius:10px;margin:14px 0;overflow:hidden}
+.content .card .h{background:var(--bg3);padding:10px 14px;display:flex;align-items:center;gap:8px}
+.content .card .name{font-weight:600;flex:1}
+.content .card .b{padding:12px 14px}
+.content .tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.72em;font-weight:600}
+.content .tag.g{background:rgba(63,185,80,.15);color:var(--g)}.content .tag.b{background:rgba(88,166,255,.15);color:var(--a)}
+.content .tag.o{background:rgba(210,153,29,.15);color:var(--o)}.content .tag.r{background:rgba(248,81,73,.15);color:var(--r)}.content .tag.p{background:rgba(163,113,247,.15);color:var(--p)}
+.content a{color:var(--a);text-decoration:none}
+.content a:hover{text-decoration:underline}
+.content img{max-width:100%;border-radius:8px;margin:8px 0}
+
+/* === 首页 === */
+.home-hero{text-align:center;padding:40px 20px 30px}
+.home-hero h1{font-size:2em;margin-bottom:8px}
+.home-hero p{color:var(--t2);font-size:1.05em;max-width:600px;margin:0 auto}
+.home-stats{display:flex;gap:16px;justify-content:center;margin:24px 0;flex-wrap:wrap}
+.home-stat{background:var(--bg2);border:1px solid var(--br);border-radius:10px;padding:16px 24px;text-align:center;min-width:120px}
+.home-stat .num{font-size:1.8em;font-weight:700;background:linear-gradient(135deg,var(--a),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.home-stat .label{font-size:.75em;color:var(--t2);margin-top:2px}
+.home-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin:20px 0}
+.home-card{background:var(--bg2);border:1px solid var(--br);border-radius:12px;padding:18px;cursor:pointer;transition:all .25s;text-decoration:none;display:block;color:var(--t)}
+.home-card:hover{border-color:var(--a);transform:translateY(-2px);box-shadow:0 4px 20px rgba(88,166,255,.1)}
+.home-card .icon{font-size:1.8em;margin-bottom:8px}
+.home-card .title{font-size:1.05em;font-weight:700;color:var(--a);margin-bottom:4px}
+.home-card .desc{font-size:.82em;color:var(--t2);line-height:1.6}
+.home-card .tags{margin-top:8px;display:flex;gap:5px;flex-wrap:wrap}
+.home-card .size{font-size:.7em;color:var(--t2);margin-top:6px}
+
+/* === 目录TOC === */
+.toc-float{position:fixed;right:20px;top:60px;width:200px;max-height:70vh;overflow-y:auto;font-size:.78em;border-left:2px solid var(--br);padding-left:12px;z-index:40}
+.toc-float a{display:block;color:var(--t2);text-decoration:none;padding:3px 0;line-height:1.5;transition:color .15s}
+.toc-float a:hover,.toc-float a.active{color:var(--a)}
+
+/* === 复制按钮 === */
+.copy-btn{position:absolute;top:6px;right:6px;background:var(--bg3);border:1px solid var(--br);color:var(--t2);padding:3px 8px;border-radius:4px;font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn.copied{color:var(--g);border-color:var(--g)}
+
+/* === 移动端 === */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .topbar .menu-btn{display:block}
+  .toc-float{display:none}
+  .content{padding:16px 14px 40px}
+}
+@media(max-width:600px){
+  .home-grid{grid-template-columns:1fr}
+  .topbar .search-box{display:none}
+}
+
+/* === 加载动画 === */
+.loading{display:flex;justify-content:center;padding:40px}
+.loading .spinner{width:32px;height:32px;border:3px solid var(--br);border-top-color:var(--a);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* === 回到顶部 === */
+.back-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;background:var(--bg2);border:1px solid var(--br);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:1.1em;z-index:90;opacity:0;transition:all .3s;pointer-events:none}
+.back-top.show{opacity:1;pointer-events:auto}
+.back-top:hover{color:var(--a);border-color:var(--a)}
+
+/* 进度条 */
+.progress-bar{position:fixed;top:0;left:0;height:2px;background:var(--a);z-index:200;transition:width .15s;width:0}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- 侧边栏 -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>📐 嵌入式开发教程</h1>
+    <p>从零到实战 · 9篇深度教程</p>
+  </div>
+  <div class="sidebar-nav" id="sidebarNav">
+    <div class="nav-group">
+      <div class="nav-group-title">🏠 首页</div>
+      <a class="nav-item active" data-page="home" onclick="loadPage('home')">教程首页</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">📖 主教程</div>
+      <a class="nav-item" data-page="main" onclick="loadPage('main')">小白完全指南 <span class="badge badge-hot">热门</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🔨 编译构建</div>
+      <a class="nav-item" data-page="arm-gcc" onclick="loadPage('arm-gcc')">ARM GCC 工具链</a>
+      <a class="nav-item" data-page="cmake" onclick="loadPage('cmake')">CMake 构建系统</a>
+      <a class="nav-item" data-page="makefile" onclick="loadPage('makefile')">Makefile 实战</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🔌 烧录调试</div>
+      <a class="nav-item" data-page="flash-debug" onclick="loadPage('flash-debug')">烧录与调试</a>
+      <a class="nav-item" data-page="serial" onclick="loadPage('serial')">串口通信</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">🎯 芯片框架</div>
+      <a class="nav-item" data-page="stm32" onclick="loadPage('stm32')">STM32 开发</a>
+      <a class="nav-item" data-page="esp32" onclick="loadPage('esp32')">ESP32 开发</a>
+      <a class="nav-item" data-page="freertos" onclick="loadPage('freertos')">FreeRTOS 入门</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">📡 通信协议</div>
+      <a class="nav-item" data-page="protocols" onclick="loadPage('protocols')">I2C/SPI/UART/CAN</a>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    v1.0.0 · 2026-06-16 · 暗色主题
+  </div>
+</nav>
+
+<!-- 主区域 -->
+<div class="main">
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="breadcrumb" id="breadcrumb">📐 嵌入式开发教程</div>
+    <div class="search-box">
+      <span class="icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="搜索教程内容..." oninput="handleSearch(this.value)">
+    </div>
+  </div>
+  <div class="content" id="contentArea">
+    <!-- 动态加载内容 -->
+  </div>
+</div>
+
+<!-- 回到顶部 -->
+<div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+// === 页面配置 ===
+const PAGES = {
+  home: { title: '教程首页', breadcrumb: '📐 首页', type: 'home' },
+  main: { title: '嵌入式小白完全指南', breadcrumb: '📐 首页 / 📖 小白完全指南', type: 'tutorial', file: 'tutorials/main.html' },
+  'arm-gcc': { title: 'ARM GCC 编译工具链', breadcrumb: '📐 首页 / 🔨 ARM GCC', type: 'tutorial', file: 'tutorials/arm-gcc.html' },
+  cmake: { title: 'CMake 构建系统', breadcrumb: '📐 首页 / 📦 CMake', type: 'tutorial', file: 'tutorials/cmake.html' },
+  makefile: { title: 'Makefile 实战', breadcrumb: '📐 首页 / 📜 Makefile', type: 'tutorial', file: 'tutorials/makefile.html' },
+  'flash-debug': { title: '烧录与调试', breadcrumb: '📐 首页 / ⚡ 烧录与调试', type: 'tutorial', file: 'tutorials/flash-debug.html' },
+  serial: { title: '串口通信', breadcrumb: '📐 首页 / 📡 串口通信', type: 'tutorial', file: 'tutorials/serial.html' },
+  stm32: { title: 'STM32 开发', breadcrumb: '📐 首页 / 🔵 STM32', type: 'tutorial', file: 'tutorials/stm32.html' },
+  esp32: { title: 'ESP32 开发', breadcrumb: '📐 首页 / 🟢 ESP32', type: 'tutorial', file: 'tutorials/esp32.html' },
+  freertos: { title: 'FreeRTOS 入门', breadcrumb: '📐 首页 / 🔄 FreeRTOS', type: 'tutorial', file: 'tutorials/freertos.html' },
+  protocols: { title: '通信协议', breadcrumb: '📐 首页 / 🔌 通信协议', type: 'tutorial', file: 'tutorials/protocols.html' }
+};
+
+let currentPage = 'home';
+let searchMode = false;
+
+// === 加载首页 ===
+function renderHome() {
+  const cards = [
+    { page:'main', icon:'📖', title:'小白完全指南', desc:'从环境搭建到项目实战的完整路线图，14章覆盖嵌入式开发全流程', tags:['必读','全流程'], size:'112KB', hot:true },
+    { page:'arm-gcc', icon:'🔧', title:'ARM GCC 工具链', desc:'gcc/as/ld/objcopy/objdump全命令详解，编译参数速查，链接脚本原理', tags:['核心','编译'], size:'28KB' },
+    { page:'cmake', icon:'📦', title:'CMake 构建系统', desc:'CMakeLists.txt全语法，工具链文件，CubeMX集成，VS Code配置', tags:['自动化','构建'], size:'25KB' },
+    { page:'makefile', icon:'📜', title:'Makefile 实战', desc:'语法规则，变量，模式规则，完整STM32项目Makefile，增量编译', tags:['进阶','构建'], size:'71KB' },
+    { page:'flash-debug', icon:'⚡', title:'烧录与调试', desc:'ST-Link/J-Link/串口ISP，OpenOCD，GDB，VS Code Cortex-Debug', tags:['必学','调试'], size:'92KB' },
+    { page:'serial', icon:'📡', title:'串口通信', desc:'UART协议，CH340驱动，PuTTY，pyserial编程，STM32 HAL串口', tags:['必学','通信'], size:'48KB' },
+    { page:'stm32', icon:'🔵', title:'STM32 开发', desc:'HAL/LL/寄存器，CubeMX，GPIO/UART/TIM/ADC/NVIC，时钟树', tags:['必学','MCU'], size:'65KB', hot:true },
+    { page:'esp32', icon:'🟢', title:'ESP32 开发', desc:'Arduino/ESP-IDF双框架，WiFi/BLE，OTA，深度睡眠，esptool', tags:['进阶','WiFi'], size:'28KB' },
+    { page:'freertos', icon:'🔄', title:'FreeRTOS 入门', desc:'任务/队列/信号量/互斥量，中断安全，与HAL共存，内存管理', tags:['进阶','RTOS'], size:'111KB' },
+    { page:'protocols', icon:'🔌', title:'通信协议', desc:'I2C/SPI/UART/CAN协议原理，硬件接线，HAL代码，逻辑分析仪', tags:['进阶','通信'], size:'23KB' }
+  ];
+  let html = `<div class="home-hero">
+    <h1>📐 嵌入式开发教程</h1>
+    <p>从零到实战的完整学习路线，10篇深度教程覆盖编译、调试、MCU、RTOS、通信协议全部核心技能</p>
+  </div>
+  <div class="home-stats">
+    <div class="home-stat"><div class="num">10</div><div class="label">篇教程</div></div>
+    <div class="home-stat"><div class="num">500+</div><div class="label">KB 内容</div></div>
+    <div class="home-stat"><div class="num">200+</div><div class="label">代码示例</div></div>
+    <div class="home-stat"><div class="num">50+</div><div class="label">常见问题</div></div>
+  </div>
+  <div class="home-grid">`;
+  cards.forEach(c => {
+    const tagHtml = c.tags.map((t,i) => `<span class="tag ${i===0?'g':'b'}">${t}</span>`).join('');
+    html += `<a class="home-card" onclick="loadPage('${c.page}')">
+      <div class="icon">${c.icon}</div>
+      <div class="title">${c.title}${c.hot?' 🔥':''}</div>
+      <div class="desc">${c.desc}</div>
+      <div class="tags">${tagHtml}</div>
+      <div class="size">${c.size}</div>
+    </a>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+// === 加载教程内容 ===
+async function loadPage(pageId) {
+  currentPage = pageId;
+  searchMode = false;
+  document.getElementById('searchInput').value = '';
+
+  // 更新导航高亮
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+  if (navItem) navItem.classList.add('active');
+
+  // 更新面包屑
+  const pageConfig = PAGES[pageId];
+  document.getElementById('breadcrumb').innerHTML = pageConfig.breadcrumb;
+
+  // 关闭移动端侧边栏
+  document.getElementById('sidebar').classList.remove('open');
+
+  const content = document.getElementById('contentArea');
+  window.scrollTo({top:0});
+
+  if (pageId === 'home') {
+    content.innerHTML = renderHome();
+    document.title = '嵌入式开发教程';
+    history.pushState({page:pageId}, '', `#/${pageId}`);
+    return;
+  }
+
+  // 加载教程HTML
+  content.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  try {
+    const resp = await fetch(pageConfig.file);
+    if (!resp.ok) throw new Error('加载失败');
+    const html = await resp.text();
+    // 提取body内容
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    // 移除原有的nav-top和breadcrumb
+    doc.querySelectorAll('.nav-top, .breadcrumb, .nav-top + style').forEach(el => el.remove());
+    const bodyContent = doc.body.innerHTML;
+    content.innerHTML = bodyContent;
+
+    // 给所有pre加复制按钮
+    content.querySelectorAll('pre').forEach(pre => {
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = '复制';
+      btn.onclick = () => {
+        navigator.clipboard.writeText(pre.textContent).then(() => {
+          btn.textContent = '已复制 ✓';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 1500);
+        });
+      };
+      pre.style.position = 'relative';
+      pre.appendChild(btn);
+    });
+
+    document.title = pageConfig.title + ' - 嵌入式开发教程';
+    history.pushState({page:pageId}, '', `#/${pageId}`);
+  } catch(e) {
+    content.innerHTML = `<div class="warn">⚠️ 加载失败: ${e.message}，请刷新重试。</div>`;
+  }
+}
+
+// === 搜索 ===
+function handleSearch(query) {
+  if (!query.trim()) {
+    if (searchMode) loadPage(currentPage);
+    return;
+  }
+  searchMode = true;
+  const content = document.getElementById('contentArea');
+  const q = query.toLowerCase();
+  const results = [];
+  Object.entries(PAGES).forEach(([id, cfg]) => {
+    if (id === 'home') return;
+    const text = cfg.title.toLowerCase() + ' ' + cfg.breadcrumb.toLowerCase();
+    if (text.includes(q)) {
+      results.push({ id, title: cfg.title });
+    }
+  });
+  let html = `<h2>🔍 搜索结果: "${query}"</h2>`;
+  if (results.length === 0) {
+    html += '<p style="color:var(--t2)">未找到匹配的教程，试试其他关键词。</p>';
+  } else {
+    results.forEach(r => {
+      html += `<div class="card" style="cursor:pointer" onclick="loadPage('${r.id}')"><div class="b"><strong style="color:var(--a)">${r.title}</strong><br><span style="color:var(--t2);font-size:.85em">${PAGES[r.id].breadcrumb}</span></div></div>`;
+    });
+  }
+  content.innerHTML = html;
+}
+
+// === 侧边栏切换 ===
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// === 阅读进度条 ===
+window.addEventListener('scroll', () => {
+  const scrollTop = document.documentElement.scrollTop;
+  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+  document.getElementById('progressBar').style.width = progress + '%';
+
+  // 回到顶部按钮
+  const backTop = document.getElementById('backTop');
+  if (scrollTop > 400) backTop.classList.add('show');
+  else backTop.classList.remove('show');
+});
+
+// === 路由 ===
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.page) loadPage(e.state.page);
+  else loadPage('home');
+});
+
+// === 初始化 ===
+(function init() {
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#/')) {
+    const page = hash.slice(2);
+    if (PAGES[page]) { loadPage(page); return; }
+  }
+  loadPage('home');
+})();
+</script>
+</body>
+</html>
