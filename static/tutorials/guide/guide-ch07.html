@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第7章：ESP32开发实战 - 嵌入式小白完全指南</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.8;max-width:880px;margin:0 auto;padding:14px}
+h1{font-size:1.55em;text-align:center;padding:16px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:1.15em;color:var(--a);margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--br)}
+h3{font-size:1.02em;color:var(--g);margin:18px 0 7px}
+h4{font-size:.95em;color:var(--o);margin:12px 0 5px}
+pre{background:#1c2128;border:1px solid var(--br);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0 12px;font-size:.82em;line-height:1.6;white-space:pre-wrap;word-break:break-all;position:relative}
+code{font-family:'SF Mono','Fira Code',monospace}
+pre code{color:#e6edf3}
+.note{background:rgba(210,153,29,.08);border:1px solid rgba(210,153,29,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--o)}
+.warn{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--r)}
+.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--g)}
+.example{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.25);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--a)}
+.example b{color:var(--g)}
+.trouble{background:rgba(163,113,247,.06);border:1px solid rgba(163,113,247,.3);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--p)}
+.trouble b{color:var(--p)}
+.card{background:var(--bg2);border:1px solid var(--br);border-radius:10px;margin:14px 0;overflow:hidden}
+.card>.h{padding:10px 14px;background:var(--bg3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card>.h>.name{font-weight:700;font-size:.9em;color:var(--t);font-family:monospace}
+.card>.h>.tag{font-size:.65em;padding:2px 8px;border-radius:8px;white-space:nowrap;border:1px solid var(--br);color:var(--t2)}
+.card>.h>.tag.g{background:rgba(63,185,80,.15);border-color:var(--g);color:var(--g)}
+.card>.h>.tag.y{background:rgba(210,153,29,.15);border-color:var(--o);color:var(--o)}
+.card>.h>.tag.r{background:rgba(248,81,73,.15);border-color:var(--r);color:var(--r)}
+.card>.h>.tag.b{background:rgba(88,166,255,.15);border-color:var(--a);color:var(--a)}
+.card>.h>.tag.p{background:rgba(163,113,247,.15);border-color:var(--p);color:var(--p)}
+.card>.b{padding:10px 14px;font-size:.87em}
+.card>.b>.desc{font-size:.92em;color:var(--t2);margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.81em;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--br)}
+td,th{padding:8px 12px;border-bottom:1px solid var(--br);text-align:left}
+th{background:var(--bg3);color:var(--a);font-weight:600}
+tr:last-child td{border-bottom:none}
+.step{background:var(--bg3);border-radius:6px;padding:8px 13px;margin:6px 0;font-size:.83em}
+.step b{color:var(--a)}
+.summary{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(163,113,247,.1));border:1px solid var(--br);border-radius:10px;padding:12px 16px;margin:18px 0;font-size:.88em;color:var(--t)}
+.summary b{color:var(--a)}
+.analogy{background:rgba(57,197,207,.07);border-left:3px solid var(--c1);padding:8px 13px;margin:8px 0;font-size:.82em;color:var(--c1);border-radius:0 6px 6px 0}
+.analogy b{color:var(--c1)}
+.chnav{display:flex;justify-content:space-between;margin:30px 0 10px;gap:12px;border-top:1px solid var(--br);padding-top:16px;flex-wrap:wrap}
+.chnav a{flex:1;text-align:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;color:var(--a);text-decoration:none;font-size:.85em;transition:all .2s;min-width:120px;cursor:pointer}
+.chnav a:hover{background:var(--bg3);border-color:var(--a)}
+.chnav .toc-link{flex:0;min-width:80px;background:var(--bg3);color:var(--t2)}
+.chnav .toc-link:hover{color:var(--a)}
+.copy-btn{position:absolute;top:4px;right:4px;padding:3px 10px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;color:var(--t2);font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--a);color:var(--bg)}
+.copy-btn.copied{background:var(--g);color:var(--bg);border-color:var(--g)}
+@media(max-width:480px){body{padding:10px}h1{font-size:1.3em}h2{font-size:1.05em}pre{font-size:.75em}}
+</style>
+</head>
+<body>
+
+<h1>第7章：ESP32开发实战</h1>
+<div class="summary"><b>📖 小白完全指南 · 7/14</b> | 阅读时间约3分钟</div>
+
+<p>ESP32=单片机界的<strong>瑞士军刀</strong>——自带WiFi+蓝牙，双核240MHz，520KB RAM，¥10一片。做物联网项目首选。</p>
+
+<div class="analogy">💡 <b>类比：</b>如果STM32是精工手表（精准、低功耗），ESP32就是智能手机（功能全面、联网、性能强）。做精确控制用STM32，做联网应用用ESP32。</div>
+
+<h3>esptool 烧录</h3>
+
+<pre><code># 查看ESP32信息
+esptool.py --chip esp32 -p COM3 chip_id
+
+# 烧录固件
+esptool.py --chip esp32 -p COM3 -b 460800     write_flash -z 0x1000 bootloader.bin     0x8000 partitions.bin     0x10000 firmware.bin
+
+# 擦除Flash
+esptool.py --chip esp32 -p COM3 erase_flash
+
+# 读取Flash
+esptool.py --chip esp32 -p COM3 read_flash 0 0x400000 flash_dump.bin</code></pre>
+
+<h3>ESP-IDF 基础（官方开发框架）</h3>
+
+<div class="warn">⚠️ <b>前提条件：</b>ESP-IDF需要完整安装（约2-3GB），<strong>初学者可先跳过</strong>，用Arduino框架也能跑ESP32。<br><br>
+<strong>Windows安装步骤：</strong><br>
+① 下载离线安装包：<a href="https://dl.espressif.com/dl/esp-idf/" style="color:var(--a)">dl.espressif.com/dl/esp-idf/</a>（推荐，包含所有依赖）<br>
+② 双击安装，选择默认路径 <code>C:\Espressif</code>，勾选"添加到PATH"<br>
+③ 安装约需10-20分钟，取决于网速<br>
+④ 安装完成后，打开"ESP-IDF 5.x CMD"快捷方式（安装器创建的）<br>
+⑤ 验证：<code>idf.py --version</code> → 输出版本号即成功<br><br>
+<strong>如果离线包下载慢：</strong><br>
+• 用手机热点试试（有时比WiFi快）<br>
+• 在有VPN的环境下载后拷贝过来<br>
+• 用PlatformIO插件（VS Code里装了）创建ESP32项目，无需单独装ESP-IDF</div>
+
+<pre><code>// WiFi扫描示例
+#include "esp_wifi.h"
+#include "esp_event.h"
+
+void wifi_scan(void) {
+    wifi_scan_config_t scan_config = {
+        .ssid = NULL,
+        .bssid = NULL,
+        .channel = 0,
+        .show_hidden = true
+    };
+
+    esp_wifi_set_mode(WIFI_MODE_STA);
+    esp_wifi_start();
+    esp_wifi_scan_start(&amp;scan_config, true);  // 阻塞扫描
+
+    uint16_t ap_count = 0;
+    esp_wifi_scan_get_ap_num(&amp;ap_count);
+
+    wifi_ap_record_t *ap_list = malloc(sizeof(wifi_ap_record_t) * ap_count);
+    esp_wifi_scan_get_ap_records(&amp;ap_count, ap_list);
+
+    for (int i = 0; i &lt; ap_count; i++) {
+        printf("%-32s RSSI: %d Ch: %d
+",
+            ap_list[i].ssid, ap_list[i].rssi, ap_list[i].primary);
+    }
+    free(ap_list);
+}</code></pre>
+
+<h3>WiFi连接</h3>
+
+<pre><code>// 连接WiFi
+void wifi_connect(const char *ssid, const char *password) {
+    wifi_config_t wifi_config = {0};
+    strncpy((char *)wifi_config.sta.ssid, ssid, 31);
+    strncpy((char *)wifi_config.sta.password, password, 63);
+
+    esp_wifi_set_mode(WIFI_MODE_STA);
+    esp_wifi_set_config(WIFI_IF_STA, &amp;wifi_config);
+    esp_wifi_start();
+    esp_wifi_connect();
+
+    // 等待连接成功事件
+    // 在事件处理函数中处理 WIFI_EVENT_STA_CONNECTED
+}</code></pre>
+
+<h3>Arduino vs ESP-IDF</h3>
+
+<table>
+<tr><th>特性</th><th>Arduino</th><th>ESP-IDF</th></tr>
+<tr><td>上手难度</td><td>极低</td><td>中等</td></tr>
+<tr><td>灵活性</td><td>受限</td><td>完全控制</td></tr>
+<tr><td>性能优化</td><td>一般</td><td>极致</td></tr>
+<tr><td>FreeRTOS</td><td>隐藏使用</td><td>显式使用</td></tr>
+<tr><td>适合</td><td>原型验证/初学者</td><td>产品开发/进阶</td></tr>
+</table>
+
+<div class="tip">💡 <b>建议：</b>Arduino快速验证想法，ESP-IDF做正式产品。PlatformIO支持两种框架切换。</div>
+
+<h3>⚡ ESP32 5分钟快速上手（Arduino框架）</h3>
+
+<div class="note">⚠️ <b>最快的方式：</b>用PlatformIO创建ESP32 Arduino项目，无需单独装ESP-IDF！</div>
+
+<div class="step"><b>步骤1：</b>VS Code → PlatformIO → New Project → Board: ESP32 Dev Module → Framework: Arduino</div>
+<div class="step"><b>步骤2：</b>把下面的代码粘贴到 <code>src/main.cpp</code></div>
+<pre><code>// ESP32 LED闪烁 + 串口输出（Arduino框架，5分钟跑通）
+// 大多数ESP32开发板的LED在GPIO2
+
+void setup() {
+    Serial.begin(115200);  // 初始化串口
+    pinMode(2, OUTPUT);     // GPIO2设为输出
+    Serial.println("ESP32 Started!");
+}
+
+void loop() {
+    digitalWrite(2, HIGH);   // LED亮
+    Serial.println("LED ON");
+    delay(500);
+    digitalWrite(2, LOW);    // LED灭
+    Serial.println("LED OFF");
+    delay(500);
+}
+</code></pre>
+<div class="step"><b>步骤3：</b>连接ESP32 → 点击PlatformIO的→箭头按钮（Upload） → 自动编译+烧录</div>
+<div class="step"><b>步骤4：</b>打开串口监视器（PlatformIO插头图标），看到"LED ON/OFF"交替输出就成功了！</div>
+
+<div class="trouble">🔍 <b>常见问题：esptool连接失败</b><br>
+1. 按住BOOT键再点RST键，进入下载模式<br>
+2. 检查COM口号是否正确<br>
+3. 某些ESP32板需要手动按BOOT进入下载模式<br>
+4. USB驱动：CP2102/CH340确认已安装</div>
+
+<!-- ====== 第8章 ====== -->
+<a id="ch8"></a>
+<div class="summary">📖 <b>第8章学完你能干啥：</b>理解RTOS概念，会创建任务/队列/信号量/互斥量，能把FreeRTOS移植到STM32上。</div>
+
+<div class="chnav">
+<a onclick="window.parent.loadPage('guide-ch06')">← 第6章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch08')">第8章 →</a>
+</div>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
