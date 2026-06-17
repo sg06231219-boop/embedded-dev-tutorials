@@ -191,6 +191,26 @@ pre:hover .copy-btn{opacity:1}
 .search-results-count{color:var(--t2);font-size:.85em;margin-bottom:12px}
 .search-highlight{background:rgba(88,166,255,.25);padding:1px 3px;border-radius:3px}
 
+/* ══ v1.5.1 新增: 收藏夹 & 进度 ══ */
+.bookmark-btn{background:none;border:none;font-size:1.2em;cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .15s;opacity:.4;vertical-align:middle}
+.bookmark-btn:hover{opacity:1;transform:scale(1.2)}
+.bookmark-btn.active{opacity:1}
+.bookmarks-section{margin-top:8px;border-top:1px solid var(--br);padding-top:8px}
+.bookmarks-title{font-size:.72em;color:var(--t2);padding:6px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:6px}
+.bookmarks-count{font-size:.75em;background:var(--bg3);padding:1px 6px;border-radius:8px}
+.bm-item{display:block;padding:5px 16px 5px 24px;font-size:.8em;color:var(--t2);text-decoration:none;cursor:pointer;transition:all .15s;border-left:3px solid transparent;position:relative}
+.bm-item:hover{color:var(--t);background:var(--bg3);border-left-color:var(--g)}
+.bm-item .bm-remove{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.7em;opacity:0;transition:opacity .15s;cursor:pointer;color:var(--r)}
+.bm-item:hover .bm-remove{opacity:1}
+.read-time{font-size:.75em;color:var(--t2);margin-left:4px}
+.progress-indicator{display:inline-flex;align-items:center;gap:4px;font-size:.7em;color:var(--t2)}
+.progress-indicator .pi-bar{width:40px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.progress-indicator .pi-fill{height:100%;background:var(--g);border-radius:2px;transition:width .3s}
+.sort-bar{display:flex;gap:6px;margin:14px 0 8px;flex-wrap:wrap;align-items:center}
+.sort-bar span.label{font-size:.8em;color:var(--t2)}
+.sort-btn{padding:4px 10px;border:1px solid var(--br);border-radius:6px;font-size:.78em;cursor:pointer;background:var(--bg2);color:var(--t2);transition:all .15s}
+.sort-btn:hover,.sort-btn.active{border-color:var(--a);color:var(--a);background:var(--bg3)}
+
 /* ══ 骨架屏 ══ */
 .skeleton-wrap{padding:24px 28px}
 .skeleton-line{height:14px;background:var(--bg2);border-radius:6px;margin:10px 0;position:relative;overflow:hidden}
@@ -300,8 +320,12 @@ body.light-mode .skeleton-card .sk-icon,body.light-mode .skeleton-card .sk-title
       <a class="nav-item" data-page="proj-oscilloscope-debug" onclick="loadPage('proj-oscilloscope-debug')">示波器调试</a>
     </div>
   </div>
+  <div class="bookmarks-section" id="bookmarksSection" style="display:none">
+    <div class="bookmarks-title">⭐ 收藏夹 <span class="bookmarks-count" id="bmCount">0</span></div>
+    <div id="bookmarkList"></div>
+  </div>
   <div class="sidebar-footer">
-    v1.5.0 · 2026-06-17 · <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换亮色/暗色">🌓</button> · ⌨️ <span class="kbd">/</span> 搜索
+    v1.5.1 · 2026-06-17 · <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换亮色/暗色">🌙</button> · ⌨️ <span class="kbd">/</span> 搜索
   </div>
 </nav>
 
@@ -314,6 +338,7 @@ body.light-mode .skeleton-card .sk-icon,body.light-mode .skeleton-card .sk-title
       <span class="icon">🔍</span>
       <input type="text" id="searchInput" placeholder="搜索教程内容..." oninput="handleSearch(this.value)">
     </div>
+    <button class="bookmark-btn" id="bmToggle" onclick="toggleBookmark(currentPage)" title="收藏当前教程" style="display:none">☆</button>
   </div>
   <div class="content" id="contentArea">
     <!-- 动态加载内容 -->
@@ -372,38 +397,38 @@ let searchMode = false;
 function renderHome() {
 // === 全局教程卡片数据 ===
 const cardsData = [
-    { page:'main', icon:'📖', title:'小白完全指南', desc:'从环境搭建到项目实战的完整路线图，14章覆盖嵌入式开发全流程', tags:['必读','全流程'], size:'112KB', hot:true, diff:1 },
-    { page:'arm-gcc', icon:'🔧', title:'ARM GCC 工具链', desc:'gcc/as/ld/objcopy/objdump全命令详解，编译参数速查，链接脚本原理', tags:['核心','编译'], size:'28KB', diff:1 },
-    { page:'cmake', icon:'📦', title:'CMake 构建系统', desc:'CMakeLists.txt全语法，工具链文件，CubeMX集成，VS Code配置', tags:['自动化','构建'], size:'25KB', diff:2 },
-    { page:'makefile', icon:'📜', title:'Makefile 实战', desc:'语法规则，变量，模式规则，完整STM32项目Makefile，增量编译', tags:['进阶','构建'], size:'71KB', diff:2 },
-    { page:'flash-debug', icon:'⚡', title:'烧录与调试', desc:'ST-Link/J-Link/串口ISP，OpenOCD，GDB，VS Code Cortex-Debug', tags:['必学','调试'], size:'92KB', diff:2 },
-    { page:'serial', icon:'📡', title:'串口通信', desc:'UART协议，CH340驱动，PuTTY，pyserial编程，STM32 HAL串口', tags:['必学','通信'], size:'48KB', diff:1 },
-    { page:'stm32', icon:'🔵', title:'STM32 开发', desc:'HAL/LL/寄存器，CubeMX，GPIO/UART/TIM/ADC/NVIC，时钟树', tags:['必学','MCU'], size:'65KB', hot:true, diff:2 },
-    { page:'esp32', icon:'🟢', title:'ESP32 开发', desc:'Arduino/ESP-IDF双框架，WiFi/BLE，OTA，深度睡眠，esptool', tags:['进阶','WiFi'], size:'28KB', diff:3 },
-    { page:'freertos', icon:'🔄', title:'FreeRTOS 入门', desc:'任务/队列/信号量/互斥量，中断安全，与HAL共存，内存管理', tags:['进阶','RTOS'], size:'111KB', diff:3 },
-    { page:'protocols', icon:'🔌', title:'通信协议', desc:'I2C/SPI/UART/CAN协议原理，硬件接线，HAL代码，逻辑分析仪', tags:['进阶','通信'], size:'23KB', diff:2 },
-    { page:'practice-projects', icon:'🔬', title:'练手方向大全', desc:'20个分级项目：LED跑马灯→FreeRTOS多任务→智能小车→Bootloader→USB开发', tags:['实战','必看'], size:'6KB', hot:true, diff:0 },
-    { page:'bci-2026', icon:'🧠', title:'脑机接口2026全球进展', desc:'Neuralink/Synchron/博睿康最新突破，三星4nm芯片，大模型+BCI融合架构', tags:['前沿','热点'], size:'6KB', hot:true, diff:0 },
-    { page:'proj-led-button', icon:'💡', title:'LED跑马灯+按键控制', desc:'GPIO输出流水灯，按键输入，外部中断，软件/硬件消抖，第一个完整项目', tags:['入门','GPIO'], size:'25KB', diff:1 },
-    { page:'proj-uart-hello', icon:'🖥️', title:'串口Hello World', desc:'UART配置，printf重定向，中断接收，命令解析控制LED，DMA接收', tags:['入门','UART'], size:'28KB', diff:1 },
-    { page:'proj-oled-display', icon:'📱', title:'OLED显示屏驱动', desc:'I2C通信，SSD1306驱动，字符/数字/图形显示，字库取模，滚动效果', tags:['入门','I2C'], size:'30KB', diff:1 },
-    { page:'proj-dht11-monitor', icon:'🌡️', title:'DHT11温湿度监测', desc:'单总线时序，GPIO模式切换，微秒延时，数据校验，OLED+串口显示', tags:['入门','传感器'], size:'22KB', diff:1 },
-    { page:'proj-pwm-motor', icon:'⚙️', title:'直流电机PWM控制', desc:'定时器PWM原理，L298N驱动，占空比调速，正反转，按键/串口控速', tags:['进阶','PWM'], size:'15KB', diff:2 },
-    { page:'proj-servo-control', icon:'🦾', title:'舵机控制', desc:'50Hz PWM信号，角度计算公式，多路舵机，机械臂协同控制', tags:['进阶','PWM'], size:'17KB', diff:2 },
-    { page:'proj-ir-remote', icon:'📺', title:'红外遥控解码', desc:'NEC协议，外部中断+定时器测脉宽，状态机解码，键值映射控制', tags:['进阶','中断'], size:'21KB', diff:2 },
-    { page:'proj-ultrasonic', icon:'📡', title:'超声波测距', desc:'HC-SR04 Trig/Echo，输入捕获测脉宽，距离计算，报警阈值', tags:['进阶','定时器'], size:'18KB', diff:2 },
-    { page:'proj-stepper-motor', icon:'🔄', title:'步进电机控制', desc:'四相八拍相序，28BYJ-48减速比计算，梯形加减速曲线，精确位置', tags:['进阶','电机'], size:'20KB', diff:2 },
-    { page:'proj-freertos-station', icon:'📊', title:'FreeRTOS环境监测站', desc:'4任务协同，队列传数据，信号量同步，互斥量保护I2C，报警判断', tags:['实战','RTOS'], size:'25KB', hot:true, diff:3 },
-    { page:'proj-smart-car', icon:'🚗', title:'智能小车', desc:'电机驱动+超声波避障+红外遥控+蓝牙APP+PID速度闭环+状态机', tags:['实战','综合'], size:'26KB', hot:true, diff:3 },
-    { page:'proj-can-bus', icon:'🔌', title:'CAN总线通信', desc:'CAN协议帧格式，HAL_CAN收发，过滤器配置，双节点通信，终端电阻', tags:['实战','CAN'], size:'22KB', diff:3 },
-    { page:'proj-sd-logger', icon:'💾', title:'SD卡数据记录仪', desc:'SPI+FatFS，文件创建/写入/读取，CSV格式，串口导出，时间戳', tags:['实战','文件系统'], size:'20KB', diff:3 },
-    { page:'proj-esp32-iot', icon:'🌐', title:'ESP32 WiFi物联网', desc:'Arduino框架，WiFi连接，HTTP请求，MQTT发布订阅，ThingSpeak，OTA', tags:['实战','IoT'], size:'22KB', diff:3 },
-    { page:'proj-low-power', icon:'🔋', title:'低功耗电池设备', desc:'Sleep/Stop/Standby模式，RTC定时唤醒，外部中断唤醒，μA级优化', tags:['高级','低功耗'], size:'22KB', diff:4 },
-    { page:'proj-bootloader-iap', icon:'⬆️', title:'Bootloader IAP升级', desc:'Flash分区，向量表重定位，串口接收bin，CRC校验，版本管理', tags:['高级','Bootloader'], size:'26KB', diff:4 },
-    { page:'proj-dma-adc', icon:'📈', title:'DMA双缓冲ADC采集', desc:'ADC连续采样+DMA传输，双缓冲切换，不丢点采集，波形显示', tags:['高级','DMA'], size:'22KB', diff:4 },
-    { page:'proj-usb-hid', icon:'⌨️', title:'USB HID键盘鼠标', desc:'USB协议栈，HID描述符，报表描述符，模拟键盘/鼠标，按键触发', tags:['高级','USB'], size:'20KB', diff:4 },
-    { page:'proj-s32k144-auto', icon:'🚙', title:'S32K144汽车电子', desc:'S32DS环境，FLEXCAN，LPIT定时器，AUTOSAR概念，功能安全意识', tags:['高级','汽车'], size:'18KB', diff:4 },
-    { page:'proj-oscilloscope-debug', icon:'🔭', title:'示波器调试实战', desc:'GPIO翻转测量，I2C/SPI/UART时序分析，PWM测量，中断延迟，偶发BUG捕捉', tags:['高级','调试'], size:'20KB', diff:4 }
+    { page:'main', icon:'📖', title:'小白完全指南', desc:'从环境搭建到项目实战的完整路线图，14章覆盖嵌入式开发全流程', tags:['必读','全流程'], time:'~60分钟', size:'117KB', time:'2小时', hot:true, diff:1 },
+    { page:'arm-gcc', icon:'🔧', title:'ARM GCC 工具链', desc:'gcc/as/ld/objcopy/objdump全命令详解，编译参数速查，链接脚本原理', tags:['核心','编译'], time:'~20分钟', size:'35KB', time:'25分钟', diff:1 },
+    { page:'cmake', icon:'📦', title:'CMake 构建系统', desc:'CMakeLists.txt全语法，工具链文件，CubeMX集成，VS Code配置', tags:['自动化','构建'], time:'~20分钟', size:'32KB', time:'20分钟', diff:2 },
+    { page:'makefile', icon:'📜', title:'Makefile 实战', desc:'语法规则，变量，模式规则，完整STM32项目Makefile，增量编译', tags:['进阶','构建'], time:'~25分钟', size:'76KB', time:'40分钟', diff:2 },
+    { page:'flash-debug', icon:'⚡', title:'烧录与调试', desc:'ST-Link/J-Link/串口ISP，OpenOCD，GDB，VS Code Cortex-Debug', tags:['必学','调试'], time:'~30分钟', size:'96KB', time:'50分钟', diff:2 },
+    { page:'serial', icon:'📡', title:'串口通信', desc:'UART协议，CH340驱动，PuTTY，pyserial编程，STM32 HAL串口', tags:['必学','通信'], time:'~20分钟', size:'48KB', time:'30分钟', diff:1 },
+    { page:'stm32', icon:'🔵', title:'STM32 开发', desc:'HAL/LL/寄存器，CubeMX，GPIO/UART/TIM/ADC/NVIC，时钟树', tags:['必学','MCU'], time:'~35分钟', size:'65KB', time:'35分钟', hot:true, diff:2 },
+    { page:'esp32', icon:'🟢', title:'ESP32 开发', desc:'Arduino/ESP-IDF双框架，WiFi/BLE，OTA，深度睡眠，esptool', tags:['进阶','WiFi'], time:'~20分钟', size:'31KB', time:'20分钟', diff:3 },
+    { page:'freertos', icon:'🔄', title:'FreeRTOS 入门', desc:'任务/队列/信号量/互斥量，中断安全，与HAL共存，内存管理', tags:['进阶','RTOS'], time:'~40分钟', size:'116KB', time:'55分钟', diff:3 },
+    { page:'protocols', icon:'🔌', title:'通信协议', desc:'I2C/SPI/UART/CAN协议原理，硬件接线，HAL代码，逻辑分析仪', tags:['进阶','通信'], time:'~20分钟', size:'29KB', time:'20分钟', diff:2 },
+    { page:'practice-projects', icon:'🔬', title:'练手方向大全', desc:'20个分级项目：LED跑马灯→FreeRTOS多任务→智能小车→Bootloader→USB开发', tags:['实战','必看'], time:'~10分钟', size:'28KB', time:'15分钟', hot:true, diff:0 },
+    { page:'bci-2026', icon:'🧠', title:'脑机接口2026全球进展', desc:'Neuralink/Synchron/博睿康最新突破，三星4nm芯片，大模型+BCI融合架构', tags:['前沿','热点'], time:'~15分钟', size:'46KB', time:'25分钟', hot:true, diff:0 },
+    { page:'proj-led-button', icon:'💡', title:'LED跑马灯+按键控制', desc:'GPIO输出流水灯，按键输入，外部中断，软件/硬件消抖，第一个完整项目', tags:['入门','GPIO'], time:'~15分钟', size:'25KB', diff:1 },
+    { page:'proj-uart-hello', icon:'🖥️', title:'串口Hello World', desc:'UART配置，printf重定向，中断接收，命令解析控制LED，DMA接收', tags:['入门','UART'], time:'~15分钟', size:'28KB', diff:1 },
+    { page:'proj-oled-display', icon:'📱', title:'OLED显示屏驱动', desc:'I2C通信，SSD1306驱动，字符/数字/图形显示，字库取模，滚动效果', tags:['入门','I2C'], time:'~15分钟', size:'30KB', diff:1 },
+    { page:'proj-dht11-monitor', icon:'🌡️', title:'DHT11温湿度监测', desc:'单总线时序，GPIO模式切换，微秒延时，数据校验，OLED+串口显示', tags:['入门','传感器'], time:'~12分钟', size:'22KB', diff:1 },
+    { page:'proj-pwm-motor', icon:'⚙️', title:'直流电机PWM控制', desc:'定时器PWM原理，L298N驱动，占空比调速，正反转，按键/串口控速', tags:['进阶','PWM'], time:'~18分钟', size:'15KB', diff:2 },
+    { page:'proj-servo-control', icon:'🦾', title:'舵机控制', desc:'50Hz PWM信号，角度计算公式，多路舵机，机械臂协同控制', tags:['进阶','PWM'], time:'~18分钟', size:'17KB', diff:2 },
+    { page:'proj-ir-remote', icon:'📺', title:'红外遥控解码', desc:'NEC协议，外部中断+定时器测脉宽，状态机解码，键值映射控制', tags:['进阶','中断'], time:'~15分钟', size:'21KB', diff:2 },
+    { page:'proj-ultrasonic', icon:'📡', title:'超声波测距', desc:'HC-SR04 Trig/Echo，输入捕获测脉宽，距离计算，报警阈值', tags:['进阶','定时器'], time:'~15分钟', size:'18KB', diff:2 },
+    { page:'proj-stepper-motor', icon:'🔄', title:'步进电机控制', desc:'四相八拍相序，28BYJ-48减速比计算，梯形加减速曲线，精确位置', tags:['进阶','电机'], time:'~18分钟', size:'20KB', diff:2 },
+    { page:'proj-freertos-station', icon:'📊', title:'FreeRTOS环境监测站', desc:'4任务协同，队列传数据，信号量同步，互斥量保护I2C，报警判断', tags:['实战','RTOS'], time:'~20分钟', size:'25KB', hot:true, diff:3 },
+    { page:'proj-smart-car', icon:'🚗', title:'智能小车', desc:'电机驱动+超声波避障+红外遥控+蓝牙APP+PID速度闭环+状态机', tags:['实战','综合'], time:'~25分钟', size:'26KB', hot:true, diff:3 },
+    { page:'proj-can-bus', icon:'🔌', title:'CAN总线通信', desc:'CAN协议帧格式，HAL_CAN收发，过滤器配置，双节点通信，终端电阻', tags:['实战','CAN'], time:'~20分钟', size:'22KB', diff:3 },
+    { page:'proj-sd-logger', icon:'💾', title:'SD卡数据记录仪', desc:'SPI+FatFS，文件创建/写入/读取，CSV格式，串口导出，时间戳', tags:['实战','文件系统'], time:'~20分钟', size:'20KB', diff:3 },
+    { page:'proj-esp32-iot', icon:'🌐', title:'ESP32 WiFi物联网', desc:'Arduino框架，WiFi连接，HTTP请求，MQTT发布订阅，ThingSpeak，OTA', tags:['实战','IoT'], time:'~20分钟', size:'22KB', diff:3 },
+    { page:'proj-low-power', icon:'🔋', title:'低功耗电池设备', desc:'Sleep/Stop/Standby模式，RTC定时唤醒，外部中断唤醒，μA级优化', tags:['高级','低功耗'], time:'~18分钟', size:'22KB', diff:4 },
+    { page:'proj-bootloader-iap', icon:'⬆️', title:'Bootloader IAP升级', desc:'Flash分区，向量表重定位，串口接收bin，CRC校验，版本管理', tags:['高级','Bootloader'], time:'~20分钟', size:'26KB', diff:4 },
+    { page:'proj-dma-adc', icon:'📈', title:'DMA双缓冲ADC采集', desc:'ADC连续采样+DMA传输，双缓冲切换，不丢点采集，波形显示', tags:['高级','DMA'], time:'~18分钟', size:'22KB', diff:4 },
+    { page:'proj-usb-hid', icon:'⌨️', title:'USB HID键盘鼠标', desc:'USB协议栈，HID描述符，报表描述符，模拟键盘/鼠标，按键触发', tags:['高级','USB'], time:'~20分钟', size:'20KB', diff:4 },
+    { page:'proj-s32k144-auto', icon:'🚙', title:'S32K144汽车电子', desc:'S32DS环境，FLEXCAN，LPIT定时器，AUTOSAR概念，功能安全意识', tags:['高级','汽车'], time:'~20分钟', size:'18KB', diff:4 },
+    { page:'proj-oscilloscope-debug', icon:'🔭', title:'示波器调试实战', desc:'GPIO翻转测量，I2C/SPI/UART时序分析，PWM测量，中断延迟，偶发BUG捕捉', tags:['高级','调试'], time:'~15分钟', size:'20KB', diff:4 }
   ];
   let html = `<div class="home-hero">
     <h1>📐 嵌入式开发教程</h1>
@@ -426,7 +451,7 @@ const cardsData = [
   </div>
 
   <div class="home-stats">
-    <div class="home-stat"><div class="num">32</div><div class="label">篇教程</div></div>
+    <div class="home-stat"><div class="num">33</div><div class="label">篇教程</div></div>
     <div class="home-stat"><div class="num">1.2MB</div><div class="label">总内容</div></div>
     <div class="home-stat"><div class="num">400+</div><div class="label">代码示例</div></div>
     <div class="home-stat"><div class="num">100+</div><div class="label">常见问题</div></div>
@@ -442,7 +467,33 @@ const cardsData = [
     {title:'🔴 高级项目（1年+）', filter:c => c.tags.includes('高级')}
   ];
 
-  function renderCardGroup(title, items) {
+  let sortMode = 'default';
+function renderSortBar() {
+  return `<div class="sort-bar"><span class="label">排序：</span>
+    <button class="sort-btn active" onclick="sortCards('default',this)">默认</button>
+    <button class="sort-btn" onclick="sortCards('time-asc',this)">⏱ 短→长</button>
+    <button class="sort-btn" onclick="sortCards('time-desc',this)">⏱ 长→短</button>
+    <button class="sort-btn" onclick="sortCards('diff-asc',this)">📊 简单→难</button>
+    <button class="sort-btn" onclick="sortCards('name',this)">🔤 名称</button>
+  </div>`;
+}
+function sortCards(mode, btn) {
+  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  sortMode = mode;
+  loadPage('home');
+  renderBookmarksList();
+  updateHomeStats();
+}
+function getSorted(items) {
+  if (sortMode === 'time-asc') return [...items].sort((a,b)=>parseInt(a.time||'99')-parseInt(b.time||'99'));
+  if (sortMode === 'time-desc') return [...items].sort((a,b)=>parseInt(b.time||'99')-parseInt(a.time||'99'));
+  if (sortMode === 'diff-asc') return [...items].sort((a,b)=>(a.diff||0)-(b.diff||0));
+  if (sortMode === 'name') return [...items].sort((a,b)=>a.title.localeCompare(b.title,'zh'));
+  return items;
+}
+function renderCardGroup(title, items) {
+  items = getSorted(items);
     let h = `<div class="home-section-title">${title}</div><div class="home-grid">`;
     items.forEach(c => {
       const tagHtml = c.tags.map((t,i) => `<span class="tag ${i===0?'g':'b'}">${t}</span>`).join('');
@@ -453,7 +504,7 @@ const cardsData = [
         <div class="desc">${c.desc}</div>
         ${diffHtml}
         <div class="tags">${tagHtml}</div>
-        <div class="size">${c.size}</div>
+        <div class="size">${c.size} <span class="read-time">⏱ ${c.time||''}</span></div>
       </a>`;
     });
     h += '</div>';
@@ -489,16 +540,21 @@ function skeletonContent() {
 }
 
 // === 亮暗模式切换 ===
+function updateThemeIcon() {
+  const btn = document.getElementById('themeToggle');
+  const isLight = document.body.classList.contains('light-mode');
+  if (btn) btn.textContent = isLight ? '☀️' : '🌙';
+}
 function toggleTheme() {
   document.body.classList.toggle('light-mode');
   const isLight = document.body.classList.contains('light-mode');
   localStorage.setItem('theme', isLight ? 'light' : 'dark');
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.textContent = isLight ? '🌙' : '🌓';
+  updateThemeIcon();
 }
 (function() {
   const saved = localStorage.getItem('theme');
   if (saved === 'light') document.body.classList.add('light-mode');
+  updateThemeIcon();
 })();
 
 // === 加载教程内容 ===
@@ -524,6 +580,16 @@ async function loadPage(pageId) {
   // 关闭移动端侧边栏
   document.getElementById('sidebar').classList.remove('open');
 
+  // 更新收藏按钮
+  const bmToggle = document.getElementById('bmToggle');
+  if (bmToggle) {
+    if (pageId === 'home') { bmToggle.style.display = 'none'; }
+    else { bmToggle.style.display = ''; updateBookmarkUI(); }
+  }
+
+  // 标记已读
+  if (pageId !== 'home') markViewed(pageId);
+
   const content = document.getElementById('contentArea');
   window.scrollTo({top:0});
 
@@ -531,6 +597,8 @@ async function loadPage(pageId) {
     content.innerHTML = renderHome();
     document.title = '嵌入式开发教程';
     history.pushState({page:pageId}, '', `#/${pageId}`);
+    updateHomeStats();
+    setTimeout(() => updateHomeStats(), 200);
     return;
   }
 
@@ -586,8 +654,8 @@ async function loadPage(pageId) {
       }
     }, 100);
 
-    // 添加上/下篇导航
-    const pageOrder = Object.keys(PAGES).filter(k => k !== 'home');
+    // 添加上/下篇导航（按学习路线排序）
+    const pageOrder = ['overview','main','arm-gcc','cmake','makefile','serial','flash-debug','stm32','esp32','freertos','protocols','practice-projects','proj-led-button','proj-uart-hello','proj-oled-display','proj-dht11-monitor','proj-pwm-motor','proj-servo-control','proj-ir-remote','proj-ultrasonic','proj-stepper-motor','proj-freertos-station','proj-smart-car','proj-can-bus','proj-sd-logger','proj-esp32-iot','proj-low-power','proj-bootloader-iap','proj-dma-adc','proj-usb-hid','proj-s32k144-auto','proj-oscilloscope-debug','bci-2026'];
     const idx = pageOrder.indexOf(pageId);
     if (idx >= 0) {
       const navHtml = document.createElement('div');
@@ -603,39 +671,83 @@ async function loadPage(pageId) {
       }
       navHtml.innerHTML = links;
       content.appendChild(navHtml);
+    // 显示收藏按钮
+    const bmBtn = document.getElementById('bmToggle');
+    if (bmBtn) { bmBtn.style.display = ''; updateBookmarkUI(); }
     }
   } catch(e) {
     content.innerHTML = `<div class="warn">⚠️ 加载失败: ${e.message}，请刷新重试。</div>`;
   }
 }
 
+// === 全文搜索缓存 ===
+let searchCache = {};
+let searchIndexReady = false;
+
+async function buildSearchIndex() {
+  if (searchIndexReady) return;
+  const pages = Object.entries(PAGES).filter(([id, cfg]) => id !== 'home' && cfg.file);
+  const promises = pages.map(async ([id, cfg]) => {
+    try {
+      const resp = await fetch(cfg.file);
+      if (!resp.ok) return;
+      const text = await resp.text();
+      const plain = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '').replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '').replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/gi, ' ').replace(/\s+/g, ' ').toLowerCase();
+      searchCache[id] = plain;
+    } catch(e) {}
+  });
+  await Promise.all(promises);
+  searchIndexReady = true;
+}
+
+setTimeout(buildSearchIndex, 2500);
+
 // === 搜索 ===
-function handleSearch(query) {
+async function handleSearch(query) {
   if (!query.trim()) {
     if (searchMode) loadPage(currentPage);
     return;
   }
   searchMode = true;
   const content = document.getElementById('contentArea');
+  content.innerHTML = skeletonContent();
+
+  if (!searchIndexReady) await buildSearchIndex();
+
   const q = query.toLowerCase();
   const results = [];
   Object.entries(PAGES).forEach(([id, cfg]) => {
     if (id === 'home') return;
     const card = cardsData.find(c => c.page === id);
     const desc = card ? card.desc.toLowerCase() : '';
-    const text = cfg.title.toLowerCase() + ' ' + cfg.breadcrumb.toLowerCase() + ' ' + desc;
-    if (text.includes(q)) {
-      results.push({ id, title: cfg.title, desc: card ? card.desc : '', card });
+    const metaText = cfg.title.toLowerCase() + ' ' + cfg.breadcrumb.toLowerCase() + ' ' + desc;
+    let matchLevel = 0;
+    if (metaText.includes(q)) matchLevel = 1;
+    const fullText = searchCache[id] || '';
+    if (fullText.includes(q)) matchLevel = Math.max(matchLevel, 2);
+    if (matchLevel > 0) {
+      let snippet = '';
+      if (matchLevel >= 2 && fullText) {
+        const idx = fullText.indexOf(q);
+        const start = Math.max(0, idx - 30);
+        const end = Math.min(fullText.length, idx + q.length + 60);
+        snippet = (start > 0 ? '…' : '') + fullText.slice(start, end).trim() + (end < fullText.length ? '…' : '');
+      }
+      results.push({ id, title: cfg.title, desc: card ? card.desc : '', card, matchLevel, snippet });
     }
   });
-  let html = `<h2>🔍 搜索结果: "${query}"</h2><div class="search-results-count">找到 ${results.length} 个匹配教程</div>`;
+  results.sort((a,b) => b.matchLevel - a.matchLevel);
+
+  let html = `<h2>🔍 搜索结果: "${query}"</h2><div class="search-results-count">找到 ${results.length} 个匹配教程（全文搜索）</div>`;
   if (results.length === 0) {
-    html += '<p style="color:var(--t2)">未找到匹配的教程，试试其他关键词。</p><p style="color:var(--t2);font-size:.85em">提示：可搜索教程标题或描述，如"PWM""串口""电机"</p>';
+    html += '<p style="color:var(--t2)">未找到匹配的教程，试试其他关键词。</p><p style="color:var(--t2);font-size:.85em">提示：可搜教程标题、描述或全文内容，如"PWM""HAL_Delay""定时器"</p>';
   } else {
     results.forEach(r => {
       const diffHtml = r.card && r.card.diff ? `<div class="difficulty d${r.card.diff}">${'<span class="dot on"></span>'.repeat(r.card.diff)+'<span class="dot"></span>'.repeat(4-r.card.diff)}</div>` : '';
       const tags = r.card ? r.card.tags.map((t,i) => `<span class="tag ${i===0?'g':'b'}">${t}</span>`).join('') : '';
-      html += `<div class="card" style="cursor:pointer" onclick="loadPage('${r.id}')"><div class="b"><strong style="color:var(--a)">${r.title}</strong>${r.desc ? '<br><span style="color:var(--t2);font-size:.85em">'+r.desc+'</span>' : ''}${diffHtml}<div style="margin-top:6px">${tags}</div></div></div>`;
+      const matchBadge = r.matchLevel === 2 ? '<span class="tag g" style="margin-left:4px">全文匹配</span>' : '<span class="tag b" style="margin-left:4px">标题匹配</span>';
+      const snippetHtml = r.snippet ? `<div style="font-size:.78em;color:var(--t2);margin-top:4px;padding:6px 10px;background:var(--bg3);border-radius:6px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.snippet.replace(q, '<b style="background:rgba(88,166,255,.25);padding:1px 3px;border-radius:3px">'+q+'</b>')}</div>` : '';
+      html += `<div class="card" style="cursor:pointer" onclick="loadPage('${r.id}')"><div class="b"><strong style="color:var(--a)">${r.title}</strong>${matchBadge}${r.desc ? '<br><span style="color:var(--t2);font-size:.85em">'+r.desc+'</span>' : ''}${diffHtml}${snippetHtml}<div style="margin-top:6px">${tags}</div></div></div>`;
     });
   }
   content.innerHTML = html;
@@ -672,6 +784,8 @@ window.addEventListener('scroll', () => {
 window.addEventListener('popstate', (e) => {
   if (e.state && e.state.page) loadPage(e.state.page);
   else loadPage('home');
+  renderBookmarksList();
+  updateHomeStats();
 });
 
 // === 键盘快捷键 ===
@@ -689,12 +803,98 @@ document.addEventListener('keydown', (e) => {
   }
   // 左右箭头翻页（非输入状态）
   if (!['INPUT','TEXTAREA'].includes(document.activeElement.tagName) && currentPage !== 'home') {
-    const pageOrder = Object.keys(PAGES).filter(k => k !== 'home');
+    const pageOrder = ['overview','main','arm-gcc','cmake','makefile','serial','flash-debug','stm32','esp32','freertos','protocols','practice-projects','proj-led-button','proj-uart-hello','proj-oled-display','proj-dht11-monitor','proj-pwm-motor','proj-servo-control','proj-ir-remote','proj-ultrasonic','proj-stepper-motor','proj-freertos-station','proj-smart-car','proj-can-bus','proj-sd-logger','proj-esp32-iot','proj-low-power','proj-bootloader-iap','proj-dma-adc','proj-usb-hid','proj-s32k144-auto','proj-oscilloscope-debug','bci-2026'];
     const idx = pageOrder.indexOf(currentPage);
     if (e.key === 'ArrowLeft' && idx > 0) loadPage(pageOrder[idx - 1]);
     if (e.key === 'ArrowRight' && idx < pageOrder.length - 1) loadPage(pageOrder[idx + 1]);
   }
 });
+
+// === 收藏夹 ===
+function getBookmarks() {
+  try { return JSON.parse(localStorage.getItem('tutorial_bookmarks')||'[]'); }
+  catch(e) { return []; }
+}
+function saveBookmarks(list) { localStorage.setItem('tutorial_bookmarks', JSON.stringify(list)); }
+function toggleBookmark(pageId) {
+  const bm = getBookmarks();
+  const idx = bm.indexOf(pageId);
+  if (idx >= 0) bm.splice(idx, 1);
+  else bm.push(pageId);
+  saveBookmarks(bm);
+  updateBookmarkUI();
+  renderBookmarksList();
+}
+function isBookmarked(pageId) { return getBookmarks().includes(pageId); }
+function updateBookmarkUI() {
+  const btn = document.getElementById('bmToggle');
+  if (!btn) return;
+  if (isBookmarked(currentPage)) { btn.classList.add('active'); btn.textContent = '⭐'; }
+  else { btn.classList.remove('active'); btn.textContent = '☆'; }
+}
+function renderBookmarksList() {
+  const bm = getBookmarks();
+  const section = document.getElementById('bookmarksSection');
+  const list = document.getElementById('bookmarkList');
+  const countEl = document.getElementById('bmCount');
+  if (bm.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  countEl.textContent = bm.length;
+  let html = '';
+  bm.forEach(id => {
+    const cfg = PAGES[id];
+    if (cfg) html += `<div class="bm-item" onclick="loadPage('${id}')">${cfg.title}<span class="bm-remove" onclick="event.stopPropagation();removeBookmark('${id}')">✕</span></div>`;
+  });
+  list.innerHTML = html;
+}
+function removeBookmark(pageId) {
+  const bm = getBookmarks().filter(id => id !== pageId);
+  saveBookmarks(bm);
+  renderBookmarksList();
+  updateBookmarkUI();
+}
+
+// === 学习进度 ===
+function markViewed(pageId) {
+  if (pageId === 'home') return;
+  try {
+    const viewed = JSON.parse(localStorage.getItem('tutorial_viewed')||'{}');
+    viewed[pageId] = new Date().toISOString();
+    localStorage.setItem('tutorial_viewed', JSON.stringify(viewed));
+  } catch(e) {}
+}
+function getViewedCount() {
+  try { return Object.keys(JSON.parse(localStorage.getItem('tutorial_viewed')||'{}')).length; }
+  catch(e) { return 0; }
+}
+function getProgressPercent() {
+  const total = Object.keys(PAGES).length - 1; // exclude home
+  return Math.round((getViewedCount() / total) * 100);
+}
+function progressIndicator() {
+  const pct = getProgressPercent();
+  return pct > 0 ? `<div class="progress-indicator" title="已读 ${pct}%"><div class="pi-bar"><div class="pi-fill" style="width:${pct}%"></div></div>${pct}%</div>` : '';
+}
+function updateHomeStats() {
+  const viewed = getViewedCount();
+  const progressHtml = progressIndicator();
+  // Update stats if on home page
+  const statsDiv = document.querySelector('.home-stats');
+  if (statsDiv) {
+    const existing = statsDiv.querySelector('.home-stat.progress-stat');
+    if (!existing && viewed > 0) {
+      const statEl = document.createElement('div');
+      statEl.className = 'home-stat progress-stat';
+      statEl.innerHTML = `<div class="num">${viewed}</div><div class="label">已学习</div><div class="progress-indicator" style="margin-top:4px"><div class="pi-bar"><div class="pi-fill" style="width:${getProgressPercent()}%"></div></div>${getProgressPercent()}%</div>`;
+      statsDiv.appendChild(statEl);
+    } else if (existing && viewed > 0) {
+      existing.querySelector('.num').textContent = viewed;
+      existing.querySelector('.pi-fill').style.width = getProgressPercent()+'%';
+      existing.querySelector('.progress-indicator').childNodes[2].textContent = getProgressPercent()+'%';
+    }
+  }
+}
+
 
 // === 初始化 ===
 (function init() {
@@ -704,6 +904,8 @@ document.addEventListener('keydown', (e) => {
     if (PAGES[page]) { loadPage(page); return; }
   }
   loadPage('home');
+  renderBookmarksList();
+  updateHomeStats();
 })();
 </script>
 </body>
