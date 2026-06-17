@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第9章：通信协议详解 - 嵌入式小白完全指南</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.8;max-width:880px;margin:0 auto;padding:14px}
+h1{font-size:1.55em;text-align:center;padding:16px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:1.15em;color:var(--a);margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--br)}
+h3{font-size:1.02em;color:var(--g);margin:18px 0 7px}
+h4{font-size:.95em;color:var(--o);margin:12px 0 5px}
+pre{background:#1c2128;border:1px solid var(--br);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0 12px;font-size:.82em;line-height:1.6;white-space:pre-wrap;word-break:break-all;position:relative}
+code{font-family:'SF Mono','Fira Code',monospace}
+pre code{color:#e6edf3}
+.note{background:rgba(210,153,29,.08);border:1px solid rgba(210,153,29,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--o)}
+.warn{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--r)}
+.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--g)}
+.example{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.25);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--a)}
+.example b{color:var(--g)}
+.trouble{background:rgba(163,113,247,.06);border:1px solid rgba(163,113,247,.3);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--p)}
+.trouble b{color:var(--p)}
+.card{background:var(--bg2);border:1px solid var(--br);border-radius:10px;margin:14px 0;overflow:hidden}
+.card>.h{padding:10px 14px;background:var(--bg3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card>.h>.name{font-weight:700;font-size:.9em;color:var(--t);font-family:monospace}
+.card>.h>.tag{font-size:.65em;padding:2px 8px;border-radius:8px;white-space:nowrap;border:1px solid var(--br);color:var(--t2)}
+.card>.h>.tag.g{background:rgba(63,185,80,.15);border-color:var(--g);color:var(--g)}
+.card>.h>.tag.y{background:rgba(210,153,29,.15);border-color:var(--o);color:var(--o)}
+.card>.h>.tag.r{background:rgba(248,81,73,.15);border-color:var(--r);color:var(--r)}
+.card>.h>.tag.b{background:rgba(88,166,255,.15);border-color:var(--a);color:var(--a)}
+.card>.h>.tag.p{background:rgba(163,113,247,.15);border-color:var(--p);color:var(--p)}
+.card>.b{padding:10px 14px;font-size:.87em}
+.card>.b>.desc{font-size:.92em;color:var(--t2);margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.81em;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--br)}
+td,th{padding:8px 12px;border-bottom:1px solid var(--br);text-align:left}
+th{background:var(--bg3);color:var(--a);font-weight:600}
+tr:last-child td{border-bottom:none}
+.step{background:var(--bg3);border-radius:6px;padding:8px 13px;margin:6px 0;font-size:.83em}
+.step b{color:var(--a)}
+.summary{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(163,113,247,.1));border:1px solid var(--br);border-radius:10px;padding:12px 16px;margin:18px 0;font-size:.88em;color:var(--t)}
+.summary b{color:var(--a)}
+.analogy{background:rgba(57,197,207,.07);border-left:3px solid var(--c1);padding:8px 13px;margin:8px 0;font-size:.82em;color:var(--c1);border-radius:0 6px 6px 0}
+.analogy b{color:var(--c1)}
+.chnav{display:flex;justify-content:space-between;margin:30px 0 10px;gap:12px;border-top:1px solid var(--br);padding-top:16px;flex-wrap:wrap}
+.chnav a{flex:1;text-align:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;color:var(--a);text-decoration:none;font-size:.85em;transition:all .2s;min-width:120px;cursor:pointer}
+.chnav a:hover{background:var(--bg3);border-color:var(--a)}
+.chnav .toc-link{flex:0;min-width:80px;background:var(--bg3);color:var(--t2)}
+.chnav .toc-link:hover{color:var(--a)}
+.copy-btn{position:absolute;top:4px;right:4px;padding:3px 10px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;color:var(--t2);font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--a);color:var(--bg)}
+.copy-btn.copied{background:var(--g);color:var(--bg);border-color:var(--g)}
+@media(max-width:480px){body{padding:10px}h1{font-size:1.3em}h2{font-size:1.05em}pre{font-size:.75em}}
+</style>
+</head>
+<body>
+
+<h1>第9章：通信协议详解</h1>
+<div class="summary"><b>📖 小白完全指南 · 9/14</b> | 阅读时间约3分钟</div>
+
+<p>单片机要与传感器、显示屏、存储器等外设通信，离不开<strong>通信协议</strong>。最常用的三种：UART、I2C、SPI，各有各的场景。</p>
+
+<div class="analogy">💡 <b>类比：</b><br>
+• <strong>UART</strong>=对讲机（两点之间，全双工，各说各的）<br>
+• <strong>I2C</strong>=课堂点名（一条总线，老师(Master)点名，学生(Slave)应答，7位学号=地址）<br>
+• <strong>SPI</strong>=专线电话（四根线，一对一高速通话，片选=拨号选人）</div>
+
+<h3>三种协议对比</h3>
+
+<table>
+<tr><th>特性</th><th>UART</th><th>I2C</th><th>SPI</th></tr>
+<tr><td>线数</td><td>2 (TX/RX)</td><td>2 (SDA/SCL)</td><td>4 (MOSI/MISO/SCK/CS)</td></tr>
+<tr><td>拓扑</td><td>点对点</td><td>多从机（地址寻址）</td><td>多从机（片选线）</td></tr>
+<tr><td>速度</td><td>≤1Mbps</td><td>≤3.4Mbps</td><td>≤80Mbps</td></tr>
+<tr><td>双工</td><td>全双工</td><td>半双工</td><td>全双工</td></tr>
+<tr><td>距离</td><td>远（15m+）</td><td>近（1m）</td><td>极近（0.3m）</td></tr>
+<tr><td>典型用途</td><td>串口调试/GPS</td><td>传感器/EEPROM</td><td>Flash/显示屏/ADC</td></tr>
+</table>
+
+<h3>I2C协议详解</h3>
+
+<pre><code>// I2C读写示例（HAL库）
+// 写：主机→从机
+HAL_I2C_Mem_Write(&amp;hi2c1, 0x68&lt;&lt;1, 0x75, 1, &amp;data, 1, 1000);
+//           I2C句柄  从机地址(左移1位) 寄存器地址  长度  数据  长度  超时
+
+// 读：从机→主机
+uint8_t reg = 0x75;
+HAL_I2C_Mem_Read(&amp;hi2c1, 0x68&lt;&lt;1, reg, 1, &amp;who_am_i, 1, 1000);
+
+// I2C地址扫描（扫描0x03-0x77）
+void i2c_scan(void) {
+    printf("I2C Scan:\n");
+    for (uint8_t addr = 0x03; addr &lt; 0x78; addr++) {
+        if (HAL_I2C_IsDeviceReady(&amp;hi2c1, addr&lt;&lt;1, 3, 10) == HAL_OK) {
+            printf("  Found device at 0x%02X
+", addr);
+        }
+    }
+}</code></pre>
+
+<h3>SPI协议详解</h3>
+
+<pre><code>// SPI读写（HAL库）
+// 写数据到SPI
+uint8_t tx_buf[] = {0x9F};  // 命令：读取Flash ID
+uint8_t rx_buf[4] = {0};
+HAL_SPI_TransmitReceive(&amp;hspi1, tx_buf, rx_buf, 4, 1000);
+// rx_buf[1-3] = Manufacturer ID + Memory Type + Capacity
+
+// 带CS控制的SPI操作
+HAL_GPIO_WritePin(GPIOA, SPI_CS_PIN, GPIO_PIN_RESET);  // CS拉低
+HAL_SPI_Transmit(&amp;hspi1, &amp;cmd, 1, 1000);
+HAL_SPI_Receive(&amp;hspi1, rx_buf, len, 1000);
+HAL_GPIO_WritePin(GPIOA, SPI_CS_PIN, GPIO_PIN_SET);    // CS拉高</code></pre>
+
+<h3>CAN总线简介</h3>
+
+<p>CAN(Controller Area Network)是汽车和工业控制的<strong>标准总线</strong>。差分信号抗干扰，最高1Mbps，支持多节点，有优先级仲裁。</p>
+
+<div class="note">⚠️ <b>前提：</b>STM32的CAN外设需要配置波特率、过滤器、中断。以下代码基于STM32F103 + HAL库，需先用CubeMX启用CAN外设。</div>
+
+<pre><code>// STM32 HAL CAN初始化（CubeMX生成后补充）
+CAN_HandleTypeDef hcan;
+
+void MX_CAN_Init(void) {
+    hcan.Instance = CAN1;
+    hcan.Init.Prescaler = 4;           // 72MHz/4=18MHz
+    hcan.Init.Mode = CAN_MODE_NORMAL;
+    hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
+    hcan.Init.TimeSeg1 = CAN_BS1_13TQ; // 时间段1
+    hcan.Init.TimeSeg2 = CAN_BS2_2TQ;  // 时间段2
+    // 波特率 = 18MHz / (1+13+2) = 1MHz... 实际500Kbps常用
+    hcan.Init.TimeTriggeredMode = DISABLE;
+    hcan.Init.AutoBusOff = ENABLE;
+    hcan.Init.AutoWakeUp = DISABLE;
+    hcan.Init.AutoRetransmission = ENABLE;
+    HAL_CAN_Init(&amp;hcan);
+}
+
+// 配置过滤器（必须！否则收不到数据）
+CAN_FilterTypeDef filter;
+filter.FilterBank = 0;
+filter.FilterMode = CAN_FILTERMODE_IDMASK;
+filter.FilterScale = CAN_FILTERSCALE_32BIT;
+filter.FilterIdHigh = 0x0000;
+filter.FilterIdLow = 0x0000;
+filter.FilterMaskIdHigh = 0x0000;
+filter.FilterMaskIdLow = 0x0000;
+filter.FilterFIFOAssignment = CAN_RX_FIFO0;
+filter.FilterActivation = ENABLE;
+HAL_CAN_ConfigFilter(&amp;hcan, &amp;filter);
+HAL_CAN_Start(&amp;hcan);
+HAL_CAN_ActivateNotification(&amp;hcan, CAN_IT_RX_FIFO0_MSG_PENDING);</code></pre>
+
+<pre><code>// STM32 HAL CAN发送
+CAN_TxHeaderTypeDef tx_header;
+tx_header.StdId = 0x123;
+tx_header.IDE   = CAN_ID_STD;
+tx_header.RTR   = CAN_RTR_DATA;
+tx_header.DLC   = 8;
+
+uint8_t tx_data[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+uint32_t tx_mailbox;
+HAL_CAN_AddTxMessage(&amp;hcan, &amp;tx_header, tx_data, &amp;tx_mailbox);</code></pre>
+
+<pre><code>// CAN接收中断回调
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
+    CAN_RxHeaderTypeDef rx_header;
+    uint8_t rx_data[8];
+    if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &amp;rx_header, rx_data) == HAL_OK) {
+        printf("CAN ID:0x%lx DLC:%lu Data:", rx_header.StdId, rx_header.DLC);
+        for (int i = 0; i &lt; rx_header.DLC; i++) {
+            printf("%02X ", rx_data[i]);
+        }
+        printf("\n");
+    }
+}</code></pre>
+
+<h3>逻辑分析仪</h3>
+
+<p>逻辑分析仪是调试通信协议的<strong>必备神器</strong>——它同时抓取多路数字信号，用软件解码I2C/SPI/UART等协议的数据。</p>
+
+<div class="card">
+<div class="h"><span class="name">逻辑分析仪</span><span class="tag g">协议调试</span><span class="tag y">¥20-50</span></div>
+<div class="b">
+<div class="desc">8通道/24MHz采样率就够用。配合 sigrok/PulseView 开源软件，能自动解码I2C/SPI/UART/CAN等协议。</div>
+<pre><code># PulseView（开源逻辑分析仪软件）
+# 1. 下载：sigrok.org
+# 2. 连接逻辑分析仪到USB
+# 3. 选择通道和采样率（推荐8MHz以上）
+# 4. 添加协议解码器（I2C/SPI/UART等）
+# 5. 捕获→查看解码数据</code></pre>
+</div></div>
+
+<div class="trouble">🔍 <b>常见问题：I2C设备无响应</b><br>
+1. 上拉电阻！I2C的SDA/SCL必须各接4.7K上拉电阻到VCC<br>
+2. 地址是否正确？很多传感器有AD0引脚，接地/接VCC地址不同<br>
+3. 用 i2c_scan() 扫描确认设备是否存在<br>
+4. 逻辑分析仪抓波形，看是否有ACK</div>
+
+<div class="example-block">
+<div class="ex-title">📝 完整示例：I2C设备扫描</div>
+<div class="ex-input">场景：OLED屏幕(SSD1306)接在I2C1上，确认设备地址</div>
+<pre><code>// 调用 i2c_scan() 后串口输出：</code></pre>
+<div class="ex-output">输出结果：</div>
+<pre><code>I2C Scan:
+  Found device at 0x3C    ← 这就是OLED屏幕！
+  Found device at 0x68    ← MPU6050加速度计
+2 device(s) found</code></pre>
+<div class="ex-input">使用地址0x3C读写OLED：</div>
+<pre><code>uint8_t cmd = 0xAE;  // 关闭显示命令
+HAL_I2C_Mem_Write(&amp;hi2c1, 0x3C&lt;&lt;1, 0x00, 1, &amp;cmd, 1, 1000);
+// OLED屏幕关闭</code></pre>
+</div>
+
+<!-- ====== 第10章 ====== -->
+<a id="ch10"></a>
+<div class="summary">📖 <b>第10章学完你能干啥：</b>能看懂原理图，会读数据手册关键参数，会用万用表测电压/通断，了解焊接和基本元件。</div>
+
+<div class="chnav">
+<a onclick="window.parent.loadPage('guide-ch08')">← 第8章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch10')">第10章 →</a>
+</div>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
