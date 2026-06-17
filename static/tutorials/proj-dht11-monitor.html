@@ -1053,5 +1053,24 @@ dht11_monitor/
 <strong>📚 进阶学习</strong>：尝试使用SHT30或BME280传感器，它们使用I2C接口，精度更高，编程更简单。BME280还额外支持气压测量。
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: DHT11读取失败？</p>
+  <p style="color:var(--t)">A: 1)时序要求严格，禁用中断再读 2)起始信号拉低18ms 3)数据线需要4.7kΩ上拉 4)换DHT22精度更高</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 温度精度差？</p>
+  <p style="color:var(--t)">A: DHT11精度±2°C，DHT22精度±0.5°C。高精度场景用DS18B20或SHT30。</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-oled-display')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">OLED显示 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-freertos-station')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">FreeRTOS站 →</a>
+</div>
+
 </body>
 </html>

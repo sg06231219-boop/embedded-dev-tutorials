@@ -867,5 +867,25 @@ void USART1_IRQHandler(void)
 <strong>📚 进阶学习</strong>：学习RS485/RS232协议，使用MAX3232/MAX485芯片实现远距离通信。
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 中文乱码？</p>
+  <p style="color:var(--t)">A: 确保发送端和接收端编码都是UTF-8。PuTTY设置Window→Translation→UTF-8。代码中字符串加u8前缀。</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: DMA接收丢数据？</p>
+  <p style="color:var(--t)">A: 1)DMA缓冲区要4字节对齐 2)用空闲中断(IDLE)处理不定长数据 3)双缓冲防数据覆盖</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('serial')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">串口通信 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-oled-display')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">OLED显示 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-dht11-monitor')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">温湿度 →</a>
+</div>
+
 </body>
 </html>

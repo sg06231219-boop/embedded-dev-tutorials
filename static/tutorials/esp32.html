@@ -750,4 +750,29 @@ Serial.printf("空闲堆: %d\n", ESP.getFreeHeap());
 
 <div class="breadcrumb">📐 <a href="index.html">返回工具教程合集</a></div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: ESP32用Arduino还是ESP-IDF？</p>
+  <p style="color:var(--t)">A: 快速原型用Arduino，产品开发用ESP-IDF。ESP-IDF有更好的FreeRTOS集成和功耗管理。</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: ESP32和STM32哪个好？</p>
+  <p style="color:var(--t)">A: 不同定位：ESP32适合WiFi/BLE/IoT场景，STM32适合实时控制/低功耗。做IoT选ESP32，做电机控制选STM32。</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: ESP32功耗怎么优化？</p>
+  <p style="color:var(--t)">A: Deep Sleep模式下10μA，定时唤醒或GPIO唤醒。Light Sleep约0.8mA。WiFi发射时约200mA。</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('stm32')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">STM32开发 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-esp32-iot')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">ESP32 IoT →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('freertos')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">FreeRTOS →</a>
+</div>
+
 </body></html>

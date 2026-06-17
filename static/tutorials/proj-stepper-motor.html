@@ -549,4 +549,23 @@ void Stepper_SetSpeed(uint16_t speed) {
 <strong>📌 总结：</strong>步进电机是精确位置控制的利器，但需要注意相序、减速比标定和防失步。28BYJ-48虽然便宜，但精度有限，适合低精度应用。需要高精度时，推荐使用42步进电机 + A4988/DRV8825驱动。
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 步进电机丢步？</p>
+  <p style="color:var(--t)">A: 1)加速度太大，需要梯形/S形加减速曲线 2)负载过重 3)驱动电压不够 4)脉冲频率突变</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 28BYJ-48为什么转得慢？</p>
+  <p style="color:var(--t)">A: 减速比1:64，实际步距角5.625°/64=0.088°。需要高速时换NEMA17+A4988驱动。</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-pwm-motor')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">PWM电机 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-servo-control')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">舵机 →</a>
+</div>
+
 </body></html>

@@ -650,4 +650,25 @@ void vApplicationIdleHook(void)
 4. 每个任务入口打印一条信息，确认任务已启动
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 任务间数据怎么传？</p>
+  <p style="color:var(--t)">A: 1)队列(xQueueSend/Receive)最安全 2)全局变量+互斥量 3)事件组(EventGroup)适合同步 4)流缓冲区(StreamBuffer)适合DMA数据</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 系统跑飞？</p>
+  <p style="color:var(--t)">A: 1)栈溢出（增大任务栈） 2)优先级设置不合理 3)中断中调用了非ISR安全API 4)看门狗超时</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('freertos')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">FreeRTOS →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-dht11-monitor')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">温湿度 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-oled-display')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">OLED显示 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-sd-logger')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">SD卡记录 →</a>
+</div>
+
 </body></html>

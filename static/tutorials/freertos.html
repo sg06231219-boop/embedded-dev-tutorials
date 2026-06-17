@@ -2347,5 +2347,36 @@ lib_deps =
         <span>|</span>
         <a href="../embedded-tools.html">← 返回嵌入式工具主教程</a>
     </div>
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: FreeRTOS和裸机开发哪个好？</p>
+  <p style="color:var(--t)">A: 3个以上并发任务用RTOS更清晰。1~2个任务裸机+状态机更简单。不要为了用RTOS而用RTOS。</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 任务栈大小怎么设？</p>
+  <p style="color:var(--t)">A: 初期设256或512字（word），用uxTaskGetStackHighWaterMark()查看实际用量，再减半+20%余量。</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 优先级反转怎么办？</p>
+  <p style="color:var(--t)">A: 使用互斥量(Mutex)替代二值信号量，FreeRTOS的Mutex自带优先级继承机制。</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: vTaskDelay和vTaskDelayUntil区别？</p>
+  <p style="color:var(--t)">A: vTaskDelay是相对延时（从调用时刻起），vTaskDelayUntil是绝对周期（适合精确周期任务）。推荐用DelayUntil做采样循环。</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('stm32')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">STM32开发 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-freertos-station')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">FreeRTOS站 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-smart-car')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">智能小车 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-low-power')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">低功耗 →</a>
+</div>
+
 </body>
 </html>

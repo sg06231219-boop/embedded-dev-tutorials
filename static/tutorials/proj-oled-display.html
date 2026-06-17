@@ -1117,5 +1117,24 @@ const uint8_t Chinese_Char[][32] = {
 💡 <strong>进阶提示</strong>：可以使用u8g2库（通用图形库）来简化OLED驱动开发，支持多种显示器。
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: OLED不亮？</p>
+  <p style="color:var(--t)">A: 1)I2C地址扫描(0x3C或0x3D) 2)SDA/SCL上拉电阻4.7kΩ 3)供电3.3V（不是5V！）</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 显示花屏？</p>
+  <p style="color:var(--t)">A: 1)刷新率太快导致I2C拥堵 2)显存buffer未清零 3)坐标计算越界（0~127×0~63）</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-dht11-monitor')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">温湿度 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-freertos-station')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">FreeRTOS站 →</a>
+</div>
+
 </body>
 </html>

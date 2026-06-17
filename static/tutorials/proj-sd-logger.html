@@ -819,4 +819,24 @@ f_open(&amp;fil, filename, FA_CREATE_ALWAYS | FA_WRITE);
 5. 定期导出数据，防止SD卡损坏丢失
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: SD卡初始化失败？</p>
+  <p style="color:var(--t)">A: 1)SPI模式需先发80个时钟 2)供电3.3V（某些卡需5V） 3)换一张卡试试（卡兼容性问题常见） 4)FatFS版本要新</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 写入速度慢？</p>
+  <p style="color:var(--t)">A: 1)单次写入512字节对齐 2)用f_sync()代替频繁f_close() 3)SD卡Class等级影响写入速度 4)避免频繁打开关闭文件</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-freertos-station')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">FreeRTOS站 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-dht11-monitor')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">温湿度 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-bootloader-iap')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">Bootloader →</a>
+</div>
+
 </body></html>

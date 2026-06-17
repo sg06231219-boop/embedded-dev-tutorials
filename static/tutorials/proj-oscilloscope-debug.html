@@ -502,4 +502,23 @@ void Test_PWM_Measure(void)
 6. <strong>XY模式</strong>：用于李萨如图形，观察两个信号的相位关系
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 没有示波器怎么办？</p>
+  <p style="color:var(--t)">A: 1)逻辑分析仪(¥60)可看数字信号 2)Saleae软件很强大 3)STM32的GPIO翻转+逻辑分析仪替代 4)SoundCard示波器(用声卡)看低频信号</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 如何测量中断延迟？</p>
+  <p style="color:var(--t)">A: 在中断入口翻转GPIO(拉高)，处理完再拉低。示波器测量GPIO高电平宽度=中断处理时间。触发信号用外部中断源。</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('flash-debug')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">烧录与调试 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-dma-adc')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">DMA+ADC →</a>
+</div>
+
 </body></html>

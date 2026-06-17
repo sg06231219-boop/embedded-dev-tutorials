@@ -584,4 +584,24 @@ int __io_putchar(int ch)
 4. 发布版本可以关闭SWD调试接口：<code>__HAL_RCC_DBGMCU_CLK_DISABLE()</code>
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 功耗降不下来？</p>
+  <p style="color:var(--t)">A: 1)未用GPIO设为模拟输入 2)关闭不需要的外设时钟 3)ADC用完关闭 4)printf/UART是功耗大户 5)检查是否有上拉电阻持续耗电</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: Standby模式唤醒后程序从头跑？</p>
+  <p style="color:var(--t)">A: 对，Standby是最深度休眠，唤醒等同复位。需要保存数据到RTC后备寄存器或外部EEPROM。Stop模式可保持RAM。</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('freertos')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">FreeRTOS →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('stm32')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">STM32开发 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-freertos-station')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">FreeRTOS站 →</a>
+</div>
+
 </body></html>

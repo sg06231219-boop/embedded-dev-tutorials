@@ -531,4 +531,23 @@ if (cmd != last_key || (now - last_key_time) &gt; 300) {
 <li>添加蜂鸣器音效：不同按键不同音调</li>
 </ol>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 解码不稳定？</p>
+  <p style="color:var(--t)">A: 1)用输入捕获不要轮询 2)定时器时钟精度够高(1MHz以上) 3)加状态机容错 4)屏蔽重复码</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 不同遥控器协议不同？</p>
+  <p style="color:var(--t)">A: 最常见NEC协议。还有Sony SIRC、Philips RC-5。一般只支持NEC就够了。</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-smart-car')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">智能小车 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-led-button')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">LED+按键 →</a>
+</div>
+
 </body></html>

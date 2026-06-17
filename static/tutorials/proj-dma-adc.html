@@ -575,4 +575,24 @@ CubeMX生成的代码可能顺序不对，需要手动调整。<br>
 5. 使用DMA的M2M模式实现数据的快速搬移
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: ADC数据跳变？</p>
+  <p style="color:var(--t)">A: 1)模拟输入阻抗太高（加运放缓冲） 2)采样时间太短（增大ADC采样周期） 3)参考电压不稳（加去耦电容） 4)数字噪声干扰（模拟地数字地分开）</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: DMA传输完成中断不触发？</p>
+  <p style="color:var(--t)">A: 1)检查DMA模式和通道配置 2)NVIC使能DMA中断 3)ADC连续采样模式 4)缓冲区大小是DMA传输数据量的整数倍</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('stm32')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">STM32开发 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('bci-2026')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">BCI 2026 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-oscilloscope-debug')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">示波器调试 →</a>
+</div>
+
 </body></html>

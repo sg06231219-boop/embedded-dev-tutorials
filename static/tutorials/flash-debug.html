@@ -2145,5 +2145,30 @@ mark {
   });
 </script>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: ST-Link和J-Link哪个好？</p>
+  <p style="color:var(--t)">A: ST-Link便宜（克隆版¥8），只支持ST芯片；J-Link贵（¥200+），支持所有ARM芯片且速度快。初学用ST-Link够了。</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 烧录失败怎么排查？</p>
+  <p style="color:var(--t)">A: 1)检查SWD接线(SWDIO/SWCLK/GND/VCC) 2)检查芯片是否锁死(Option Bytes) 3)检查供电电压(3.3V) 4)OpenOCD看输出日志</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: HardFault怎么调试？</p>
+  <p style="color:var(--t)">A: 1)在HardFault_Handler中设断点 2)查看LR寄存器判断是MSP还是PSP 3)从栈中提取PC值 4)用addr2line定位源码行</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('arm-gcc')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">ARM GCC →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('stm32')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">STM32开发 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('serial')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">串口通信 →</a>
+</div>
+
 </body>
 </html>

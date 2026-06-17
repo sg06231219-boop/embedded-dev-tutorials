@@ -571,4 +571,23 @@ DLC=1: [0xFF] (所有节点必须响应并停止运动)
 5. 注意STM32的CAN1和CAN2是独立的，本项目只用CAN1
 </div>
 
+
+<hr><h2>❓ 常见问题 FAQ</h2>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: CAN通信不上？</p>
+  <p style="color:var(--t)">A: 1)两个节点波特率必须一致 2)CAN_H和CAN_L不要接反 3)需要120Ω终端电阻 4)至少2个节点才能正常通信</p>
+</div>
+
+<div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
+  <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: CAN过滤器怎么配？</p>
+  <p style="color:var(--t)">A: STM32 CAN过滤器有列表模式和掩码模式。初学用列表模式（精确匹配ID），高级用掩码模式（范围过滤）。</p>
+</div>
+
+<hr><h2>🔗 相关教程</h2>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<a href="#" onclick="parent.loadPage && parent.loadPage('protocols')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">通信协议 →</a>
+<a href="#" onclick="parent.loadPage && parent.loadPage('proj-s32k144-auto')" style="display:inline-block;padding:6px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--a);text-decoration:none;font-size:.85em">汽车电子 →</a>
+</div>
+
 </body></html>
