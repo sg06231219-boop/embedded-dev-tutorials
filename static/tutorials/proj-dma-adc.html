@@ -576,7 +576,136 @@ CubeMX生成的代码可能顺序不对，需要手动调整。<br>
 </div>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+
+<h2>🔄 DMA双缓冲 (Double Buffering) 技术</h2>
+<p>DMA采集时如果CPU读取和DMA写入同时操作同一buffer会导致数据混乱。双缓冲技术完美解决：</p>
+<pre><code>// DMA半传输完成中断 → Buffer0满, 处理Buffer0
+// DMA传输完成中断   → Buffer1满, 处理Buffer1
+// 乒乓切换, 零数据丢失
+
+#define ADC_BUFFER_SIZE 1024  // 每通道采样点
+#define ADC_CHANNELS   4
+
+uint16_t adc_buffer[2][ADC_BUFFER_SIZE * ADC_CHANNELS];
+volatile uint8_t active_buffer = 0;  // 0=处理Buf0, 1=处理Buf1
+
+// 配置DMA为循环模式 + 半传输中断
+HAL_ADC_Start_DMA(&hadc1, 
+    (uint32_t*)adc_buffer, 
+    ADC_BUFFER_SIZE * ADC_CHANNELS * 2);  // 双倍长度
+
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc) {
+    // Buffer0 满了 → 标记处理
+    active_buffer = 0;
+    ProcessADCBlock(adc_buffer[0]);  // 处理前半段
+}
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+    // Buffer1 满了 → 标记处理
+    active_buffer = 1;
+    ProcessADCBlock(adc_buffer[1]);  // 处理后半段
+}</code></pre>
+
+<h2>⏱️ 定时器触发ADC (Timer-Triggered Sampling)</h2>
+<pre><code>// 精确控制采样率，避免HAL_ADC_Start()的软件抖动
+// 适用场景: FFT分析、振动测量、电力质量监测
+
+// 配置TIM3输出触发ADC1
+void TIM_TriggerADC_Config(uint32_t sample_rate_hz) {
+    // TIM3 → TRGO → ADC1 (需要配置ADC_ExternalTrigConv)
+    // 采样率 = TIM_CLK / ((PSC+1) * (ARR+1))
+    
+    uint32_t tim_clk = HAL_RCC_GetPCLK1Freq() * 2;  // APB1×2
+    uint32_t prescaler = 0;
+    uint32_t period = tim_clk / sample_rate_hz - 1;
+    
+    if (period > 65535) {
+        prescaler = period / 65536;  // 需要分频
+        period = period / (prescaler + 1) - 1;
+    }
+    
+    htim3.Init.Prescaler = prescaler;
+    htim3.Init.Period = period;
+    htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+    HAL_TIM_Base_Init(&htim3);
+    
+    // 配置TRGO为更新事件
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig);
+    
+    // ADC配置外部触发
+    sConfig.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T3_TRGO;
+    // 注意: 不同STM32系列的ADC外部触发源不同!
+    // F103: ADC1→TIM1/TIM2/TIM3, F4: ADC1→TIM2/TIM3/TIM4/TIM5/TIM8
+}
+
+// 实际采样率验证:
+// 用另一个TIM做计数器，1秒后读取采样数 = 实际采样率
+// 通常实际值会比理论值偏小2-5% (DMA总线仲裁延迟)</code></pre>
+
+<h2>📊 DMA+ADC+FFT实时频谱分析</h2>
+<pre><code>// ARM CMSIS-DSP FFT流水线
+#include "arm_math.h"
+
+#define FFT_SIZE 1024
+
+float32_t fft_input[FFT_SIZE * 2];  // 实部+虚部交错
+float32_t fft_output[FFT_SIZE];
+
+void ProcessFFT(uint16_t* raw_buffer) {
+    // 1. 转浮点 + 去直流
+    float32_t mean = 0;
+    for (int i = 0; i < FFT_SIZE; i++)
+        mean += raw_buffer[i];
+    mean /= FFT_SIZE;
+    
+    for (int i = 0; i < FFT_SIZE; i++) {
+        fft_input[i * 2] = raw_buffer[i] - mean;  // 实部
+        fft_input[i * 2 + 1] = 0;                  // 虚部(0)
+    }
+    
+    // 2. FFT (使用CMSIS-DSP的RFFT, 比CFFT快50%)
+    arm_rfft_fast_instance_f32 rfft;
+    arm_rfft_fast_init_f32(&rfft, FFT_SIZE);
+    arm_rfft_fast_f32(&rfft, fft_input, fft_output, 0);
+    
+    // 3. 计算幅值
+    // fft_output[0] = 直流分量, fft_output[1] = 实部(频率1)
+    // fft_output[FFT_SIZE/2] = 虚部(频率1)
+    // 频率分辨率 = 采样率 / FFT_SIZE
+    arm_cmplx_mag_f32(fft_output, fft_input, FFT_SIZE / 2);
+    
+    // 4. 查找峰值频率
+    float32_t max_mag = 0;
+    uint32_t max_bin = 0;
+    for (int i = 1; i < FFT_SIZE / 2; i++) {  // 跳过DC
+        if (fft_input[i] > max_mag) {
+            max_mag = fft_input[i];
+            max_bin = i;
+        }
+    }
+    float32_t peak_freq = (float32_t)max_bin * sample_rate / FFT_SIZE;
+}</code></pre>
+
+<h2>⚡ DMA传输优化技巧</h2>
+<table>
+<tr><th>优化项</th><th>效果</th><th>代价</th></tr>
+<tr><td>使用DMA FIFO</td><td>减少总线占用(4→1次)</td><td>FIFO满才传输, 延迟增加</td></tr>
+<tr><td>DMA突发传输(Burst)</td><td>吞吐量翻倍</td><td>需要外设支持</td></tr>
+<tr><td>SRAM分区(D2域)</td><td>避免CPU+DMA抢总线</td><td>F4/H7才有</td></tr>
+<tr><td>DMA半传输中断</td><td>实现零拷贝双缓冲</td><td>代码复杂度+</td></tr>
+<tr><td>链接列表(BDMA)</td><td>复杂采集模式</td><td>仅G4/H7/U5</td></tr>
+</table>
+
+<div class="warn">
+<strong>DMA常见坑：</strong><br>
+1. DMA传输长度 = 外设数据宽度 × 计数，配置错误会导致少传/多传<br>
+2. ADC采样时间太短(<7.5周期) + 高频率 → DMA取走的数据是上一次的<br>
+3. Cache一致性问题(H7系列)：DMA写到SRAM，CPU读Cache → 需要SCB_CleanInvalidateDCache<br>
+4. STM32F103的DMA不能跨AHB总线 → 检查数据源和目标是否在同一总线
+</div><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: ADC数据跳变？</p>

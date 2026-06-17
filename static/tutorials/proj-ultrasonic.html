@@ -470,7 +470,109 @@ uint32_t distance_cm = (high_time_us * 34) / 200; // 除以2再×100000转cm</co
 </ol>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+
+<h2>📡 超声波传感器阵列与多目标检测</h2>
+<pre><code>// 多个HC-SR04同时工作会互相干扰
+// 方案1: 分时触发 - 轮流触发，每个等60ms(最大测量距离4m)
+// 方案2: 不同频率 - 定制不同频率的探头(40kHz/25kHz/58kHz)
+
+// 冲突避免算法 - 基于随机退避
+#define SONAR_COUNT 4
+
+typedef struct {
+    GPIO_TypeDef* trig_port;
+    uint16_t trig_pin;
+    GPIO_TypeDef* echo_port;
+    uint16_t echo_pin;
+    uint32_t last_trigger;
+    float distance_cm;
+} SonarSensor;
+
+void Sonar_TriggerWithAvoidance(SonarSensor* sn, uint8_t index) {
+    // 检查是否有其他传感器正在测量
+    uint32_t now = HAL_GetTick();
+    for (int i = 0; i < SONAR_COUNT; i++) {
+        if (i == index) continue;
+        uint32_t since = now - sonars[i].last_trigger;
+        if (since < 50) {  // 50ms内有人在工作
+            return;  // 等下一轮
+        }
+    }
+    // 安全触发
+    HAL_GPIO_WritePin(sn->trig_port, sn->trig_pin, GPIO_PIN_SET);
+    delay_us(10);
+    HAL_GPIO_WritePin(sn->trig_port, sn->trig_pin, GPIO_PIN_RESET);
+    sn->last_trigger = now;
+}</code></pre>
+
+<h2>🔬 超声波信号处理与滤波</h2>
+<table>
+<tr><th>方法</th><th>效果</th><th>实现复杂度</th><th>适用场景</th></tr>
+<tr><td>中值滤波</td><td>去除偶然野点</td><td>低(3-5样本排序取中)</td><td>基本抗干扰</td></tr>
+<tr><td>滑动平均</td><td>平滑数据</td><td>低(队列+累加/除)</td><td>实时显示</td></tr>
+<tr><td>卡尔曼滤波</td><td>最优估计+预测</td><td>中(6个浮点运算)</td><td>机器人定位</td></tr>
+<tr><td>互相关匹配</td><td>识别特定波形</td><td>高(DSP/FFT)</td><td>高级回波分析</td></tr>
+</table>
+
+<pre><code>// 超声波距离测量的卡尔曼滤波器
+typedef struct {
+    float x;     // 状态(距离估计)
+    float P;     // 估计误差协方差
+    float Q;     // 过程噪声 (越小越信任模型, 典型0.01)
+    float R;     // 测量噪声 (越小越信任传感器, 典型5.0)
+} KalmanFilter1D;
+
+float Kalman_Update(KalmanFilter1D* kf, float measurement) {
+    // 预测
+    kf->P = kf->P + kf->Q;
+    // 更新
+    float K = kf->P / (kf->P + kf->R);  // 卡尔曼增益
+    kf->x = kf->x + K * (measurement - kf->x);
+    kf->P = (1.0f - K) * kf->P;
+    return kf->x;
+}
+
+// 使用示例:
+KalmanFilter1D sonar_kf = {.x=100, .P=1, .Q=0.01, .R=5.0};
+float raw = Sonar_ReadDistance();
+float filtered = Kalman_Update(&sonar_kf, raw);
+// filtered响应平滑，不会因单个异常值跳变</code></pre>
+
+<h2>🌡️ 温度补偿与声速修正</h2>
+<p>声速随温度变化：v = 331.3 + 0.606 × T (m/s)，T为摄氏温度。在-10°C到40°C范围内，声速变化约15%，距离测量误差同比例。</p>
+<pre><code>// 带温度补偿的距离计算
+float Sonar_DistanceWithTemp(float pulse_us, float temp_c) {
+    float speed_of_sound = 331.3f + 0.606f * temp_c;  // m/s
+    float speed_cm_us = speed_of_sound / 10000.0f;     // cm/&mu;s (除以100×100)
+    return (pulse_us * speed_cm_us) / 2.0f;  // 除以2(往返)
+}
+
+// 不同温度下的声速对照:
+// -10°C: 325.2 m/s → 1cm需要61.5μs往返
+//  20°C: 343.4 m/s → 1cm需要58.2μs往返
+//  40°C: 355.5 m/s → 1cm需要56.2μs往返</code></pre>
+
+<h2>📐 波束角与安装策略</h2>
+<table>
+<tr><th>型号</th><th>波束角</th><th>盲区</th><th>最大距离</th><th>精度</th></tr>
+<tr><td>HC-SR04</td><td>~15°</td><td>2cm</td><td>4m</td><td>±3mm</td></tr>
+<tr><td>JSN-SR04T(防水)</td><td>~75°</td><td>25cm</td><td>4.5m</td><td>±1cm</td></tr>
+<tr><td>US-100</td><td>~15°</td><td>2cm</td><td>4.5m</td><td>±1mm</td></tr>
+<tr><td>AJ-SR04M(防水)</td><td>~75°</td><td>20cm</td><td>8m</td><td>±1cm</td></tr>
+</table>
+
+<div class="note">
+<strong>波束角实战意义：</strong> 15°波束角下，4m距离的覆盖直径约1.05m。如果检测窄小物体(如桌腿直径5cm)，需要精确对准。75°广角防水探头适合液位测量，但盲区大(25cm)。
+</div>
+
+<h2>🎯 超声波 vs 其他测距方案对比</h2>
+<table>
+<tr><th>方案</th><th>精度</th><th>距离</th><th>刷新率</th><th>受光线影响</th><th>价格</th></tr>
+<tr><td>HC-SR04(超声)</td><td>±3mm</td><td>2cm-4m</td><td>25Hz</td><td>不受影响</td><td>¥3</td></tr>
+<tr><td>VL53L0X(ToF激光)</td><td>±1mm</td><td>3cm-2m</td><td>50Hz</td><td>不受影响(940nm)</td><td>¥15</td></tr>
+<tr><td>GP2Y0A21(红外)</td><td>±3cm</td><td>10-80cm</td><td>40Hz</td><td>严重影响</td><td>¥8</td></tr>
+<tr><td>TFMini Plus(激光雷达)</td><td>±1cm</td><td>10cm-12m</td><td>1000Hz</td><td>室内不受影响</td><td>¥120</td></tr>
+</table><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 测距不准？</p>

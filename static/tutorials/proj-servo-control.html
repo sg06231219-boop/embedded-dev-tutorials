@@ -418,7 +418,138 @@ SG90是<strong>180°角度舵机</strong>，无法360°旋转。<br>
 </ol>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+
+<h2>📐 舵机内部结构与PID控制</h2>
+<p>标准舵机内部是一个完整的闭环控制系统：</p>
+<pre><code>舵机内部框图:
+┌─────────┐   ┌──────────┐   ┌──────────┐   ┌─────────┐
+│PWM信号  │→  │比较器/   │→  │H桥驱动  │→  │直流电机 │→ 齿轮减速→输出轴
+│(500-   │   │误差放大  │   │          │   │         │
+│ 2500μs)│   └────┬─────┘   └──────────┘   └─────────┘
+└─────────┘        │                                    │
+                   │         ┌──────────┐               │
+                   └─────────│电位器反馈│←──────────────┘
+                             └──────────┘
+
+误差 = 目标位置 - 实际位置(电位器电压)
+误差 → P放大 → 驱动电机 → 减小误差 → 0误差=停止</code></pre>
+
+<h3>舵机死区(Deadband)与精度</h3>
+<table>
+<tr><th>舵机类型</th><th>死区</th><th>最小角度分辨率</th><th>典型价格</th></tr>
+<tr><td>廉价SG90</td><td>~10&mu;s</td><td>~1°</td><td>¥5</td></tr>
+<tr><td>标准MG995</td><td>~5&mu;s</td><td>~0.5°</td><td>¥15</td></tr>
+<tr><td>数字舵机(DS3225)</td><td>~2&mu;s</td><td>~0.2°</td><td>¥40</td></tr>
+<tr><td>磁编码舵机</td><td>~0.5&mu;s</td><td>~0.05°</td><td>¥200+</td></tr>
+</table>
+
+<h2>🔄 模拟舵机 vs 数字舵机</h2>
+<table>
+<tr><th>特性</th><th>模拟舵机</th><th>数字舵机</th></tr>
+<tr><td>控制频率</td><td>50Hz (20ms帧)</td><td>最高333Hz (3ms帧)</td></tr>
+<tr><td>死区</td><td>5-10&mu;s</td><td>0.5-2&mu;s</td></tr>
+<tr><td>响应速度</td><td>0.2-0.3s/60°</td><td>0.05-0.1s/60°</td></tr>
+<tr><td>静止耗电</td><td>低(仅电位器)</td><td>高(MCU持续工作)</td></tr>
+<tr><td>锁定力矩</td><td>中</td><td>高(高频修正)</td></tr>
+<tr><td>典型应用</td><td>航模/教学</td><td>机器人/无人机</td></tr>
+</table>
+
+<div class="warn">
+<strong>数字舵机注意事项：</strong> 数字舵机需要更高的控制频率（100-333Hz），如果仍用50Hz信号，它会在每帧之间"睡着"再"醒来"，表现为抖动和发热。用TIM的PWM频率参数调整：72MHz/(PSC+1)/(ARR+1) ≈ 250Hz。例如PSC=71, ARR=3999 → 250Hz。
+</div>
+
+<h2>🧮 多舵机同步控制算法</h2>
+<pre><code>// 多舵机插值同步 - 使多个舵机同时到达目标位置
+// 避免"各走各的"的机械抖动
+
+#define SERVO_COUNT 6
+
+typedef struct {
+    uint16_t start_pulse;   // 起始脉宽 (500-2500)
+    uint16_t target_pulse;  // 目标脉宽
+    uint16_t current_pulse; // 当前脉宽
+    uint32_t start_time;    // 起始时间戳(ms)
+    uint32_t duration;      // 运动时长(ms)
+} ServoChannel;
+
+ServoChannel servos[SERVO_COUNT];
+
+void Servo_MoveSync(uint16_t targets[], uint32_t duration_ms) {
+    // 找出需要最长时间移动的舵机
+    uint32_t max_travel = 0;
+    for (int i = 0; i < SERVO_COUNT; i++) {
+        uint32_t travel = abs((int)targets[i] - (int)servos[i].current_pulse);
+        if (travel > max_travel) max_travel = travel;
+    }
+    
+    // 按最大行程分配时间，所有舵机同步完成
+    for (int i = 0; i < SERVO_COUNT; i++) {
+        servos[i].start_pulse = servos[i].current_pulse;
+        servos[i].target_pulse = targets[i];
+        servos[i].start_time = HAL_GetTick();
+        uint32_t travel = abs((int)targets[i] - (int)servos[i].current_pulse);
+        servos[i].duration = (max_travel > 0) 
+            ? (travel * duration_ms) / max_travel 
+            : duration_ms;
+    }
+}
+
+void Servo_Update(void) {
+    // 在SysTick中断或RTOS任务中调用
+    uint32_t now = HAL_GetTick();
+    for (int i = 0; i < SERVO_COUNT; i++) {
+        if (servos[i].current_pulse == servos[i].target_pulse) continue;
+        uint32_t elapsed = now - servos[i].start_time;
+        if (elapsed >= servos[i].duration) {
+            servos[i].current_pulse = servos[i].target_pulse;
+        } else {
+            // 线性插值
+            float t = (float)elapsed / servos[i].duration;
+            // 使用缓动函数让运动更平滑
+            t = t * t * (3.0f - 2.0f * t);  // smoothstep
+            servos[i].current_pulse = servos[i].start_pulse 
+                + (uint16_t)((servos[i].target_pulse - servos[i].start_pulse) * t);
+        }
+        TIMx->CCRx = servos[i].current_pulse;  // 更新对应通道
+    }
+}</code></pre>
+
+<h2>🎯 总线舵机协议(UART/TTL)</h2>
+<p>高端机器人舵机(如Dynamixel、SCS系列)使用串行总线协议替代PWM控制，支持位置/速度/温度/电压反馈：</p>
+<pre><code>// Dynamixel Protocol 2.0 示例
+// 指令格式: [0xFF,0xFF,0xFD,0x00, ID, Len_L,Len_H, INST, PARAM..., CRC_L,CRC_H]
+// INST=0x03: 写位置 (Goal Position)
+
+uint8_t dxl_write_position(uint8_t id, uint16_t position) {
+    uint8_t packet[] = {
+        0xFF, 0xFF, 0xFD, 0x00,           // Header
+        id,                                 // ID
+        0x07, 0x00,                         // Length (7 bytes)
+        0x03,                               // Instruction: WRITE
+        0x74, 0x00,                         // Address: Goal Position (116)
+        position & 0xFF, position >> 8,     // Position (0-4095)
+        position & 0xFF, position >> 8,     // Position (0-4095)
+        0x00, 0x00                          // CRC (calculate)
+    };
+    // 计算CRC16...
+    return uart_send(packet, sizeof(packet));
+}
+
+// 电压反馈(Address 144): 实际电压 = 读取值 × 0.1V
+// 温度反馈(Address 146): 实际温度 = 读取值 (°C)
+// 负载反馈(Address 126): 0-1023 → 0-100% 最大扭矩</code></pre>
+
+<h2>⚙️ 舵机电源设计要点</h2>
+<div class="warn">
+<strong>多舵机系统的电源陷阱：</strong>
+<ul>
+<li>单个SG90堵转电流可达750mA，6个=4.5A！</li>
+<li>STM32开发板的5V输出通常仅500mA，带上2个舵机就可能复位</li>
+<li>解法：舵机独立供电(5-6V/3-5A开关电源)，共地接STM32</li>
+<li>舵机启动瞬间电流可达额定值3-5倍，电源需留裕量</li>
+<li>信号线串100&Omega;电阻防止舵机噪声耦合回MCU</li>
+</ul>
+</div><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 舵机抖动？</p>

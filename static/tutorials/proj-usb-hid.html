@@ -543,7 +543,158 @@ F1-F12: 0x3A-0x45
 </div>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+
+<h2>📋 HID报告描述符深度解析</h2>
+<p>HID报告描述符是USB设备与主机之间最关键的"契约"，定义了数据包格式。错误的描述符会导致设备无法识别。</p>
+
+<pre><code>// 自定义复合HID设备描述符（键盘+多媒体键+鼠标）
+// 使用HID Descriptor Tool (USB-IF官方工具)可视化编辑
+
+__ALIGN_BEGIN static const uint8_t HID_Composite_ReportDesc[] __ALIGN_END = {
+    // === 键盘部分 (Report ID 1) ===
+    0x05, 0x01,        // USAGE_PAGE (Generic Desktop)
+    0x09, 0x06,        // USAGE (Keyboard)
+    0xa1, 0x01,        // COLLECTION (Application)
+    0x85, 0x01,        //   REPORT_ID (1) ← 键盘
+    
+    // 修饰键位图(8bit): Ctrl/Shift/Alt/GUI
+    0x05, 0x07,        //   USAGE_PAGE (Keyboard/Keypad)
+    0x19, 0xe0,        //   USAGE_MINIMUM (Left Control)
+    0x29, 0xe7,        //   USAGE_MAXIMUM (Right GUI)
+    0x15, 0x00,        //   LOGICAL_MINIMUM (0)
+    0x25, 0x01,        //   LOGICAL_MAXIMUM (1)
+    0x75, 0x01,        //   REPORT_SIZE (1)
+    0x95, 0x08,        //   REPORT_COUNT (8)
+    0x81, 0x02,        //   INPUT (Data,Var,Abs)
+    
+    // 保留字节
+    0x95, 0x01,        //   REPORT_COUNT (1)
+    0x75, 0x08,        //   REPORT_SIZE (8)
+    0x81, 0x01,        //   INPUT (Cnst,Ary,Abs)
+    
+    // 按键数组(6个同时按下)
+    0x95, 0x06,        //   REPORT_COUNT (6)
+    0x75, 0x08,        //   REPORT_SIZE (8)
+    0x15, 0x00,        //   LOGICAL_MINIMUM (0)
+    0x25, 0x65,        //   LOGICAL_MAXIMUM (101)
+    0x05, 0x07,        //   USAGE_PAGE (Keyboard)
+    0x19, 0x00,        //   USAGE_MINIMUM (Reserved)
+    0x29, 0x65,        //   USAGE_MAXIMUM (Keyboard Application)
+    0x81, 0x00,        //   INPUT (Data,Ary,Abs)
+    
+    // LED输出(大小写锁定等)
+    0x95, 0x05,        //   REPORT_COUNT (5)
+    0x75, 0x01,        //   REPORT_SIZE (1)
+    0x05, 0x08,        //   USAGE_PAGE (LEDs)
+    0x19, 0x01,        //   USAGE_MINIMUM (Num Lock)
+    0x29, 0x05,        //   USAGE_MAXIMUM (Kana)
+    0x91, 0x02,        //   OUTPUT (Data,Var,Abs)
+    0x95, 0x01,        //   REPORT_COUNT (1)
+    0x75, 0x03,        //   REPORT_SIZE (3)  // padding
+    0x91, 0x01,        //   OUTPUT (Cnst,Ary,Abs)
+    0xc0,              // END_COLLECTION
+    
+    // === 鼠标部分 (Report ID 2) ===
+    0x05, 0x01,        // USAGE_PAGE (Generic Desktop)
+    0x09, 0x02,        // USAGE (Mouse)
+    0xa1, 0x01,        // COLLECTION (Application)
+    0x85, 0x02,        //   REPORT_ID (2) ← 鼠标
+    0x09, 0x01,        //   USAGE (Pointer)
+    0xa1, 0x00,        //   COLLECTION (Physical)
+    
+    // 按键(3个)
+    0x05, 0x09,        //     USAGE_PAGE (Button)
+    0x19, 0x01,        //     USAGE_MINIMUM (Button 1)
+    0x29, 0x03,        //     USAGE_MAXIMUM (Button 3)
+    0x15, 0x00,        //     LOGICAL_MINIMUM (0)
+    0x25, 0x01,        //     LOGICAL_MAXIMUM (1)
+    0x95, 0x03,        //     REPORT_COUNT (3)
+    0x75, 0x01,        //     REPORT_SIZE (1)
+    0x81, 0x02,        //     INPUT (Data,Var,Abs)
+    
+    // 填充
+    0x95, 0x01,        //     REPORT_COUNT (1)
+    0x75, 0x05,        //     REPORT_SIZE (5)
+    0x81, 0x01,        //     INPUT (Cnst)
+    
+    // X, Y, 滚轮 (相对值)
+    0x05, 0x01,        //     USAGE_PAGE (Generic Desktop)
+    0x09, 0x30,        //     USAGE (X)
+    0x09, 0x31,        //     USAGE (Y)
+    0x09, 0x38,        //     USAGE (Wheel)
+    0x15, 0x81,        //     LOGICAL_MINIMUM (-127)
+    0x25, 0x7f,        //     LOGICAL_MAXIMUM (127)
+    0x75, 0x08,        //     REPORT_SIZE (8)
+    0x95, 0x03,        //     REPORT_COUNT (3)
+    0x81, 0x06,        //     INPUT (Data,Var,Rel)
+    0xc0,              //   END_COLLECTION
+    0xc0,              // END_COLLECTION
+};
+
+// 发送键盘报告
+typedef struct __packed {
+    uint8_t report_id;   // = 1
+    uint8_t modifiers;
+    uint8_t reserved;
+    uint8_t keys[6];
+} KeyboardReport;
+
+// 发送鼠标报告
+typedef struct __packed {
+    uint8_t report_id;   // = 2
+    uint8_t buttons;
+    int8_t  x;
+    int8_t  y;
+    int8_t  wheel;
+} MouseReport;</code></pre>
+
+<h2>🔄 USB复合设备配置</h2>
+<pre><code>// 一个USB设备提供多个HID功能 - 配置描述符结构
+// 设备描述符 → 配置描述符 → 接口0(HID键盘) → 接口1(HID鼠标) → 接口2(HID游戏手柄)
+
+// 关键：每个HID接口需要独立的端点(或共享端点用Report ID区分)
+// 端点资源有限(STM32F103: 8个端点), 需要合理分配:
+
+// 端点配置策略:
+// EP1 IN:  键盘报告 → 主机 (中断传输, 10ms轮询)
+// EP2 IN:  鼠标报告 → 主机 (中断传输, 1ms轮询, 更高优先级)
+// EP3 OUT: 键盘LED → 设备 (中断传输)
+
+// 描述符总大小限制: FS设备配置描述符+接口+端点+报告 ≤ 64字节
+// 如果超限 → 使用字符串描述符或报告描述符单独获取</code></pre>
+
+<div class="warn">
+<strong>USB HID常见坑：</strong>
+<ol>
+<li>报告描述符中REPORT_COUNT和REPORT_SIZE必须与实际发送数据长度匹配（差1bit都不行）</li>
+<li>Windows对HID键盘有特殊处理：即使你不发送按键，也必须定期发送空报告（否则系统认为设备断开）</li>
+<li>复合设备的接口描述符中bInterfaceClass=0x03 (HID)，但IAD描述符的bFunctionClass可以是0x00或0x03</li>
+<li>Linux的usbhid驱动对report descriptor语法更严格，一些Windows接受的错误在Linux上报错</li>
+</ol>
+</div>
+
+<h2>🎮 HID游戏手柄实现</h2>
+<pre><code>// 标准游戏手柄报告描述符要点:
+// Usage Page: 0x01 (Generic Desktop)
+// Usage: 0x05 (Game Pad)
+// 常见轴: X, Y, Z, Rx, Ry, Rz, Hat Switch, Slider
+// 按钮: Usage Page 0x09 (Button), 最多32个
+
+// 最小化游戏手柄报告 (8轴 + 16按键 = 12字节)
+typedef struct __packed {
+    uint8_t report_id;   // 默认0
+    // 轴 (每个2字节, 范围-32768~32767, 但游戏通常用0~65535)
+    int16_t x, y;        // 左摇杆
+    int16_t z, rz;       // 右摇杆 (Z=左扳机, Rz=右扳机)
+    int16_t rx, ry;      // 可选轴
+    uint8_t hat;         // 方向键 (0-7 = N→NW, 8=居中)
+    // 按钮位图
+    uint16_t buttons;    // 16个按钮
+} GamepadReport;
+
+// 注意: 使用HID Gamepad需要报告描述符声明Physical Descriptor
+// Set Physical Descriptor Set (0x330-0x33F) 定义轴的物理含义
+// 游戏通常不严格校验, 但XInput兼容需要特定映射</code></pre><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 电脑识别不到USB设备？</p>

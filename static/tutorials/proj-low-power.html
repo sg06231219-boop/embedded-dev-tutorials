@@ -585,7 +585,97 @@ int __io_putchar(int ch)
 </div>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+
+<h2>💤 STM32低功耗模式深度对比</h2>
+<table>
+<tr><th>模式</th><th>功耗(F103@72MHz)</th><th>唤醒源</th><th>唤醒时间</th><th>SRAM保持</th><th>适用场景</th></tr>
+<tr><td>Run(正常运行)</td><td>~36mA</td><td>—</td><td>—</td><td>全部</td><td>高性能计算</td></tr>
+<tr><td>Sleep(睡眠)</td><td>~14mA</td><td>任意中断</td><td>即刻</td><td>全部</td><td>等待事件</td></tr>
+<tr><td>Stop(停止)</td><td>~25&mu;A</td><td>EXTI/RTC/WKUP</td><td>~6&mu;s</td><td>全部</td><td>间歇采样</td></tr>
+<tr><td>Standby(待机)</td><td>~3&mu;A</td><td>WKUP/RTC/NRST</td><td>~60&mu;s</td><td>丢失</td><td>电池供电传感器</td></tr>
+<tr><td>Shutdown(F4+)</td><td>~0.3&mu;A</td><td>WKUP/RTC/NRST</td><td>~200&mu;s</td><td>丢失</td><td>超长待机</td></tr>
+</table>
+
+<pre><code>// Stop模式的正确用法 (功耗: 36mA → 25&mu;A, 降低1400倍!)
+void Enter_StopMode(void) {
+    // 1. 关闭不需要的外设时钟
+    __HAL_RCC_GPIOA_CLK_DISABLE();  // 只保留唤醒源GPIO
+    __HAL_RCC_USART1_CLK_DISABLE();
+    __HAL_RCC_SPI1_CLK_DISABLE();
+    
+    // 2. 配置所有未用GPIO为模拟输入(最低功耗)
+    GPIO_InitTypeDef gpio = {0};
+    gpio.Mode = GPIO_MODE_ANALOG;
+    gpio.Pull = GPIO_NOPULL;
+    for (int pin = 0; pin <= 15; pin++) {
+        gpio.Pin = 1 << pin;
+        HAL_GPIO_Init(GPIOA, &gpio);
+    }
+    
+    // 3. 配置唤醒源
+    HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);  // PA0上升沿唤醒
+    
+    // 4. 进入Stop模式
+    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+    
+    // 5. 唤醒后: 恢复时钟和外设
+    SystemClock_Config();  // 重新配置时钟
+}</code></pre>
+
+<h2>🔋 电池寿命估算</h2>
+<pre><code>// 电池容量计算
+// 假设: 2000mAh锂电池 + Stop模式(25&mu;A) + 每10秒唤醒50ms采样(14mA)
+
+// 平均电流 = (待机电流 × 待机时间 + 工作电流 × 工作时间) / 总时间
+// = (25&mu;A × 9950ms + 14mA × 50ms) / 10000ms
+// = (0.24875 + 0.7) / 10 = 0.0949 mA
+
+// 续航 = 2000mAh / 0.0949mA = 21075小时 ≈ 878天 ≈ 2.4年!
+
+// 如果不用低功耗(Run模式永远36mA):
+// 续航 = 2000mAh / 36mA = 55小时 ≈ 2.3天
+
+// 结论: Stop模式把电池寿命从2天提升到2年!</code></pre>
+
+<h2>⏰ RTC闹钟唤醒策略</h2>
+<pre><code>// 周期性唤醒 + 执行任务 + 快速回睡
+void RTC_Wakeup_Config(uint32_t interval_seconds) {
+    // 使用RTC的Wakeup定时器(不需要额外时钟源)
+    __HAL_RCC_PWR_CLK_ENABLE();
+    HAL_PWR_EnableBkUpAccess();
+    
+    // LSI = ~32kHz, 配置每interval_seconds秒唤醒一次
+    // RTC_WAKEUPCLOCK_RTCCLK_DIV16 = 32kHz/16 = 2kHz
+    uint32_t wakeup_counter = interval_seconds * 2000 - 1;
+    
+    HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, wakeup_counter, 
+        RTC_WAKEUPCLOCK_RTCCLK_DIV16);
+}
+
+void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *hrtc) {
+    // 1. 快速采样传感器
+    uint16_t temp = ReadTemperature();  // ~10ms
+    uint16_t humidity = ReadHumidity(); // ~10ms
+    
+    // 2. 判断是否需要上报
+    if (abs(temp - last_temp) > 2.0f) {  // 温度变化>2°C才发
+        LoRa_Send(temp, humidity);       // ~100ms
+        last_temp = temp;
+    }
+    
+    // 3. 回到Stop模式 (总占用: 20-120ms)
+    Enter_StopMode();
+}</code></pre>
+
+<h2>📊 实际功耗测量方法</h2>
+<div class="note">
+<strong>精确测量低功耗电流的方法：</strong><br>
+1. 串联&Omega;级采样电阻(如10&Omega;)在电源回路<br>
+2. 用高精度万用表测量电阻两端电压 → I = V/R<br>
+3. 或在电源回路串入万用表电流档(注意: &mu;A档内阻较大, 唤醒瞬间可能导致MCU复位)<br>
+4. 更专业的方法: Nordic PPK2或Joulescope(能捕捉&mu;s级瞬态电流)<br>
+5. 注意: 杜邦线接触电阻、面包板寄生电容都可能增加功耗5-10&mu;A
+</div><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 功耗降不下来？</p>

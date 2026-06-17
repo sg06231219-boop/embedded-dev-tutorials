@@ -550,7 +550,100 @@ void Stepper_SetSpeed(uint16_t speed) {
 </div>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+
+<h2>📐 步进电机微步细分原理</h2>
+<p>全步(full-step)时每一步1.8°(200步/转)，通过控制两相电流比例可以实现更小的步进角：</p>
+
+<pre><code>// 两相电流与微步位置的关系
+// I_A = I_max × cos(&theta;), I_B = I_max × sin(&theta;)
+// &theta; = (step / microsteps_per_step) × 90°
+
+// 16微步的电流表(正弦表，DAC输出或PWM+滤波)
+const uint16_t microstep_sine[16] = {
+    // 第一象限 0°-90°
+    0,     // sin(0°)    → 0%
+    4006,  // sin(5.625°)→ 9.8% (4095×0.098)
+    7996,  // sin(11.25°)→ 19.5%
+    11955, // sin(16.875°)→29.2%
+    15866, // sin(22.5°)→ 38.8%
+    19714, // sin(28.125°)→48.1%
+    23483, // sin(33.75°)→57.3%
+    27158, // sin(39.375°)→66.3%
+    30725, // sin(45°)→   75.0%
+    34170, // sin(50.625°)→83.4%
+    37480, // sin(56.25°)→91.5%
+    40643, // sin(61.875°)→99.2%
+    43648, // sin(67.5°)→ ~100%(夹紧)
+    46484, // sin(73.125°)
+    49142, // sin(78.75°)
+    51612, // sin(84.375°)
+};
+
+// 使用TIM高级定时器互补输出 + 死区 + 斩波模式
+// A4988/DRV8825内部已实现微步，只需STEP/DIR控制
+// 自己用H桥+MCU做微步时才需要上面的正弦表</code></pre>
+
+<h2>⚡ S曲线加减速算法</h2>
+<pre><code>// S曲线加速 vs 梯形加速
+// 梯形: 突然起停 → 机械振动、丢步
+// S曲线: 加速度渐变 → 平滑、安静、高速
+
+// Bresenham算法 + S曲线速度表
+#define ACCEL_STEPS 200  // 加速步数
+
+// 生成S曲线频率表（定时器重载值）
+uint16_t s_curve_freq[ACCEL_STEPS];
+
+void Generate_SCurve(uint32_t start_freq, uint32_t target_freq) {
+    for (int i = 0; i < ACCEL_STEPS; i++) {
+        float t = (float)i / ACCEL_STEPS;  // 0→1
+        // S曲线公式: 使用sigmoid或三角函数的对称S
+        // f(t) = start + (target-start) × (1-cos(&pi;×t))/2
+        float s = (1.0f - cosf(3.14159f * t)) / 2.0f;
+        float freq = start_freq + (target_freq - start_freq) * s;
+        s_curve_freq[i] = (uint16_t)(SystemCoreClock / freq);
+    }
+}
+
+// 步进脉冲定时器中断
+void TIMx_IRQHandler(void) {
+    // 更新定时器ARR → 改变脉冲频率
+    if (step_index < ACCEL_STEPS) {
+        TIMx->ARR = s_curve_freq[step_index++];  // 加速
+    } else if (step_index < total_steps - ACCEL_STEPS) {
+        TIMx->ARR = s_curve_freq[ACCEL_STEPS-1];  // 匀速
+    } else {
+        TIMx->ARR = s_curve_freq[total_steps - step_index];  // 减速
+    }
+}</code></pre>
+
+<h2>🔧 常见驱动器芯片对比</h2>
+<table>
+<tr><th>芯片</th><th>最大电流</th><th>微步</th><th>最大电压</th><th>Rds(on)</th><th>价格</th><th>特点</th></tr>
+<tr><td>A4988</td><td>2A</td><td>1/16</td><td>35V</td><td>0.32&Omega;</td><td>¥5</td><td>最流行</td></tr>
+<tr><td>DRV8825</td><td>2.5A</td><td>1/32</td><td>45V</td><td>0.2&Omega;</td><td>¥8</td><td>高细分</td></tr>
+<tr><td>TMC2208</td><td>1.4A</td><td>1/256</td><td>36V</td><td>0.28&Omega;</td><td>¥12</td><td>超静音</td></tr>
+<tr><td>TMC2209</td><td>2.8A</td><td>1/256</td><td>29V</td><td>0.17&Omega;</td><td>¥18</td><td>StallGuard</td></tr>
+<tr><td>TMC5160</td><td>3A</td><td>1/256</td><td>60V</td><td>0.06&Omega;</td><td>¥55</td><td>高端旗舰</td></tr>
+</table>
+
+<div class="tip">
+<strong>TMC2209的StealthChop2 vs SpreadCycle：</strong><br>
+StealthChop2：静音模式，适合3D打印机，低速安静但高速扭矩不足<br>
+SpreadCycle：高性能模式，有轻微噪音但全速段扭矩保持<br>
+可通过UART配置切换模式，无需改动硬件
+</div>
+
+<h2>📏 共振与失步问题</h2>
+<div class="warn">
+<strong>步进电机共振区：</strong> 每台步进电机都有特定的共振频率，在此频率下振动幅度急剧增大，可能导致丢步。常见共振区在50-200RPM。<br><br>
+<strong>解决方案：</strong><br>
+1. 加速时快速穿过共振区（不在此频率段做匀速）<br>
+2. 使用微步驱动（16细分以上，振动减小到1/16）<br>
+3. 机械阻尼（加装减震垫、柔性联轴器）<br>
+4. 使用TMC系列芯片的共振抑制算法<br>
+5. 电流闭环控制（通过反电动势检测丢步）
+</div><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 步进电机丢步？</p>

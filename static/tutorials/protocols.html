@@ -467,7 +467,94 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 <div class="breadcrumb">📐 <a href="index.html">返回工具教程合集</a></div>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+<h2>🔌 逻辑电平转换实战</h2>
+<table>
+<tr><th>方案</th><th>速度</th><th>双向</th><th>通道数</th><th>价格</th><th>适用</th></tr>
+<tr><td>电阻分压(1.8k+3.3k)</td><td>&le;1MHz</td><td>单向</td><td>每路2电阻</td><td>¥0.02</td><td>低速单向</td></tr>
+<tr><td>BSS138 MOSFET</td><td>&le;2MHz</td><td>双向</td><td>1/片</td><td>¥0.15</td><td>I2C/双向</td></tr>
+<tr><td>TXS0108E</td><td>&le;60Mbps</td><td>双向/自动</td><td>8</td><td>¥3</td><td>通用, 推荐!</td></tr>
+<tr><td>74LVC245/4245</td><td>&le;100Mbps</td><td>单向</td><td>8</td><td>¥2</td><td>高速并行</td></tr>
+<tr><td>SN74AVC4T774</td><td>&le;360Mbps</td><td>双向可配</td><td>4</td><td>¥8</td><td>SD卡/SPI高速</td></tr>
+</table>
+
+<pre><code>// 3.3V → 5V 电平转换的"野路子"与正规做法
+// 
+// 野路子1: 很多5V MCU的输入高电平阈值Vih=0.7×Vcc=3.5V
+// 3.3V输出不够? → 错! 查数据手册Vih通常=2.0V左右
+//
+// 野路子2: 用GPIO开漏+上拉电阻
+// 5V设备开漏输出→上拉到3.3V→3.3V MCU接收(安全)
+// 3.3V开漏输出→上拉到5V→5V设备接收(注意!查看引脚是否5V耐受)
+//
+// 正规做法: 使用电平转换芯片TXS0108E
+// 无需方向控制、自动双向、8通道、推挽/开漏自适应</code></pre>
+
+<h2>📡 信号完整性检查清单</h2>
+<div class="warn">
+<strong>排查通信问题的10步checklist：</strong>
+<ol>
+<li>共地了吗？两个设备必须有公共地线！(最常见错误)</li>
+<li>BAUD率误差在允许范围内吗？(标准UART容忍±2%, 内部HSI温度漂移可达±5% → 必须校准或用HSE晶振)</li>
+<li>逻辑电平匹配吗？3.3V↔5V需要转换</li>
+<li>线序对吗？TX↔RX交叉、MOSI↔MOSI直连、SDA/SDA直连</li>
+<li>上拉电阻？I2C必须外接(4.7k&Omega;@3.3V), SPI的CS需要上拉防浮空</li>
+<li>终端电阻？RS485/RS422/CAN需要在总线两端加120&Omega;</li>
+<li>线长？UART≤2m, I2C≤30cm(PCB上), SPI≤10cm, RS485≤1200m</li>
+<li>干扰源？电机/继电器/开关电源与信号线保持5cm以上距离</li>
+<li>共模电压？RS485共模范围-7V~+12V, 超出会永久损坏</li>
+<li>总线冲突？RS485多个发送器同时发送→短路→需要方向控制(DE/RE)</li>
+</ol>
+</div>
+
+<h2>⚡ 用逻辑分析仪查通信问题</h2>
+<pre><code>// Saleae Logic / PulseView 的逻辑分析仪使用技巧
+// 硬件: 8通道/24MHz采样率的CY7C68013A方案(¥25-40)
+
+// 关键设置:
+// 采样率: ≥ 通信速率的 10倍 (如115200 bps → ≥1.15MHz)
+// 触发: UART→下降沿, I2C→起始条件, SPI→CS下降沿
+// 协议解码: 选择对应协议、设置波特率/极性和相位
+
+// 常见问题与波形判断:
+// UART:
+// - 全部为0xFF: 线断了或对方未发送
+// - 偶发错误字节: 波特率偏差(对照波形测量位宽)
+// - 只有0x00: TX/RX接反了(检查交叉)
+//
+// I2C:
+// - SDA始终低: 从设备拉死(地址错误或时钟停)
+// - 有SCK无SDA: 上拉电阻缺失或太大
+// - 前7bit对后8bit不对: 地址左移1位？(有些库已做, 有些未做)
+//
+// SPI:
+// - MISO全0: 从设备未正确响应(检查CS时序)
+// - 数据移位: CPOL/CPHA配置错误
+// - 第一个字节错误: CS建立时间不够(在CS拉低后delay 10&mu;s)</code></pre>
+
+<h2>🔧 通信协议的选择决策树</h2>
+<pre><code>需要通信的两个设备...
+
+├── 都在同一块PCB上?
+│   ├── 需要多从设备? → I2C (2线, 最多127个从设备)
+│   ├── 需要高速? → SPI (4线, 可达50Mbps)
+│   └── 最简单、只有2个设备? → UART (2线, 常用115200bps)
+│
+├── 距离 2-10米?
+│   ├── 抗干扰要求高? → RS485 (差分, 1200m)
+│   └── 简单点对点? → UART + MAX232 (RS232, 15m)
+│
+├── 距离 10-50米?
+│   └── RS485
+│
+├── 工业/汽车场景?
+│   ├── 汽车内部 → CAN (差分, 多主, 无损仲裁)
+│   ├── 简单传感器/执行器 → LIN (单线, 19.2kbps, 便宜)
+│   └── 工业自动化 → RS485 + Modbus RTU
+│
+└── 无线?
+    ├── 10m内 → BLE (nRF52/ESP32)
+    ├── 100m-几km → LoRa (SX1278)
+    └── 需要自组网 → Zigbee</code></pre><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: I2C和SPI选哪个？</p>

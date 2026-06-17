@@ -571,7 +571,118 @@ CAN调试检查清单:
 </div>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+
+<h2>🚗 汽车功能安全标准 ISO 26262</h2>
+<table>
+<tr><th>ASIL等级</th><th>单点故障指标</th><th>潜在故障指标</th><th>安全目标示例</th></tr>
+<tr><td>QM</td><td>无要求</td><td>无要求</td><td>信息娱乐系统</td></tr>
+<tr><td>ASIL A</td><td>&ge;90%</td><td>&ge;60%</td><td>座椅加热</td></tr>
+<tr><td>ASIL B</td><td>&ge;90%</td><td>&ge;60%</td><td>仪表盘、车灯</td></tr>
+<tr><td>ASIL C</td><td>&ge;97%</td><td>&ge;80%</td><td>自适应巡航</td></tr>
+<tr><td>ASIL D</td><td>&ge;99%</td><td>&ge;90%</td><td>刹车、转向、气囊</td></tr>
+</table>
+
+<div class="note">
+<strong>S32K144的ASIL B就绪特性：</strong><br>
+- 双核锁步(Dual-core Lockstep) → 检测处理器故障<br>
+- ECC on Flash/SRAM → 单比特纠错、双比特检测<br>
+- 存储器保护单元(MPU) → 防止任务间非法访问<br>
+- 内部看门狗+外部窗口看门狗 → 双级超时保护<br>
+- 时钟监控(CMU) → 检测晶振停振/偏差<br>
+- 电源监控(PMC) → 检测过压/欠压<br>
+- 自检库(S32K SDK自带) → ADC/DAC/Flash测试
+</div>
+
+<h2>🔌 AUTOSAR架构入门</h2>
+<pre><code>AUTOSAR分层架构:
+┌──────────────────────────────────────┐
+│         应用层 (Application)          │  ← SWC (Software Component)
+├──────────────────────────────────────┤
+│       RTE (Runtime Environment)       │  ← 虚拟功能总线(VFB)
+├──────────────────────────────────────┤
+│  服务层    │  ECU抽象层  │  复杂驱动  │
+├──────────────────────────────────────┤
+│       MCAL (Microcontroller Abstraction)│  ← CAN/LIN/SPI/I2C/ADC/DIO驱动
+└──────────────────────────────────────┘
+           硬件 (S32K144)
+
+// MCAL层关键模块:
+// Can → CAN驱动(CAN_Write/CanIf)
+// Lin → LIN驱动(Lin_SendFrame)
+// Dio → 数字IO(Dio_WriteChannel)
+// Adc → ADC驱动(Adc_StartGroupConversion)
+// Pwm → PWM驱动(Pwm_SetDutyCycle)
+// Gpt → 通用定时器(Gpt_StartTimer)
+// Wdg → 看门狗(Wdg_SetTriggerCondition)
+// Eep → EEPROM模拟(Fee_Write)
+
+// S32K144的AUTOSAR MCAL由NXP提供(需NDA)
+// 开源替代: Arctic Studio + OpenSAR
+// 入门建议: 先用SDK裸机开发理解MCAL, 再引入AUTOSAR</code></pre>
+
+<h2>🛡️ S32K144安全机制实战</h2>
+<pre><code>// 1. 看门狗配置 (独立的128kHz LPO时钟)
+void WDOG_Config(void) {
+    WDOG->CNT = 0;  // 必须先解锁
+    // 超时时间 = (TOVAL+1) × 256 / 128kHz
+    // TOVAL=999 → (1000×256)/128000 = 2秒
+    WDOG->TOVAL = 999;
+    WDOG->CS = WDOG_CS_CLK(1)      // LPO时钟
+             | WDOG_CS_EN(1)       // 使能
+             | WDOG_CS_WIN(1)      // 窗口模式
+             | WDOG_CS_UPDATE(1);  // 允许更新
+    // 刷新: WDOG->CNT = 0x02A4 + 0xB480; (顺序不可逆)
+}
+
+// 2. ECC错误注入测试
+void ECC_Test(void) {
+    // 使能Flash ECC
+    MSCM->OCMDR[0] |= MSCM_OCMDR_ECCEN(1);
+    
+    // 使能ECC中断
+    MSCM->OCMDR[0] |= MSCM_OCMDR_ECCIE(1);
+    
+    // 在ECC ISR中记录错误地址
+    // 单比特错误: 硬件自动纠正, 记录日志
+    // 双比特错误: 不可纠正, 进入安全状态
+}
+
+// 3. 时钟监控(FCCU)
+void FCCU_Config(void) {
+    // 配置FCCU: 检测时钟丢失 → 切换到内部IRC → 通知系统
+    // NCF(不可配置故障): 时钟丢失 → 直接触发FCCU
+    // CF(可配置故障): ADC异常/DMA错误 → FCCU_CF_S寄存器
+}</code></pre>
+
+<h2>📟 LIN总线 (S32K144内置LIN控制器)</h2>
+<pre><code>// LIN帧结构:
+// [Sync Break(13+bit低)] [Sync Byte 0x55] [PID] [Data 1-8B] [Checksum]
+// 
+// PID = ID[0:5] | P[0:1]  (P0=ID0⊕ID1⊕ID2⊕ID4, P1=¬(ID1⊕ID3⊕ID4⊕ID5))
+// 
+// 经典调度表:
+// Master发送帧头 → 指定的Slave响应 → 下一个帧头 → ...
+
+// S32K144 LPUART支持LIN模式
+void LPUART_LIN_Config(void) {
+    // 设置13bit Break检测
+    LPUART1->BAUD |= LPUART_BAUD_M10(1);    // 13bit模式
+    LPUART1->STAT |= LPUART_STAT_LBKDIF(1); // 使能Break中断
+    
+    // LIN波特率: 19200bps (S32K144 BUSCLK=48MHz)
+    LPUART1->BAUD = LPUART_BAUD_SBR(156)    // 48000000/(16×19200)-1
+                  | LPUART_BAUD_OSR(15);     // 16x过采样
+}</code></pre>
+
+<h2>🧪 汽车级测试与认证</h2>
+<table>
+<tr><th>测试项</th><th>标准</th><th>条件</th><th>目标</th></tr>
+<tr><td>温度循环</td><td>AEC-Q100 G</td><td>-40°C~+125°C, 1000次</td><td>焊接可靠性</td></tr>
+<tr><td>ESD人体模型</td><td>AEC-Q100-002</td><td>±2kV HBM</td><td>抗静电</td></tr>
+<tr><td>ESD充电器件</td><td>AEC-Q100-011</td><td>±500V CDM</td><td>制造过程静电</td></tr>
+<tr><td>闩锁效应</td><td>AEC-Q100-004</td><td>±100mA触发</td><td>不损坏</td></tr>
+<tr><td>潮湿敏感度</td><td>J-STD-020</td><td>MSL3(168h@30°C/60%)</td><td>焊接前吸潮</td></tr>
+</table><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: S32DS和STM32CubeIDE区别？</p>

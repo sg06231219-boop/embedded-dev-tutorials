@@ -572,7 +572,104 @@ DLC=1: [0xFF] (所有节点必须响应并停止运动)
 </div>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+
+<h2>🚗 CAN FD (Flexible Data Rate) 简介</h2>
+<p>传统CAN 2.0B最大8字节数据，1Mbps速率。CAN FD突破这些限制：</p>
+<table>
+<tr><th>特性</th><th>CAN 2.0B</th><th>CAN FD</th></tr>
+<tr><td>数据段速率</td><td>最大1 Mbps</td><td>最大8 Mbps</td></tr>
+<tr><td>数据长度</td><td>0-8 字节</td><td>0-64 字节</td></tr>
+<tr><td>CRC长度</td><td>15 bit</td><td>17/21 bit (自适应)</td></tr>
+<tr><td>兼容性</td><td>—</td><td>向下兼容CAN 2.0B节点</td></tr>
+<tr><td>BRS位</td><td>无</td><td>波特率切换标志位</td></tr>
+</table>
+
+<pre><code>// STM32G4/H7/FDCAN外设配置CAN FD
+FDCAN_TxHeaderTypeDef TxHeader;
+TxHeader.Identifier = 0x321;
+TxHeader.IdType = FDCAN_STANDARD_ID;
+TxHeader.TxFrameType = FDCAN_DATA_FRAME;
+TxHeader.DataLength = FDCAN_DLC_BYTES_64;  // 64字节!
+TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+TxHeader.BitRateSwitch = FDCAN_BRS_ON;      // 数据段高速
+TxHeader.FDFormat = FDCAN_FD_CAN;            // CAN FD格式
+
+uint8_t tx_data[64] = {0};
+// 填充数据...
+HAL_FDCAN_AddMessageToTxFifo(&hfdcan1, &TxHeader, tx_data);</code></pre>
+
+<h2>📋 CAN总线仲裁机制详解</h2>
+<pre><code>// CAN使用CSMA/CD+AMP (载波监听多路访问/冲突检测+仲裁消息优先级)
+// 显性电平=0(主动拉低), 隐性电平=1(被动上拉)
+
+// 两个节点同时发送时的仲裁过程:
+// 节点A: ID=0x320 = 0011 0010 0000
+// 节点B: ID=0x310 = 0011 0001 0000
+//           总线: 0011 00-- (在第7bit,B发送1但读到0→知道自己优先级低→立即退出发送)
+// 节点A继续: 0011 0010 0000 → 仲裁胜出
+
+// 这也就是为什么: ID越小优先级越高! (0x000 = 最高优先级)
+// 标准帧ID范围: 0x000 - 0x7FF (11bit)
+// 扩展帧ID范围: 0x00000000 - 0x1FFFFFFF (29bit)</code></pre>
+
+<h2>🚛 SAE J1939协议概要</h2>
+<p>J1939是商用车(卡车/客车/工程机械)的事实标准，基于CAN 2.0B扩展帧：</p>
+<pre><code>// J1939使用29bit扩展ID, 结构如下:
+// [Priority:3][R/DP:1][PF:8][PS:8][SA:8] = 28bit + 保留
+// 
+// PF(PDU Format): 0-239 = PDU1(点对点), 240-255 = PDU2(广播)
+// PS(PDU Specific): PDU1时为DA(目标地址), PDU2时为GE(组扩展)
+// SA: 源地址
+
+// 常用PGN(参数组编号):
+// PGN 61444 (0xF004): 电子发动机控制器 #1 (EEC1) → 转速、扭矩
+// PGN 65262 (0xFEEE): 发动机温度
+// PGN 65265 (0xFEF1): 巡航控制/车速
+// PGN 65270 (0xFEF6): 进气/排气条件
+
+// 例: 请求发动机转速(EEC1)
+typedef struct {
+    uint8_t  prio_res;    // Priority=6 → 0x18 (6<<5=0xC0, R=0, DP=0 → 0xC0)
+    uint8_t  pdu_f;       // PF=0x00 → 0x00
+    uint8_t  pdu_s;       // PS=DA(目标地址, 0=发动机, 3=刹车)
+    uint8_t  src_addr;    // SA=源地址
+} __attribute__((packed)) J1939_ID;
+
+// 请求8字节ID + 0字节数据(远程帧)或带数据的数据帧
+// 注意: J1939的多帧传输(>8字节)使用TP(传输协议), BAM广播5秒间隔</code></pre>
+
+<h2>🛡️ CAN总线故障诊断</h2>
+<table>
+<tr><th>错误类型</th><th>现象</th><th>原因</th><th>排查方法</th></tr>
+<tr><td>ACK错误</td><td>TEC递增, 重发</td><td>总线上无其他节点</td><td>至少2个节点才能通信</td></tr>
+<tr><td>位错误</td><td>发送与回读不一致</td><td>总线短路/终端电阻缺失</td><td>检查H/L间&Omega;应在45-65&Omega;</td></tr>
+<tr><td>填充错误</td><td>6个连续相同位</td><td>时钟精度/干扰</td><td>检查晶振/SJW配置</td></tr>
+<tr><td>格式错误</td><td>固定格式位错误</td><td>CRC分隔符/Delimter被破坏</td><td>检查总线长度&le;40m@1Mbps</td></tr>
+<tr><td>Bus-Off</td><td>TEC>255</td><td>持续错误</td><td>控制器自动脱离总线</td></tr>
+</table>
+
+<div class="warn">
+<strong>CAN总线调试必备工具：</strong> USB-CAN分析仪(¥30-200) + 上位机软件(CANtest/CANoe/CANalyzer)。可以抓取总线上的所有帧，按ID过滤，统计负载率，模拟节点发送。<br>
+<strong>没有分析仪时的土办法：</strong> 用另一个STM32做CAN监听节点，接收所有帧并通过串口转发到电脑。
+</div>
+
+<h2>⚙️ CAN总线物理层要点</h2>
+<pre><code>// CAN_H和CAN_L之间的终端电阻
+// 总线两端各一个120&Omega; → 并联等效60&Omega;
+// 万用表测量CAN_H-CAN_L(断电!)应为~60&Omega;, 
+// 如果60&Omega;→两端都有终端, 120&Omega;→只有一端, 开路→没有终端
+
+// 总线长度限制:
+// 1 Mbps → max 40m
+// 500 kbps → max 100m
+// 250 kbps → max 250m
+// 125 kbps → max 500m
+// 50 kbps → max 1000m
+
+// 采样点配置 (Sample Point = (1+TSEG1)/(1+TSEG1+TSEG2)):
+// 典型值: 75%-87.5%
+// 高速: TSEG1=11, TSEG2=4, SJW=1 → SP=(1+11)/(1+11+4)=75%@1Mbps
+// 长距离: TSEG1=13, TSEG2=2, SJW=1 → SP=(1+13)/(1+13+2)=87.5%</code></pre><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: CAN通信不上？</p>

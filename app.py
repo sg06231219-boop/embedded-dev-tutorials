@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 
-app = FastAPI(title="Embedded Dev Tutorials", version="1.4.1")
+app = FastAPI(title="Embedded Dev Tutorials", version="1.5.0")
 
 # Static files
 static_dir = os.path.join(os.path.dirname(__file__), "static")
@@ -22,7 +22,7 @@ async def index():
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "version": "1.4.1", "service": "embedded-dev-tutorials"}
+    return {"status": "ok", "version": "1.5.0", "service": "embedded-dev-tutorials"}
 
 
 @app.get("/tutorials/{page_name:path}")

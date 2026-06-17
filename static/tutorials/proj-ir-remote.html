@@ -532,7 +532,95 @@ if (cmd != last_key || (now - last_key_time) &gt; 300) {
 </ol>
 
 
-<hr><h2>❓ 常见问题 FAQ</h2>
+
+<h2>📡 红外遥控协议深度对比</h2>
+<table>
+<tr><th>协议</th><th>载波频率</th><th>编码方式</th><th>地址位</th><th>命令位</th><th>数据长度</th><th>典型设备</th></tr>
+<tr><td>NEC</td><td>38kHz</td><td>脉冲距离</td><td>8+8(反)</td><td>8+8(反)</td><td>32bit</td><td>日系家电</td></tr>
+<tr><td>Sony SIRC</td><td>40kHz</td><td>脉冲宽度</td><td>5/8/13</td><td>7</td><td>12/15/20bit</td><td>Sony全系列</td></tr>
+<tr><td>RC-5</td><td>36kHz</td><td>Manchester</td><td>5</td><td>6</td><td>14bit</td><td>飞利浦</td></tr>
+<tr><td>RC-6</td><td>36kHz</td><td>Manchester+</td><td>8</td><td>8</td><td>20bit+</td><td>飞利浦新款</td></tr>
+<tr><td>Samsung</td><td>38kHz</td><td>脉冲距离</td><td>16</td><td>16+16</td><td>48bit</td><td>三星电视</td></tr>
+</table>
+
+<h3>NEC协议细节（最常用）</h3>
+<pre><code>NEC帧结构:
+┌──────┐┌───┐  ┌─┐┌─┐┌─┐          ┌─┐┌─┐┌─┐┌─┐
+│9ms   ││4.5│  │ ││ ││ │   ...    │ ││ ││ ││ │
+│引导码││ms │  │0││1││1│          │0││0││1││0│
+└──────┘└───┘  └─┘└─┘└─┘          └─┘└─┘└─┘└─┘
+  Leader     地址(8bit) 地址反(8bit) 命令(8bit) 命令反(8bit)
+             总32bit数据 + 1bit Stop
+
+逻辑0: 562.5&mu;s载波 + 562.5&mu;s空闲 = 1.125ms
+逻辑1: 562.5&mu;s载波 + 1687.5&mu;s空闲 = 2.25ms
+重复码: 9ms载波 + 2.25ms空闲 + 562.5&mu;s载波(按住不放时每110ms发送)
+
+// NEC解码的容差范围(避免因晶振误差导致解码失败)
+#define NEC_PULSE    560   // &mu;s
+#define NEC_TOLERANCE 0.30  // 30%容差
+#define NEC_LEADER_H 9000
+#define NEC_LEADER_L 4500
+#define NEC_REPEAT_L 2250</code></pre>
+
+<h2>🔧 红外学习/克隆功能实现</h2>
+<pre><code>// 使用输入捕获测量脉冲宽度 → 存储 → 回放
+#define IR_CODE_MAX_LEN 200  // 最大脉冲数(含引导码+停止)
+
+typedef struct {
+    uint16_t pulses[IR_CODE_MAX_LEN];  // 脉宽序列(&mu;s)
+    uint16_t len;                       // 脉冲数
+    uint8_t protocol;                   // NEC=0, SIRC=1, RAW=2
+    uint32_t decoded;                   // 解码后的值
+} IR_Code;
+
+// 学习模式：记录所有脉冲宽度，不做解码
+void IR_LearnMode(void) {
+    // 1. 使能TIM输入捕获(上升沿/下降沿交替)
+    // 2. 每次捕获记录脉冲宽度
+    // 3. 超时3秒无新脉冲 → 保存
+    
+    IR_Code code;
+    code.len = 0;
+    // ... 捕获逻辑 ...
+}
+
+// 回放模式：按记录脉冲序列输出
+void IR_Replay(IR_Code* code) {
+    for (int i = 0; i < code->len; i++) {
+        IR_SendCarrier(code->pulses[i]);  // 38kHz载波开
+        if (++i < code->len)
+            IR_NoCarrier(code->pulses[i]);  // 载波关
+    }
+}
+
+// 压缩存储: 一个32bit NEC码占8字节(原始RAW约200字节)
+// 适合做"万能遥控器"的学习功能</code></pre>
+
+<h2>📊 红外发射功率与距离</h2>
+<table>
+<tr><th>电路</th><th>峰值电流</th><th>有效距离</th><th>波束角</th></tr>
+<tr><td>GPIO直驱(20mA)</td><td>~20mA</td><td>1-3m</td><td>~30°</td></tr>
+<tr><td>三极管驱动(S8050)</td><td>~100mA</td><td>5-8m</td><td>~30°</td></tr>
+<tr><td>MOSFET驱动+多管并联</td><td>~500mA</td><td>15-20m</td><td>~30°</td></tr>
+<tr><td>TSAL6200专用管@100mA</td><td>100mA</td><td>10-15m</td><td>±17°</td></tr>
+</table>
+
+<div class="tip">
+<strong>提升红外距离的实用技巧：</strong><br>
+1. 用PWM+三极管驱动(不要GPIO直驱) → 距离翻3倍<br>
+2. 占空比用33%(1/3载波)而非50% → 峰值电流更大但RMS不过热<br>
+3. 接收端加红外滤光片 → 减少环境光干扰 → 有效距离提升<br>
+4. 38kHz载波用TIM硬件生成 → 比bit-bang准确、不占CPU
+</div>
+
+<h2>🔐 红外通信安全与加密</h2>
+<div class="note">
+红外遥控信号是明文的，任何人都可以用接收头捕获。对于门禁、保险箱等安全应用：<br>
+- 滚动码(Rolling Code)：每次按发送递增计数器+加密，防止重放攻击<br>
+- 双向认证：设备收到命令后发送随机挑战码，遥控器计算响应<br>
+- 时间戳+签名：防止信号被录制后重放
+</div><hr><h2>❓ 常见问题 FAQ</h2>
 
 <div style="margin:12px 0;padding:12px 16px;background:var(--bg2);border-left:3px solid var(--a);border-radius:0 8px 8px 0">
   <p style="font-weight:600;color:var(--c1);margin-bottom:4px">Q: 解码不稳定？</p>
