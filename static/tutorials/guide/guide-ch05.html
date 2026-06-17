@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第5章：烧录与调试 - 嵌入式小白完全指南</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.8;max-width:880px;margin:0 auto;padding:14px}
+h1{font-size:1.55em;text-align:center;padding:16px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:1.15em;color:var(--a);margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--br)}
+h3{font-size:1.02em;color:var(--g);margin:18px 0 7px}
+h4{font-size:.95em;color:var(--o);margin:12px 0 5px}
+pre{background:#1c2128;border:1px solid var(--br);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0 12px;font-size:.82em;line-height:1.6;white-space:pre-wrap;word-break:break-all;position:relative}
+code{font-family:'SF Mono','Fira Code',monospace}
+pre code{color:#e6edf3}
+.note{background:rgba(210,153,29,.08);border:1px solid rgba(210,153,29,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--o)}
+.warn{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--r)}
+.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--g)}
+.example{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.25);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--a)}
+.example b{color:var(--g)}
+.trouble{background:rgba(163,113,247,.06);border:1px solid rgba(163,113,247,.3);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--p)}
+.trouble b{color:var(--p)}
+.card{background:var(--bg2);border:1px solid var(--br);border-radius:10px;margin:14px 0;overflow:hidden}
+.card>.h{padding:10px 14px;background:var(--bg3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card>.h>.name{font-weight:700;font-size:.9em;color:var(--t);font-family:monospace}
+.card>.h>.tag{font-size:.65em;padding:2px 8px;border-radius:8px;white-space:nowrap;border:1px solid var(--br);color:var(--t2)}
+.card>.h>.tag.g{background:rgba(63,185,80,.15);border-color:var(--g);color:var(--g)}
+.card>.h>.tag.y{background:rgba(210,153,29,.15);border-color:var(--o);color:var(--o)}
+.card>.h>.tag.r{background:rgba(248,81,73,.15);border-color:var(--r);color:var(--r)}
+.card>.h>.tag.b{background:rgba(88,166,255,.15);border-color:var(--a);color:var(--a)}
+.card>.h>.tag.p{background:rgba(163,113,247,.15);border-color:var(--p);color:var(--p)}
+.card>.b{padding:10px 14px;font-size:.87em}
+.card>.b>.desc{font-size:.92em;color:var(--t2);margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.81em;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--br)}
+td,th{padding:8px 12px;border-bottom:1px solid var(--br);text-align:left}
+th{background:var(--bg3);color:var(--a);font-weight:600}
+tr:last-child td{border-bottom:none}
+.step{background:var(--bg3);border-radius:6px;padding:8px 13px;margin:6px 0;font-size:.83em}
+.step b{color:var(--a)}
+.summary{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(163,113,247,.1));border:1px solid var(--br);border-radius:10px;padding:12px 16px;margin:18px 0;font-size:.88em;color:var(--t)}
+.summary b{color:var(--a)}
+.analogy{background:rgba(57,197,207,.07);border-left:3px solid var(--c1);padding:8px 13px;margin:8px 0;font-size:.82em;color:var(--c1);border-radius:0 6px 6px 0}
+.analogy b{color:var(--c1)}
+.chnav{display:flex;justify-content:space-between;margin:30px 0 10px;gap:12px;border-top:1px solid var(--br);padding-top:16px;flex-wrap:wrap}
+.chnav a{flex:1;text-align:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;color:var(--a);text-decoration:none;font-size:.85em;transition:all .2s;min-width:120px;cursor:pointer}
+.chnav a:hover{background:var(--bg3);border-color:var(--a)}
+.chnav .toc-link{flex:0;min-width:80px;background:var(--bg3);color:var(--t2)}
+.chnav .toc-link:hover{color:var(--a)}
+.copy-btn{position:absolute;top:4px;right:4px;padding:3px 10px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;color:var(--t2);font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--a);color:var(--bg)}
+.copy-btn.copied{background:var(--g);color:var(--bg);border-color:var(--g)}
+@media(max-width:480px){body{padding:10px}h1{font-size:1.3em}h2{font-size:1.05em}pre{font-size:.75em}}
+</style>
+</head>
+<body>
+
+<h1>第5章：烧录与调试</h1>
+<div class="summary"><b>📖 小白完全指南 · 5/14</b> | 阅读时间约3分钟</div>
+
+<p>编译生成.bin/.hex文件后，需要用<strong>烧录器</strong>把它写进单片机的Flash里。调试则是让程序在芯片里<strong>暂停、单步执行、查看变量</strong>，像"慢放"一样找Bug。</p>
+
+<div class="analogy">💡 <b>类比：</b>烧录=把程序<strong>刻到芯片的DNA里</strong>（写死在Flash中），调试=给程序<strong>做体检</strong>（停住→检查→继续→再检查）。</div>
+
+<h3>烧录方式对比</h3>
+
+<table>
+<tr><th>方式</th><th>工具</th><th>速度</th><th>调试支持</th><th>价格</th></tr>
+<tr><td>ST-Link</td><td>st-flash / st-util</td><td>快</td><td>✅ GDB</td><td>¥10(仿)</td></tr>
+<tr><td>J-Link</td><td>JLinkGDBServer</td><td>极快</td><td>✅ GDB+SWO</td><td>¥500+</td></tr>
+<tr><td>DAP-Link</td><td>OpenOCD</td><td>中</td><td>✅ GDB</td><td>¥20</td></tr>
+<tr><td>串口烧录</td><td>STM32 USART bootloader</td><td>慢</td><td>❌</td><td>¥0</td></tr>
+</table>
+
+<h3>OpenOCD 烧录</h3>
+
+<div class="warn">⚠️ <b>前提条件：</b>需要先安装OpenOCD。由于GitHub下载被墙，请尝试以下方式：<br>
+① 搜索"OpenOCD xpack 国内镜像"下载<br>
+② 从淘宝购买开发板卖家提供的资料包（通常包含OpenOCD）<br>
+③ 让有VPN的朋友帮忙下载<br>
+下载后解压到 <code>D:\EmbeddedTools\OpenOCD</code>，把bin目录加PATH即可。</div>
+
+<pre><code># 烧录命令
+openocd -f interface/stlink.cfg -f target/stm32f1x.cfg     -c "program build/blink.elf verify reset exit"
+
+# 只擦除
+openocd -f interface/stlink.cfg -f target/stm32f1x.cfg     -c "init; reset halt; flash erase_sector 0 0 last; reset run; shutdown"</code></pre>
+
+<h3>ST-Link 烧录（st-flash）</h3>
+
+<div class="warn">⚠️ <b>前提条件：</b>需要安装stlink工具。下载地址：<code>github.com/stlink-org/stlink/releases</code>（同GitHub，可能被墙）。替代方案：使用STM32CubeIDE自带的st-link驱动。</div>
+
+<pre><code># 安装stlink工具（需编译或下载预编译版）
+# github.com/stlink-org/stlink/releases
+# 下载后解压，把bin目录加PATH
+
+# 烧录BIN文件
+st-flash write blink.bin 0x08000000
+
+# 烧录HEX文件
+st-flash --format ihex write blink.hex
+
+# 擦除整片Flash
+st-flash erase
+
+# 读取Flash内容
+st-flash read flash_dump.bin 0x08000000 0x10000</code></pre>
+
+<h3>串口ISP烧录（零硬件成本！）</h3>
+
+<div class="tip">💡 <b>没有ST-Link？用USB转TTL也能烧！</b>STM32内置Bootloader支持串口下载，只需要CH340模块（¥5）。速度比ST-Link慢，但<strong>零额外成本</strong>。</div>
+
+<pre><code># 方式1：FlyMcu（最简单的Windows串口烧录工具）
+# 下载：www.flymcu.com（免费，中文界面）
+# 使用：
+# 1. BOOT0跳线接1（或按住BOOT0键上电）
+# 2. 打开FlyMcu → 选择COM口和hex文件
+# 3. 点击"开始编程"
+# 4. 烧录完成后BOOT0接回0，按复位键运行
+
+# 方式2：stm32flash（命令行工具）
+# 下载：github.com/ARMin stm32flash
+# 使用：
+stm32flash -w blink.hex -v -g 0x0 COM3
+# -w 写入  -v 校验  -g 0x0 写完从0地址运行  COM3 你的串口</code></pre>
+
+<div class="note">⚠️ <b>串口烧录要点：</b><br>
+• BOOT0必须接高电平(1)才能进入下载模式<br>
+• 烧录完成后BOOT0接回低电平(0)，按复位键才能运行程序<br>
+• 有些最小系统板有BOOT0跳线帽，方便切换<br>
+• 每次烧录都要切换BOOT0，不如ST-Link方便，但学习阶段完全够用</div>
+
+<h3>GDB调试</h3>
+
+<div class="note">⚠️ <b>说明：</b>GDB调试需要硬件调试器（ST-Link/DAP-Link/J-Link）。如果你暂时没有调试器，可以先跳过GDB部分，用printf调试（第11章详解）。下面提供两种调试方案：<strong>方案A用OpenOCD</strong>（免费开源，DAP-Link/ST-Link通用），<strong>方案B用st-util</strong>（ST-Link专用，更简单）。</div>
+
+<h4>方案A：OpenOCD + GDB（推荐，通用性更好）</h4>
+
+<pre><code># 终端1：启动OpenOCD作为GDB Server
+openocd -f interface/stlink.cfg -f target/stm32f1x.cfg
+# 看到 "Info : stm32f1x.cpu: hardware has 6 breakpoints" 就说明连接成功
+
+# 终端2：启动GDB客户端
+arm-none-eabi-gdb build/blink.elf
+
+# GDB常用命令（两方案通用）
+(gdb) target remote :3333         # 连接OpenOCD（注意端口3333）
+(gdb) monitor reset halt          # 复位并停住
+(gdb) load                         # 烧录程序到芯片
+(gdb) break main                   # 在main函数设断点
+(gdb) continue                     # 继续运行
+(gdb) step                         # 单步（进入函数）
+(gdb) next                         # 单步（跳过函数）
+(gdb) print variable               # 打印变量值
+(gdb) watch variable               # 监视变量变化
+(gdb) backtrace                    # 查看调用栈
+(gdb) info registers               # 查看CPU寄存器
+(gdb) x/10x 0x20000000            # 查看内存（16进制）
+(gdb) delete                       # 删除所有断点
+(gdb) quit                         # 退出</code></pre>
+
+<h4>方案B：st-util + GDB（ST-Link专用，简单）</h4>
+
+<div class="warn">⚠️ <b>前提：</b>需安装stlink工具：<code>github.com/stlink-org/stlink/releases</code>（GitHub可能被墙，替代：STM32CubeIDE自带st-link驱动）</div>
+
+<pre><code># 终端1：启动GDB Server
+st-util -p 4242
+
+# 终端2：启动GDB客户端
+arm-none-eabi-gdb build/blink.elf
+
+# GDB连接st-util
+(gdb) target remote localhost:4242
+(gdb) load
+(gdb) break main
+(gdb) continue
+# 其余命令与方案A相同</code></pre>
+
+<div class="tip">💡 <b>没有调试器怎么办？</b>用<strong>串口printf调试</strong>！第11章详细介绍了printf重定向方法，足够解决80%的问题。买ST-Link只需¥10，建议入门后尽快入手。</div>
+
+<h3>VS Code Cortex-Debug 配置</h3>
+
+<div class="note">⚠️ <b>前提：</b>① 已安装Cortex-Debug插件 ② 已安装OpenOCD或stlink工具 ③ ST-Link调试器已连接</div>
+
+<h4>方案A配置：OpenOCD（推荐，与GDB方案A配套）</h4>
+
+<pre><code>// .vscode/launch.json - OpenOCD方案
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug (OpenOCD)",
+            "cwd": "${workspaceFolder}",
+            "executable": "build/blink.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "serverType": "openocd",
+            "serverArgs": ["-f", "interface/stlink.cfg", "-f", "target/stm32f1x.cfg"],
+            "device": "STM32F103C8",
+            "svdFile": "STM32F103.svd"
+        }
+    ]
+}</code></pre>
+
+<h4>方案B配置：st-util（与GDB方案B配套）</h4>
+
+<pre><code>// .vscode/launch.json - st-util方案
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug (st-util)",
+            "cwd": "${workspaceFolder}",
+            "executable": "build/blink.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "serverType": "stutil",
+            "serverArgs": ["-p", "4242"],
+            "device": "STM32F103C8",
+            "svdFile": "STM32F103.svd"
+        }
+    ]
+}</code></pre>
+
+<div class="trouble">🔍 <b>常见问题：GDB连接不上</b><br>
+1. ST-Link驱动是否安装？<code>st-info --probe</code> 测试<br>
+2. 是否有其他程序占用了ST-Link？（关闭STM32CubeIDE等）<br>
+3. 接线是否正确？SWDIO/SWCLK/GND三根线必须接</div>
+
+<!-- ====== 第6章 ====== -->
+<a id="ch6"></a>
+<div class="summary">📖 <b>第6章学完你能干啥：</b>会用STM32 HAL库操作GPIO/UART/TIM/ADC，理解中断优先级，能独立写STM32小程序。</div>
+
+<div class="chnav">
+<a onclick="window.parent.loadPage('guide-ch04')">← 第4章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch06')">第6章 →</a>
+</div>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
