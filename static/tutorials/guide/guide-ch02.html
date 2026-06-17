@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第2章：CMake构建系统 - 嵌入式小白完全指南</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.8;max-width:880px;margin:0 auto;padding:14px}
+h1{font-size:1.55em;text-align:center;padding:16px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:1.15em;color:var(--a);margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--br)}
+h3{font-size:1.02em;color:var(--g);margin:18px 0 7px}
+h4{font-size:.95em;color:var(--o);margin:12px 0 5px}
+pre{background:#1c2128;border:1px solid var(--br);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0 12px;font-size:.82em;line-height:1.6;white-space:pre-wrap;word-break:break-all;position:relative}
+code{font-family:'SF Mono','Fira Code',monospace}
+pre code{color:#e6edf3}
+.note{background:rgba(210,153,29,.08);border:1px solid rgba(210,153,29,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--o)}
+.warn{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--r)}
+.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--g)}
+.example{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.25);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--a)}
+.example b{color:var(--g)}
+.trouble{background:rgba(163,113,247,.06);border:1px solid rgba(163,113,247,.3);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--p)}
+.trouble b{color:var(--p)}
+.card{background:var(--bg2);border:1px solid var(--br);border-radius:10px;margin:14px 0;overflow:hidden}
+.card>.h{padding:10px 14px;background:var(--bg3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card>.h>.name{font-weight:700;font-size:.9em;color:var(--t);font-family:monospace}
+.card>.h>.tag{font-size:.65em;padding:2px 8px;border-radius:8px;white-space:nowrap;border:1px solid var(--br);color:var(--t2)}
+.card>.h>.tag.g{background:rgba(63,185,80,.15);border-color:var(--g);color:var(--g)}
+.card>.h>.tag.y{background:rgba(210,153,29,.15);border-color:var(--o);color:var(--o)}
+.card>.h>.tag.r{background:rgba(248,81,73,.15);border-color:var(--r);color:var(--r)}
+.card>.h>.tag.b{background:rgba(88,166,255,.15);border-color:var(--a);color:var(--a)}
+.card>.h>.tag.p{background:rgba(163,113,247,.15);border-color:var(--p);color:var(--p)}
+.card>.b{padding:10px 14px;font-size:.87em}
+.card>.b>.desc{font-size:.92em;color:var(--t2);margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.81em;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--br)}
+td,th{padding:8px 12px;border-bottom:1px solid var(--br);text-align:left}
+th{background:var(--bg3);color:var(--a);font-weight:600}
+tr:last-child td{border-bottom:none}
+.step{background:var(--bg3);border-radius:6px;padding:8px 13px;margin:6px 0;font-size:.83em}
+.step b{color:var(--a)}
+.summary{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(163,113,247,.1));border:1px solid var(--br);border-radius:10px;padding:12px 16px;margin:18px 0;font-size:.88em;color:var(--t)}
+.summary b{color:var(--a)}
+.analogy{background:rgba(57,197,207,.07);border-left:3px solid var(--c1);padding:8px 13px;margin:8px 0;font-size:.82em;color:var(--c1);border-radius:0 6px 6px 0}
+.analogy b{color:var(--c1)}
+.chnav{display:flex;justify-content:space-between;margin:30px 0 10px;gap:12px;border-top:1px solid var(--br);padding-top:16px;flex-wrap:wrap}
+.chnav a{flex:1;text-align:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;color:var(--a);text-decoration:none;font-size:.85em;transition:all .2s;min-width:120px;cursor:pointer}
+.chnav a:hover{background:var(--bg3);border-color:var(--a)}
+.chnav .toc-link{flex:0;min-width:80px;background:var(--bg3);color:var(--t2)}
+.chnav .toc-link:hover{color:var(--a)}
+.copy-btn{position:absolute;top:4px;right:4px;padding:3px 10px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;color:var(--t2);font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--a);color:var(--bg)}
+.copy-btn.copied{background:var(--g);color:var(--bg);border-color:var(--g)}
+@media(max-width:480px){body{padding:10px}h1{font-size:1.3em}h2{font-size:1.05em}pre{font-size:.75em}}
+</style>
+</head>
+<body>
+
+<h1>第2章：CMake构建系统</h1>
+<div class="summary"><b>📖 小白完全指南 · 2/14</b> | 阅读时间约4分钟</div>
+
+<p>CMake不直接编译代码——它是<strong>"构建文件生成器"</strong>。你写CMakeLists.txt描述项目结构，CMake帮你生成Makefile，再用make编译。</p>
+
+<div class="analogy">💡 <b>类比：</b>CMake就像<strong>建筑设计师</strong>，你告诉他"我要3层楼、2个卧室"（CMakeLists.txt），他画出施工图纸（Makefile），施工队（make）按图纸盖房子（编译）。</div>
+
+<h3>CMakeLists.txt 最小模板</h3>
+
+<pre><code>cmake_minimum_required(VERSION 3.20)
+project(stm32_blink C ASM)
+
+set(SOURCES src/main.c src/stm32f1xx_it.c src/system_stm32f1xx.c)
+
+include_directories(inc CMSIS)
+
+add_compile_options(-mcpu=cortex-m3 -mthumb -Wall -ffunction-sections -fdata-sections)
+
+add_link_options(-mcpu=cortex-m3 -mthumb -Wl,--gc-sections
+    -T${CMAKE_SOURCE_DIR}/STM32F103C8Tx.ld
+    -Wl,-Map=${PROJECT_NAME}.map)
+
+add_executable(${PROJECT_NAME}.elf ${SOURCES})
+
+add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.bin
+    COMMAND ${CMAKE_OBJCOPY} -O ihex ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex
+    COMMAND ${CMAKE_SIZE} ${PROJECT_NAME}.elf)</code></pre>
+
+<h3>交叉编译工具链文件</h3>
+
+<pre><code># toolchain-arm.cmake
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR ARM)
+
+set(TOOLCHAIN_PREFIX arm-none-eabi-)
+set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+set(CMAKE_AR ${TOOLCHAIN_PREFIX}ar)
+set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
+set(CMAKE_OBJDUMP ${TOOLCHAIN_PREFIX}objdump)
+set(CMAKE_SIZE ${TOOLCHAIN_PREFIX}size)
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)</code></pre>
+
+<h3>构建命令</h3>
+
+<pre><code># 创建build目录（保持源码干净）
+mkdir build &amp;&amp; cd build
+
+# 配置（生成Makefile）
+cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake -DCMAKE_BUILD_TYPE=Debug ..
+
+# 编译（4线程并行）
+cmake --build . -j4
+
+# 清理
+cmake --build . --target clean</code></pre>
+
+<div class="trouble">🔍 <b>常见问题：cmake找不到arm-none-eabi-gcc</b><br>
+工具链没加PATH。解决：把ARM GCC的bin目录加到PATH，或在toolchain文件写死路径：<br><code>set(CMAKE_C_COMPILER "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/arm-none-eabi-gcc.exe")</code></div>
+
+<div class="example-block">
+<div class="ex-title">📝 完整示例：CMake构建STM32项目</div>
+<div class="ex-input">项目结构 + 构建命令：</div>
+<pre><code>stm32-project/
+├── CMakeLists.txt
+├── toolchain-arm.cmake
+├── STM32F103C8Tx.ld
+├── inc/
+└── src/
+    ├── main.c
+    └── stm32f1xx_it.c
+
+# 构建步骤：
+mkdir build &amp;&amp; cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build . -j4</code></pre>
+<div class="ex-output">输出结果：</div>
+<pre><code>-- The C compiler identification is GNU 14.2.1
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /path/build
+[ 33%] Building C object CMakeFiles/stm32_blink.dir/src/main.c.o
+[ 66%] Building C object CMakeFiles/stm32_blink.dir/src/stm32f1xx_it.c.o
+[100%] Linking C executable stm32_blink.elf
+PostBuild: arm-none-eabi-objcopy -O binary stm32_blink.elf stm32_blink.bin
+PostBuild: arm-none-eabi-objcopy -O ihex stm32_blink.elf stm32_blink.hex
+   text    data     bss     dec     hex filename
+   1580      20     256    1856     740 stm32_blink.elf
+
+✅ 构建成功！烧录：st-flash write stm32_blink.bin 0x08000000</pre>
+</div>
+
+<h3>🚀 5分钟快速上手：最小可编译项目</h3>
+
+<p>跟着做，<strong>从零到一个能编译的项目</strong>，只需5分钟：</p>
+
+<div class="step"><b>步骤1：</b>创建项目目录</div>
+<pre><code>mkdir stm32-blink &amp;&amp; cd stm32-blink
+mkdir src inc</code></pre>
+
+<div class="step"><b>步骤2：</b>创建最小main.c（点灯程序，无需任何库）</div>
+<pre><code># src/main.c - 最小STM32程序（纯寄存器，无需HAL库）
+// 定义寄存器地址
+#define RCC_APB2ENR  (*(volatile uint32_t*)0x40021018)
+#define GPIOC_CRH    (*(volatile uint32_t*)0x40011004)
+#define GPIOC_ODR    (*(volatile uint32_t*)0x4001100C)
+
+void delay(volatile uint32_t count) {
+    while(count--);
+}
+
+int main(void) {
+    // 使能GPIOC时钟
+    RCC_APB2ENR |= (1 &lt;&lt; 4);
+    
+    // 配置PC13为推挽输出（50MHz）
+    GPIOC_CRH = (GPIOC_CRH &amp; ~0x00F00000) | 0x00300000;
+    
+    while(1) {
+        GPIOC_ODR ^= (1 &lt;&lt; 13);  // 翻转PC13
+        delay(500000);
+    }
+}</code></pre>
+
+<div class="step"><b>步骤3：</b>创建最小链接脚本</div>
+<pre><code>/* STM32F103C8Tx.ld - 最小版（含向量表） */
+ENTRY(Reset_Handler)
+
+_estack = ORIGIN(RAM) + LENGTH(RAM);  /* 栈顶 = RAM末尾 */
+
+MEMORY {
+  FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 64K
+  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 20K
+}
+SECTIONS {
+  .isr_vector : {
+    . = ALIGN(4);
+    KEEP(*(.isr_vector))  /* 中断向量表（必须保留！） */
+    . = ALIGN(4);
+  } > FLASH
+
+  .text : { *(.text*) } > FLASH
+  .rodata : { *(.rodata*) } > FLASH
+  .data : { *(.data*) } > RAM AT > FLASH
+  .bss : { *(.bss*) *(COMMON) } > RAM
+}
+
+/* 最小启动代码（添加到main.c底部） */
+/*
+__attribute__((section(".isr_vector")))
+void (* const g_pfnVectors[])(void) = {
+    (void *)&_estack,     // 初始栈指针
+    Reset_Handler,         // 复位向量
+};
+
+void Reset_Handler(void) {
+    // 复制.data段从Flash到RAM
+    extern uint32_t _sdata, _edata, _sidata;
+    uint32_t *src = &_sidata, *dst = &_sdata;
+    while (dst < &_edata) *dst++ = *src++;
+    // 清零.bss段
+    extern uint32_t _sbss, _ebss;
+    dst = &_sbss;
+    while (dst < &_ebss) *dst++ = 0;
+    // 跳转到main
+    main();
+    while(1);
+}
+*/</code></pre>
+
+<div class="step"><b>步骤4：</b>创建CMakeLists.txt</div>
+<pre><code>cmake_minimum_required(VERSION 3.20)
+project(stm32_blink C)
+add_compile_options(-mcpu=cortex-m3 -mthumb -Wall -O2 -g3 -ffunction-sections -fdata-sections)
+add_link_options(-mcpu=cortex-m3 -mthumb -Wl,--gc-sections -T${CMAKE_SOURCE_DIR}/STM32F103C8Tx.ld --specs=nano.specs --specs=nosys.specs)
+add_executable(blink.elf src/main.c)
+add_custom_command(TARGET blink.elf POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O binary blink.elf blink.bin
+    COMMAND ${CMAKE_SIZE} blink.elf)</code></pre>
+
+<div class="step"><b>步骤4.5：</b>创建工具链文件（保存为 <code>toolchain-arm.cmake</code>，放在项目根目录）</div>
+<pre><code># toolchain-arm.cmake - 告诉CMake用ARM编译器
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR ARM)
+set(TOOLCHAIN_PREFIX arm-none-eabi-)
+set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+set(CMAKE_AR ${TOOLCHAIN_PREFIX}ar)
+set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
+set(CMAKE_OBJDUMP ${TOOLCHAIN_PREFIX}objdump)
+set(CMAKE_SIZE ${TOOLCHAIN_PREFIX}size)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)</code></pre>
+
+<div class="step"><b>步骤5：</b>构建！</div>
+<pre><code>mkdir build &amp;&amp; cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake ..
+cmake --build .</code></pre>
+
+<div class="example-block">
+<div class="ex-title">📝 构建成功输出</div>
+<div class="ex-output">预期结果：</div>
+<pre><code>-- The C compiler identification is GNU 14.2.1
+-- Configuring done
+-- Generating done
+[ 50%] Building C object CMakeFiles/blink.dir/src/main.c.o
+[100%] Linking C executable blink.elf
+PostBuild: arm-none-eabi-objcopy -O binary blink.elf blink.bin
+   text    data     bss     dec     hex filename
+    120       0       0     120     78 blink.elf
+
+✅ 编译成功！blink.bin就是你的固件，可以烧录了！</pre>
+</div>
+
+<div class="tip">💡 <b>为什么用纯寄存器不用HAL库？</b>因为这个项目<strong>不依赖任何外部文件</strong>，你能直接编译通过！等熟悉了流程，再用CubeMX生成HAL库工程（第6章会教）。</div>
+
+<!-- ====== 第3章 ====== -->
+<a id="ch3"></a>
+<div class="summary">📖 <b>第3章学完你能干啥：</b>能读懂和编写Makefile，理解规则/变量/自动变量/模式规则，能写完整STM32 Makefile。</div>
+
+<div class="chnav">
+<a onclick="window.parent.loadPage('guide-ch01')">← 第1章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch03')">第3章 →</a>
+</div>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
