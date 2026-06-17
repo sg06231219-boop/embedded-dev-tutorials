@@ -55,7 +55,7 @@ tr:nth-child(even){background:var(--bg2)}
 <div class="analogy">💡 <b>类比：</b>CMake就像装修公司的设计图——你描述"我要三室两厅、开放式厨房"，CMake生成具体的"先砌墙、再布水电、最后刷漆"的施工计划。Makefile就是那个按计划执行的人。</div>
 
 <!-- ==================== 安装 ==================== -->
-<h2 id="install">📦 安装 CMake</h2>
+<h2 id="install">📦 安装 CMake <span class="tag g">🟢入门</span></h2>
 
 <pre><code># 方法1：winget（推荐）
 winget install Kitware.CMake
@@ -70,7 +70,7 @@ cmake --version
 <div class="tip">💡 <b>CMake只是生成器：</b>CMake本身不编译，它生成Makefile（或Ninja），再由make/ninja执行编译。Windows上CMake默认用Ninja生成器，比Make快30%。</div>
 
 <!-- ==================== 为什么用CMake ==================== -->
-<h2 id="why">🤔 为什么要用 CMake</h2>
+<h2 id="why">🤔 为什么要用 CMake <span class="tag g">🟢入门</span></h2>
 
 <p>不用CMake也可以编译嵌入式项目（直接arm-none-eabi-gcc一条命令），但有以下问题：</p>
 <table>
@@ -83,7 +83,7 @@ cmake --version
 </table>
 
 <!-- ==================== 最小项目 ==================== -->
-<h2 id="basic">🚀 最小 CMake 项目（5步跑通）</h2>
+<h2 id="basic">🚀 最小 CMake 项目（5步跑通）<span class="tag g">🟢入门</span></h2>
 
 <div class="step"><b>步骤1：</b>创建项目目录</div>
 <pre><code>mkdir blink && cd blink
@@ -214,7 +214,7 @@ openocd -f interface/stlink.cfg -f target/stm32f1x.cfg \
 st-flash write build/blink.bin 0x08000000</code></pre>
 
 <!-- ==================== 项目结构 ==================== -->
-<h2 id="structure">🏗️ 标准项目结构</h2>
+<h2 id="structure">🏗️ 标准项目结构 <span class="tag o">🟡进阶</span></h2>
 
 <p>实际项目比最小例子复杂，一般这样组织：</p>
 <pre><code>project/
@@ -262,7 +262,7 @@ st-flash write build/blink.bin 0x08000000</code></pre>
 └── build/                      # 构建输出（不要提交到Git）</code></pre>
 
 <!-- ==================== 工具链文件 ==================== -->
-<h2 id="toolchain">🔧 工具链文件（可选最佳实践）</h2>
+<h2 id="toolchain">🔧 工具链文件（可选最佳实践）<span class="tag o">🟡进阶</span></h2>
 
 <p>把工具链配置单独放到一个文件，CMakeLists.txt更整洁：</p>
 
@@ -304,7 +304,7 @@ cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-arm.cmake ..
 cmake --build .</code></pre>
 
 <!-- ==================== 目标 ==================== -->
-<h2 id="target">🎯 Target（目标）详解</h2>
+<h2 id="target">🎯 Target（目标）详解 <span class="tag o">🟡进阶</span></h2>
 
 <p>CMake的核心概念是Target（目标）。每个Target代表一个可构建的东西：可执行文件、库、或自定义命令。</p>
 
@@ -347,7 +347,7 @@ target_link_libraries(myapp PRIVATE hal)  # 自动携带hal的include目录</cod
 <div class="note">⚠️ <b>规则：</b>实现文件(.c)的库用PUBLIC/PRIVATE；纯头文件的库用INTERFACE。</div>
 
 <!-- ==================== 编译参数 ==================== -->
-<h2 id="flags">⚙️ 编译参数配置详解</h2>
+<h2 id="flags">⚙️ 编译参数配置详解 <span class="tag o">🟡进阶</span></h2>
 
 <h3>三种配置类型</h3>
 <pre><code># CMAKE_BUILD_TYPE 有三种：
@@ -393,7 +393,7 @@ endif()
 #endif</code></pre>
 
 <!-- ==================== 多文件 ==================== -->
-<h2 id="multi">📂 多文件项目管理</h2>
+<h2 id="multi">📂 多文件项目管理 <span class="tag o">🟡进阶</span></h2>
 
 <h3>方式1：aux_source_directory（简单，自动找所有.c）</h3>
 <pre><code># 自动收集src/下所有.c文件
@@ -435,7 +435,7 @@ add_executable(${PROJECT_NAME}.elf
 )</code></pre>
 
 <!-- ==================== HAL集成 ==================== -->
-<h2 id="hal">🔌 STM32CubeMX + CMake 集成</h2>
+<h2 id="hal">🔌 STM32CubeMX + CMake 集成 <span class="tag r">🟠实战</span></h2>
 
 <p>CubeMX原生支持CMake，是最佳实践组合：</p>
 
@@ -498,7 +498,7 @@ cmake --build . -j 4</code></pre>
 <div class="warn">⚠️ <b>CubeMX重新生成代码后：</b>不要改Core/Inc和Drivers/目录的内容，这些会被CubeMX覆盖。你自己的代码只写在USER CODE区域内。</div>
 
 <!-- ==================== 调试 ==================== -->
-<h2 id="debug">🐛 VS Code CMake Tools 配置</h2>
+<h2 id="debug">🐛 VS Code CMake Tools 配置 <span class="tag r">🟠实战</span></h2>
 
 <pre><code># .vscode/settings.json
 {
@@ -540,7 +540,141 @@ cmake --build . -j 4</code></pre>
 <div class="tip">💡 <b>CMake Tools工作流：</b>① F7 = 配置（cmake --configure） ② Ctrl+Shift+B = 构建 ③ F5 = 调试。一键搞定！</div>
 
 <!-- ==================== 排错 ==================== -->
-<h2 id="troubleshoot">🔍 CMake 常见问题</h2>
+<h2 id="troubleshoot">🔍 CMake 常见问题 <span class="tag o">🟡进阶</span></h2>
+
+<h2 id="cmake-new-2025">🆕 CMake 3.30+ 新特性（2025-2026）</h2>
+
+<div class="card">
+<div class="h"><span class="name">CMake 3.30+ 重要更新</span><span class="tag b">前沿</span></div>
+<div class="b">
+<table>
+<tr><th>版本</th><th>新特性</th><th>对嵌入式开发的影响</th></tr>
+<tr><td>3.30</td><td><code>CMAKE_C_COMPILER_FRONTEND_VARIANT</code> 变量</td><td>更好识别 ARM GCC / Clang 前端类型</td></tr>
+<tr><td>3.30</td><td><code>find_file()</code> 支持 <code>VALIDATOR</code> 关键字</td><td>链接脚本查找更可靠</td></tr>
+<tr><td>3.29</td><td><code>CMAKE_EXECUTE_PROCESS_COMMAND_ECHO</code></td><td>调试 CMake 外部命令执行更方便</td></tr>
+<tr><td>3.29</td><td><code>target_link_options()</code> 支持 <code>BEFORE</code></td><td>链接器参数顺序控制更精确</td></tr>
+<tr><td>3.28</td><td><code>CMAKE_C_COMPILER_ID</code> 支持 ARMClang</td><td>支持 ARM 官方 Clang 工具链</td></tr>
+</table>
+</div></div>
+
+<div class="note">📌 <b>升级建议：</b>CMake 3.20+ 是嵌入式开发的最低推荐版本，3.28+ 对 ARMClang 支持更好。如果配合 <a href="arm-gcc.html">ARM GCC 14.x</a>，建议 CMake ≥ 3.30 以获得最佳 LTO 支持。</div>
+
+<h2 id="real-case-cmake">🛠️ 实战案例：多目标构建（Debug/Release/Size）</h2>
+
+<p>实际项目中需要同时支持多种构建配置：调试用 Debug（带符号、无优化），发布用 Release（有优化），空间受限用 MinSize（最小体积）。</p>
+
+<pre><code># CMakeLists.txt - 多配置构建示例
+cmake_minimum_required(VERSION 3.20)
+project(multi-config-demo C ASM)
+
+# ===== 定义自定义构建类型 =====
+set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type")
+
+# 定义三种构建配置
+set(CMAKE_C_FLAGS_DEBUG "-Og -g -Wall -Wextra -DDEBUG")
+set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
+set(CMAKE_C_FLAGS_MINSIZE "-Os -DNDEBUG -DMinSize")
+
+# ===== 工具链配置（同前）=====
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR ARM)
+set(TOOLCHAIN_PATH "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1")
+set(CMAKE_C_COMPILER "${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc.exe")
+
+# ===== 公共编译参数 =====
+set(COMMON_FLAGS "-mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard")
+add_compile_options(${COMMON_FLAGS} -ffunction-sections -fdata-sections)
+
+# ===== 源文件 =====
+file(GLOB SRC_FILES "src/*.c" "drivers/*.c")
+add_executable(${PROJECT_NAME}.elf ${SRC_FILES})
+
+# ===== 链接参数（按配置区分）=====
+target_link_options(${PROJECT_NAME}.elf PRIVATE
+    ${COMMON_FLAGS}
+    -T${CMAKE_SOURCE_DIR}/STM32F407.ld
+    -Wl,--gc-sections
+    -Wl,-Map=${PROJECT_NAME}.map
+    --specs=nosys.specs
+)
+
+# ===== 生成 .bin 和 .hex =====
+add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.bin
+    COMMAND ${CMAKE_OBJCOPY} -O ihex ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex
+    COMMAND ${CMAKE_SIZE} ${PROJECT_NAME}.elf
+    COMMENT "Generating binary and hex files..."
+)
+
+# ===== 添加自定义目标：打印内存使用 =====
+add_custom_target(memory-usage
+    COMMAND ${CMAKE_SIZE} --format=berkeley ${PROJECT_NAME}.elf
+    DEPENDS ${PROJECT_NAME}.elf
+    COMMENT "Memory usage report:"
+)
+</code></pre>
+
+<pre><code># 使用方法：
+
+# Debug 构建（带调试符号，无优化）
+cmake -B build/debug -DCMAKE_BUILD_TYPE=Debug
+cmake --build build/debug
+
+# Release 构建（优化速度）
+cmake -B build/release -DCMAKE_BUILD_TYPE=Release
+cmake --build build/release
+
+# MinSize 构建（优化体积）
+cmake -B build/minsize -DCMAKE_BUILD_TYPE=MinSize
+cmake --build build/minsize
+
+# 查看内存使用
+cmake --build build/debug --target memory-usage
+</code></pre>
+
+<div class="tip">✅ <b>成果：</b>一套 CMakeLists.txt 支持三种构建模式，配合 <a href="flash-debug.html">GDB 调试教程</a> 使用 Debug 构建可实现完整源码级调试。Release 和 MinSize 构建适合量产烧录。</div>
+
+<h2 id="faq-cmake">❓ CMake 常见问题 FAQ</h2>
+
+<div class="card">
+<div class="h"><span class="name">CMake 常见问题</span><span class="tag o">FAQ</span></div>
+<div class="b">
+
+<h4>Q1：CMake 报错 "CMAKE_C_COMPILER not set" 怎么办？</h4>
+<p>这是因为 CMake 缓存了旧配置。解决方法：删除 <code>build/</code> 目录重新配置，或者在首次配置前就设置好工具链。最佳实践是将工具链配置写入独立文件 <code>arm-gcc.cmake</code>，然后用 <code>cmake -DCMAKE_TOOLCHAIN_FILE=arm-gcc.cmake ...</code> 指定。</p>
+
+<h4>Q2：如何为不同源文件设置不同的编译参数？</h4>
+<pre><code># 方式1：对特定文件设置参数
+set_source_files_properties(src/optimized.c PROPERTIES
+    COMPILE_FLAGS "-O2"   # 强制 -O2 优化
+)
+
+# 方式2：对特定 target 设置参数
+target_compile_options(my-app PRIVATE
+    $<$<CONFIG:Debug>:-Og -g>   # Debug 配置用 -Og
+    $<$<CONFIG:Release>:-O2>     # Release 配置用 -O2
+)
+</code></pre>
+
+<h4>Q3：file(GLOB ...) 有什么坑？为什么文件增删后不重新编译？</h4>
+<p><code>file(GLOB ...)</code> 在配置时（cmake 执行时）查找文件，如果之后新增了 <code>.c</code> 文件，CMake 不会自动感知，需要手动重新运行 cmake。生产项目推荐明确列出所有源文件，或者用 <code>add_subdirectory()</code> + 每个目录一个 <code>CMakeLists.txt</code>。</p>
+
+<h4>Q4：如何集成 STM32CubeMX 生成的代码？</h4>
+<p>CubeMX 生成代码在 <code>Core/</code> 和 <code>Drivers/</code> 目录。在 CMakeLists.txt 中用 <code>add_subdirectory(Drivers/STM32F1xx_HAL_Driver)</code> 添加 HAL 库，然后在主 CMakeLists.txt 中 <code>target_link_libraries(app HAL::STM32F1)</code> 链接。详见 <a href="stm32.html">STM32 开发教程</a>中的 CubeMX 配置部分。</p>
+
+<h4>Q5：CMake 和 Makefile 是什么关系？能不能只用 Makefile？</h4>
+<p>CMake 是 <b>构建系统生成器</b>，它生成 Makefile（或 Ninja 文件），然后由 make/ninja 执行编译。只用 Makefile 也可以（参见 <a href="makefile.html">Makefile 教程</a>），但 CMake 更适合跨平台和多配置管理。新手建议先学 Makefile 理解原理，再用 CMake 提高效率。</p>
+
+<h4>Q6：如何查看 CMake 执行了哪些编译命令？</h4>
+<pre><code># 方法1：verbose 模式（显示完整编译命令）
+cmake --build build/ -- VERBOSE=1
+
+# 方法2：CMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+# 会生成 compile_commands.json，供 VS Code / clangd 使用
+</code></pre>
+
+</div></div>
 
 <h3>问题1：CMakeCache.txt 缓存了旧配置</h3>
 <pre><code># 每次改CMakeLists.txt前，先清缓存

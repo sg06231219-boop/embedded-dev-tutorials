@@ -530,7 +530,7 @@ hr {
 <!-- ============================================================ -->
 <!-- 第1章 -->
 <!-- ============================================================ -->
-<h2 id="sec1"><span class="sec-num">1</span> Makefile 是什么？为什么要用它？</h2>
+<h2 id="sec1"><span class="sec-num">1</span> Makefile 是什么？为什么要用它？<span class="tag g" style="margin-left:8px">🟢入门</span></h2>
 
 <h3>🔍 先说说"没有 Makefile"的日子</h3>
 
@@ -618,7 +618,7 @@ arm-none-eabi-size firmware.elf</code></pre>
 <!-- ============================================================ -->
 <!-- 第2章 -->
 <!-- ============================================================ -->
-<h2 id="sec2"><span class="sec-num">2</span> 基本语法规则</h2>
+<h2 id="sec2"><span class="sec-num">2</span> 基本语法规则<span class="tag g" style="margin-left:8px">🟢入门</span></h2>
 
 <h3>📐 Makefile 的核心语法</h3>
 
@@ -714,7 +714,7 @@ arm-none-eabi-size firmware.elf</code></pre>
 <!-- ============================================================ -->
 <!-- 第3章 -->
 <!-- ============================================================ -->
-<h2 id="sec3"><span class="sec-num">3</span> 变量和自动变量</h2>
+<h2 id="sec3"><span class="sec-num">3</span> 变量和自动变量<span class="tag o" style="margin-left:8px">🟡进阶</span></h2>
 
 <h3>📦 为什么需要变量？</h3>
 
@@ -853,7 +853,7 @@ arm-none-eabi-size firmware.elf</code></pre>
 <!-- ============================================================ -->
 <!-- 第4章 -->
 <!-- ============================================================ -->
-<h2 id="sec4"><span class="sec-num">4</span> 模式规则和伪目标</h2>
+<h2 id="sec4"><span class="sec-num">4</span> 模式规则和伪目标<span class="tag o" style="margin-left:8px">🟡进阶</span></h2>
 
 <h3>🧩 模式规则（Pattern Rules）</h3>
 
@@ -930,7 +930,7 @@ arm-none-eabi-size firmware.elf</code></pre>
 <!-- ============================================================ -->
 <!-- 第5章 -->
 <!-- ============================================================ -->
-<h2 id="sec5"><span class="sec-num">5</span> 完整 STM32 项目 Makefile</h2>
+<h2 id="sec5"><span class="sec-num">5</span> 完整 STM32 项目 Makefile<span class="tag r" style="margin-left:8px">🟠实战</span></h2>
 
 <h3>🏗️ 一个可直接使用的 STM32 Makefile</h3>
 
@@ -1093,7 +1093,7 @@ arm-none-eabi-size firmware.elf</code></pre>
 <!-- ============================================================ -->
 <!-- 第6章 -->
 <!-- ============================================================ -->
-<h2 id="sec6"><span class="sec-num">6</span> 增量编译原理</h2>
+<h2 id="sec6"><span class="sec-num">6</span> 增量编译原理<span class="tag o" style="margin-left:8px">🟡进阶</span></h2>
 
 <h3>🚀 什么是增量编译？</h3>
 
@@ -1211,7 +1211,7 @@ arm-none-eabi-size firmware.elf</code></pre>
 <!-- ============================================================ -->
 <!-- 第7章 -->
 <!-- ============================================================ -->
-<h2 id="sec7"><span class="sec-num">7</span> 嵌入式专用编译参数</h2>
+<h2 id="sec7"><span class="sec-num">7</span> 嵌入式专用编译参数<span class="tag o" style="margin-left:8px">🟡进阶</span></h2>
 
 <h3>🎛️ 为什么嵌入式编译参数这么多？</h3>
 
@@ -1377,7 +1377,7 @@ arm-none-eabi-size firmware.elf</code></pre>
 <!-- ============================================================ -->
 <!-- 第8章 -->
 <!-- ============================================================ -->
-<h2 id="sec8"><span class="sec-num">8</span> 调试版 vs 发布版 Makefile 切换</h2>
+<h2 id="sec8"><span class="sec-num">8</span> 调试版 vs 发布版 Makefile 切换<span class="tag r" style="margin-left:8px">🟠实战</span></h2>
 
 <h3>🎭 为什么需要两个版本？</h3>
 
@@ -1445,7 +1445,7 @@ arm-none-eabi-size firmware.elf</code></pre>
 <!-- ============================================================ -->
 <!-- 第9章 -->
 <!-- ============================================================ -->
-<h2 id="sec9"><span class="sec-num">9</span> 常见错误</h2>
+<h2 id="sec9"><span class="sec-num">9</span> 常见错误<span class="tag r" style="margin-left:8px">🟠实战</span></h2>
 
 <h3>💀 错误一：Tab 和空格混淆</h3>
 
@@ -1661,6 +1661,108 @@ $(<span class="hl-make-var">suffix</span>) name)             <span class="hl-com
 <div style="text-align:center;margin-top:32px;color:var(--t2);font-size:13px;">
   ⚙️ 嵌入式教程系列 · Makefile 细致教程 · 最后更新：2024
 </div>
+
+<h2 id="makefile-real-case">🛠️ 实战案例：带依赖自动生成的 Makefile</h2>
+
+<p>下面的 Makefile 自动处理头文件依赖，当 <code>.h</code> 文件被修改时，相关的 <code>.c</code> 文件会自动重新编译：</p>
+
+<pre><code># Makefile - 自动依赖生成版本
+# 适用于 STM32F103 项目
+
+# ===== 工具链配置 =====
+PREFIX = arm-none-eabi-
+CC = $(PREFIX)gcc
+OBJCOPY = $(PREFIX)objcopy
+SIZE = $(PREFIX)size
+
+# ===== 目标 MCU 配置 =====
+CPU = -mcpu=cortex-m3 -mthumb
+
+# ===== 编译参数 =====
+CFLAGS = $(CPU) -Os -Wall -Wextra -Werror
+CFLAGS += -ffunction-sections -fdata-sections  # 链接时删除未用代码
+CFLAGS += -MMD -MP   # 关键：自动生成 .d 依赖文件
+LDFLAGS = $(CPU) -T STM32F103C8.ld -Wl,--gc-sections -nostartfiles
+
+# ===== 源文件（自动查找）=====
+SRC = $(wildcard src/*.c)       # 自动匹配所有 .c 文件
+OBJ = $(SRC:.c=.o)             # 把 .c 替换成 .o
+DEP = $(SRC:.c=.d)             # 依赖文件列表
+
+# ===== 目标文件 =====
+TARGET = firmware
+
+# ===== 默认目标 =====
+all: $(TARGET).elf
+
+# ===== 链接规则 =====
+$(TARGET).elf: $(OBJ)
+	$(CC) $^ -o $@ $(LDFLAGS)
+	$(SIZE) $@
+
+# ===== 编译规则（自动推导）=====
+# 不需要手动写，make 会用内置规则
+# 但可以添加参数：
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# ===== 生成烧录文件 =====
+.PHONY: hex bin
+hex: $(TARGET).elf
+	$(OBJCOPY) -O ihex $< $(TARGET).hex
+
+bin: $(TARGET).elf
+	$(OBJCOPY) -O binary $< $(TARGET).bin
+
+# ===== 烧录目标 =====
+.PHONY: flash
+flash: $(TARGET).bin
+	st-flash write $< 0x8000000
+
+# ===== 清理 =====
+.PHONY: clean
+clean:
+	rm -f $(OBJ) $(DEP) $(TARGET).elf $(TARGET).bin $(TARGET).hex $(TARGET).map
+
+# ===== 包含依赖文件 ======
+# - 表示忽略不存在的错误（首次编译时 .d 不存在）
+-include $(DEP)
+</code></pre>
+
+<div class="tip">✅ <b>成果：</b>这是一个生产级 Makefile 模板。当你修改任何 .h 文件后，依赖它的 .c 文件会自动重新编译。配合 <a href="arm-gcc.html">ARM GCC 教程</a>学习编译参数，配合 <a href="flash-debug.html">烧录教程</a>一键烧录。</div>
+
+<div class="warn">⚠️ <b>常见坑：</b><code>-MMD -MP</code> 必须放在 CFLAGS 中，不是 LDFLAGS！前者是编译参数，后者是链接参数。放错位置会导致依赖文件不生成。</div>
+
+<h2 id="makefile-faq">❓ Makefile 常见问题 FAQ</h2>
+
+<div class="card">
+<div class="h"><span class="name">Makefile 常见问题</span><span class="tag o">FAQ</span></div>
+<div class="b">
+
+<h4>Q1：Makefile 报错 "missing separator" 是什么原因？</h4>
+<p>最常见的原因：<b>用了空格而不是 Tab</b>。Makefile 的命令行必须以 Tab 开头，不能用空格。在 VS Code 中，可以设置 "Insert Spaces" 为 false，或用 <code>Ctrl+Shift+P</code> → "Convert Indentation to Tabs"。</p>
+
+<h4>Q2：修改了 .h 文件，但 make 没有重新编译？</h4>
+<p>这是依赖没有正确设置。解决方法：① 加上 <code>-MMD -MP</code> 参数自动生成依赖；② 或手动添加 <code>main.o: main.h uart.h</code> 规则。推荐用方法①（见上面实战案例）。</p>
+
+<h4>Q3：make 报错 "Circular dependency dropped"？</h4>
+<p>存在循环依赖，如 A 依赖 B，B 依赖 A。常见于 <code>.PHONY: clean</code> 后又写了 <code>clean: all</code> 之类。检查依赖关系图，确保没有环路。</p>
+
+<h4>Q4：如何让 Makefile 支持并行编译？</h4>
+<pre><code># 方法1：命令行指定
+make -j4   # 同时执行 4 个编译任务
+
+# 方法2：Makefile 内设置（GNU Make 4.0+）
+MAKEFLAGS += -j$(nproc)   # 自动使用所有 CPU 核心
+</code></pre>
+
+<h4>Q5：如何判断一个目标是否为伪目标？</h4>
+<p>如果目标不生成文件（如 <code>clean</code>、<code>install</code>、<code>flash</code>），就应声明为 <code>.PHONY</code>。否则，如果目录下存在同名文件，make 会误判目标已存在而跳过执行。</p>
+
+<h4>Q6：Makefile 和 CMake 怎么选择？</h4>
+<p>小型项目用 Makefile 足够。大型项目或跨平台项目用 <a href="cmake.html">CMake</a>。初学者建议先学 Makefile 理解原理，再学 CMake 提高效率。两者可以并存：CMake 生成 Makefile，make 执行编译。</p>
+
+</div></div>
 
 </div><!-- /.container -->
 

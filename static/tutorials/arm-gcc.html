@@ -133,7 +133,7 @@ arm-none-eabi-objcopy -V    # 格式转换</code></pre>
 <div class="tip">💡 <b>为什么不直接用gcc？</b>你电脑上的gcc编译出来的是x86机器码（给CPU跑的），arm-none-eabi-gcc编译出来的是ARM机器码（给STM32跑的）。架构不同，必须用对应的编译器。</div>
 
 <!-- ==================== 编译流程 ==================== -->
-<h2 id="compile">🏗️ 完整编译流程</h2>
+<h2 id="compile">🏗️ 完整编译流程 <span class="tag g">🟢入门</span></h2>
 
 <p>从C代码到可烧录文件，要经过4个阶段：</p>
 
@@ -194,7 +194,7 @@ arm-none-eabi-size build/app.elf
 objcopy = 打包外卖（.elf → .bin/.hex）</div>
 
 <!-- ==================== 编译参数 ==================== -->
-<h2 id="flags">⚙️ 编译参数详解</h2>
+<h2 id="flags">⚙️ 编译参数详解 <span class="tag o">🟡进阶</span></h2>
 
 <h3>必选参数（每次都要加）</h3>
 <table>
@@ -269,7 +269,7 @@ LDFLAGS = -mcpu=cortex-m3 -mthumb -TSTM32F103C8.ld \
 </table>
 
 <!-- ==================== 链接脚本 ==================== -->
-<h2 id="linker">📐 链接脚本（Linker Script）详解</h2>
+<h2 id="linker">📐 链接脚本（Linker Script）详解 <span class="tag r">🔴高级</span></h2>
 
 <p>链接脚本告诉编译器：Flash从哪开始、RAM从哪开始、各个段怎么排。这是嵌入式<strong>最核心的配置文件</strong>之一。</p>
 
@@ -373,7 +373,7 @@ SECTIONS
 <div class="tip">💡 <b>规律：</b>所有STM32的Flash都从0x08000000开始，RAM都从0x20000000开始。不同型号只是大小不同。改链接脚本只需改LENGTH。</div>
 
 <!-- ==================== 启动文件 ==================== -->
-<h2 id="startup">🚀 启动文件（Startup Code）详解</h2>
+<h2 id="startup">🚀 启动文件（Startup Code）详解 <span class="tag r">🔴高级</span></h2>
 
 <p>启动文件是MCU上电后执行的<strong>第一段代码</strong>，在main()之前运行。它负责：初始化堆栈 → 复制.data → 清零.bss → 调用main()。</p>
 
@@ -500,7 +500,7 @@ void Reset_Handler(void) {
 ⑤ main() = 开门营业！</div>
 
 <!-- ==================== 排错 ==================== -->
-<h2 id="troubleshoot">🔍 常见问题与排错</h2>
+<h2 id="troubleshoot">🔍 常见问题与排错 <span class="tag o">🟠实战</span></h2>
 
 <h3>问题1：undefined reference to `_exit'</h3>
 <pre><code># 原因：没有指定nosys.specs，裸机缺少系统调用
@@ -546,6 +546,126 @@ arm-none-eabi-size app.elf
 
 <!-- ==================== 速查表 ==================== -->
 <h2 id="cheatsheet">📋 ARM GCC 速查表</h2>
+
+<h2 id="whats-new-2026">🆕 ARM GCC 14.x 新特性（2025-2026）</h2>
+
+<div class="card">
+<div class="h"><span class="name">ARM GCC 14.x 重要更新</span><span class="tag b">前沿</span></div>
+<div class="b">
+<table>
+<tr><th>特性</th><th>说明</th><th>影响</th></tr>
+<tr><td>Arm v9.6-A 支持</td><td>新增 Cortex-A720AE / Cortex-R82AE 处理器支持</td><td>汽车安全场景</td></tr>
+<tr><td>-fstack-protector-strong 默认</td><td>更强栈保护，减少缓冲区溢出风险</td><td>嵌入式安全增强</td></tr>
+<tr><td>Link-Time Optimization (LTO) 改进</td><td>LTO 速度提升约30%，内存占用降低</td><td>大项目编译更快</td></tr>
+<tr><td>新 -Wbidi-chars 警告</td><td>检测 Unicode 双向字符注入攻击（Trojan Source）</td><td>代码安全审计</td></tr>
+<tr><td>Cortex-M55/M85 优化</td><td>针对 Helium M-profile 向量扩展优化代码生成</td><td>ML/AI 嵌入式场景</td></tr>
+</table>
+</div></div>
+
+<div class="note">📌 <b>升级建议：</b>从 GCC 12.x/13.x 升级到 14.x 时，注意 <code>-fstack-protector-strong</code> 可能导致代码体积略增。可在链接脚本中预留更多 Flash 空间，或用 <code>-fno-stack-protector</code> 回退（不推荐）。详见 <a href="flash-debug.html">烧录与调试教程</a>中的 Flash 分区规划。</div>
+
+<h2 id="real-case">🛠️ 实战案例：从零构建 STM32F103 LED 闪烁项目</h2>
+
+<p>下面演示如何只用 ARM GCC（不用 IDE）从零编译一个完整的 LED 闪烁程序：</p>
+
+<pre><code>// main.c - STM32F103 LED 闪烁（寄存器版本，无 HAL 依赖）
+#include &lt;stdint.h&gt;
+
+// RCC 寄存器基址（复位和时钟控制）
+#define RCC_BASE      0x40021000U
+// GPIOC 寄存器基址（LED 在 PC13）
+#define GPIOC_BASE    0x40011000U
+
+// RCC APB2 外设时钟使能寄存器
+#define RCC_APB2ENR   (*(volatile uint32_t *)(RCC_BASE + 0x18))
+// GPIOC 端口配置寄存器（高16位对应 Pin8-15）
+#define GPIOC_CRH     (*(volatile uint32_t *)(GPIOC_BASE + 0x04))
+// GPIOC 端口输出数据寄存器
+#define GPIOC_ODR     (*(volatile uint32_t *)(GPIOC_BASE + 0x0C))
+
+// 简单延时函数（约 500ms @72MHz）
+static void delay(void) {
+    for (volatile uint32_t i = 0; i &lt; 500000; i++) {
+        __asm volatile("nop");  // 插入空指令，防止被优化掉
+    }
+}
+
+int main(void) {
+    // 步骤1：使能 GPIOC 时钟（APB2 总线上第4位）
+    RCC_APB2ENR |= (1 &lt;&lt; 4);
+
+    // 步骤2：配置 PC13 为推挽输出，最大速度 50MHz
+    // CRH 控制 Pin8-15，Pin13 对应 [23:20] 四位
+    // 通用推挽输出 = 0b0011，50MHz = CNF=00, MODE=11
+    GPIOC_CRH &amp;= ~(0xF &lt;&lt; 20);  // 先清零 Pin13 的4位配置
+    GPIOC_CRH |=  (0x3 &lt;&lt; 20);  // 设置为输出模式，50MHz
+
+    // 步骤3：循环闪烁 LED
+    while (1) {
+        GPIOC_ODR ^= (1 &lt;&lt; 13);  // 翻转 PC13（异或操作）
+        delay();                   // 延时约 500ms
+    }
+}
+</code></pre>
+
+<pre><code># 编译命令（逐步执行）
+
+# 1. 编译 main.c → main.o
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -Os -Wall \
+    -ffunction-sections -fdata-sections \
+    -c main.c -o main.o
+
+# 2. 链接（使用最小启动代码）→ main.elf
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb \
+    -nostartfiles -T STM32F103C8.ld \
+    -Wl,--gc-sections \
+    main.o -o main.elf
+
+# 3. 生成 .bin 和 .hex
+arm-none-eabi-objcopy -O binary main.elf main.bin
+arm-none-eabi-objcopy -O ihex main.elf main.hex
+
+# 4. 检查大小
+arm-none-eabi-size main.elf
+#   text    data     bss     dec     hex filename
+#   184       0       0     184      b8 main.elf   ← 极小！</code></pre>
+
+<div class="tip">✅ <b>成果：</b>纯寄存器操作，无 HAL 依赖，编译后仅 184 字节！这是理解底层硬件的最佳起点。后续可以用 <a href="stm32.html">STM32 HAL 库教程</a>学习更高级的开发方式。</div>
+
+<div class="warn">⚠️ <b>常见坑：</b>如果 LED 不亮，检查：①是否使能了 GPIOC 时钟（最常遗漏）②PC13 配置是否正确（CRH 不是 CRL）③链接脚本中 Flash 起始地址是否为 0x08000000。更多排错方法见 <a href="flash-debug.html">烧录与调试教程</a>。</div>
+
+<h2 id="faq">❓ 常见问题 FAQ</h2>
+
+<div class="card">
+<div class="h"><span class="name">ARM GCC 常见问题</span><span class="tag o">FAQ</span></div>
+<div class="b">
+
+<h4>Q1：arm-none-eabi-gcc 和 arm-linux-gnueabihf-gcc 有什么区别？</h4>
+<p><code>arm-none-eabi-</code> 是 <b>裸机工具链</b>，用于无操作系统的嵌入式开发（STM32、ESP32 等）。<code>arm-linux-gnueabihf-</code> 是 <b>Linux 工具链</b>，用于开发运行在 ARM Linux 上的应用程序，依赖 glibc 和 Linux 系统调用。嵌入式开发必须选 <code>arm-none-eabi-</code>。</p>
+
+<h4>Q2：编译时出现 multiple definition of `xxx' 怎么办？</h4>
+<p>通常是因为头文件中定义了变量（不是声明）。正确做法：头文件中用 <code>extern</code> 声明，在 <code>.c</code> 文件中定义。GCC 14.x 默认使用 <code>-fno-common</code>，不再允许多次定义合并。</p>
+
+<h4>Q3：-Os 和 -O2 该选哪个？</h4>
+<p>嵌入式一般选 <code>-Os</code>（优化代码大小），因为 Flash 空间有限。<code>-O2</code> 优化速度但体积更大。如果对性能敏感的中断处理函数，可以对特定文件用 <code>-O2</code>：在 Makefile 中用 <code>CFLAGS_isr = -O2</code> 单独设置。</p>
+
+<h4>Q4：如何查看编译后各个函数占用的 Flash 大小？</h4>
+<pre><code># 生成详细段大小信息
+arm-none-eabi-objdump -h app.elf
+
+# 按符号大小排序（找出最占空间的函数）
+arm-none-eabi-nm --size-sort --print-size app.elf | tail -20
+
+# 生成 map 文件查看详细内存映射
+arm-none-eabi-gcc ... -Wl,-Map=app.map ...</code></pre>
+
+<h4>Q5：链接脚本中 VMA 和 LMA 有什么区别？</h4>
+<p><b>VMA</b>（Virtual Memory Address）是程序运行时的地址；<b>LMA</b>（Load Memory Address）是程序存储在 Flash 中的地址。通常 VMA = LMA（代码直接在 Flash 运行），但 <b>重定位代码</b>（如从 Flash 拷贝到 RAM 执行）时 VMA ≠ LMA。详见 <a href="flash-debug.html">烧录与调试教程</a>中的 IAP 章节和 <a href="makefile.html">Makefile 教程</a>中的链接脚本配置。</p>
+
+<h4>Q6：GCC 14.x 升级后代码变大了怎么办？</h4>
+<p>GCC 14 默认启用了 <code>-fstack-protector-strong</code>，每个函数添加栈保护代码。可用以下方法优化：① <code>-fno-stack-protector</code> 关闭（牺牲安全性）② <code>-fstack-protector</code> 改用轻量版 ③ 仅对关键函数单独启用。相关内容参见 <a href="cmake.html">CMake 教程</a>中的 per-target 编译选项。</p>
+
+</div></div>
 
 <table>
 <tr><th>操作</th><th>命令</th></tr>

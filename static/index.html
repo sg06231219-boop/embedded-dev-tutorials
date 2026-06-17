@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -134,7 +134,7 @@ pre:hover .copy-btn{opacity:1}
 /* 进度条 */
 .progress-bar{position:fixed;top:0;left:0;height:2px;background:var(--a);z-index:200;transition:width .15s;width:0}
 
-/* === v1.4.0 新增样式 === */
+/* === v1.5.0 新增样式 === */
 /* 学习路线图 */
 .roadmap{background:var(--bg2);border:1px solid var(--br);border-radius:14px;padding:20px 24px;margin:20px 0}
 .roadmap h3{color:var(--a);margin-bottom:14px;font-size:1.1em}
@@ -190,6 +190,35 @@ pre:hover .copy-btn{opacity:1}
 /* 搜索增强 */
 .search-results-count{color:var(--t2);font-size:.85em;margin-bottom:12px}
 .search-highlight{background:rgba(88,166,255,.25);padding:1px 3px;border-radius:3px}
+
+/* ══ 骨架屏 ══ */
+.skeleton-wrap{padding:24px 28px}
+.skeleton-line{height:14px;background:var(--bg2);border-radius:6px;margin:10px 0;position:relative;overflow:hidden}
+.skeleton-line.title{height:28px;width:55%;margin:20px 0 16px}
+.skeleton-line.h2{height:22px;width:40%;margin:24px 0 10px}
+.skeleton-line.p{width:90%}
+.skeleton-line.p2{width:75%}
+.skeleton-line.p3{width:82%}
+.skeleton-line.short{width:50%}
+.skeleton-card{background:var(--bg2);border:1px solid var(--br);border-radius:12px;padding:18px;margin:14px 0;overflow:hidden;position:relative}
+.skeleton-card .sk-icon{width:36px;height:36px;border-radius:8px;background:var(--bg3)}
+.skeleton-card .sk-title{height:16px;width:60%;margin:10px 0 6px;background:var(--bg3);border-radius:4px}
+.skeleton-card .sk-text{height:12px;width:85%;background:var(--bg3);border-radius:4px;margin:6px 0}
+.skeleton-card .sk-text2{height:12px;width:65%;background:var(--bg3);border-radius:4px;margin:6px 0}
+.skeleton-line::after,.skeleton-card::after{content:'';position:absolute;top:0;left:-150px;width:150px;height:100%;background:linear-gradient(90deg,transparent,rgba(88,166,255,.06),transparent);animation:shimmer 1.6s infinite}
+@keyframes shimmer{to{left:100%}}
+@media(prefers-reduced-motion:reduce){.skeleton-line::after,.skeleton-card::after{animation:none}}
+
+/* ══ 亮色模式 ══ */
+body.light-mode{--bg:#f5f7fa;--bg2:#eef1f6;--bg3:#e4e8ef;--br:#d1d5db;--t:#1a202c;--t2:#4a5568;--a:#3b82f6;--g:#16a34a;--o:#d97706;--r:#dc2626;--p:#7c3aed;--c1:#0891b2}
+body.light-mode .sidebar{background:#fff;border-right-color:#e5e7eb}
+body.light-mode .topbar{background:#fff;border-bottom-color:#e5e7eb}
+body.light-mode pre{background:#f1f5f9;border-color:#e2e8f0}
+body.light-mode .home-card{background:#fff;border-color:#e5e7eb}
+body.light-mode .home-card:hover{border-color:var(--a);box-shadow:0 4px 20px rgba(59,130,246,.08)}
+body.light-mode .home-stat{background:#fff;border-color:#e5e7eb}
+body.light-mode .skeleton-line,body.light-mode .skeleton-card{background:#e8ebf0}
+body.light-mode .skeleton-card .sk-icon,body.light-mode .skeleton-card .sk-title,body.light-mode .skeleton-card .sk-text,body.light-mode .skeleton-card .sk-text2{background:#dde1e8}
 </style>
 </head>
 <body>
@@ -200,12 +229,13 @@ pre:hover .copy-btn{opacity:1}
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <h1>📐 嵌入式开发教程</h1>
-    <p>从零到实战 · 32篇深度教程</p>
+    <p>从零到实战 · 33篇深度教程</p>
   </div>
   <div class="sidebar-nav" id="sidebarNav">
     <div class="nav-group">
       <div class="nav-group-title">🏠 首页</div>
       <a class="nav-item active" data-page="home" onclick="loadPage('home')">教程首页</a>
+      <a class="nav-item" data-page="overview" onclick="loadPage('overview')">📊 教程总览 <span class="badge badge-new">新</span></a>
     </div>
     <div class="nav-group">
       <div class="nav-group-title">📖 主教程</div>
@@ -271,7 +301,7 @@ pre:hover .copy-btn{opacity:1}
     </div>
   </div>
   <div class="sidebar-footer">
-    v1.4.0 · 2026-06-17 · <button class="theme-toggle" onclick="document.body.classList.toggle('light-mode')" title="切换亮色/暗色">🌓</button> · ⌨️ <span class="kbd">/</span> 搜索
+    v1.5.0 · 2026-06-17 · <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换亮色/暗色">🌓</button> · ⌨️ <span class="kbd">/</span> 搜索
   </div>
 </nav>
 
@@ -298,7 +328,9 @@ pre:hover .copy-btn{opacity:1}
 <script>
 // === 页面配置 ===
 const PAGES = {
-  home: { title: '教程首页', breadcrumb: '📐 首页', type: 'home' },
+  home: { title: '教程首页', breadcrumb: '📐 首页', type: 'home' }
+  overview: { title: '教程总览', breadcrumb: '📐 首页 / 📊 教程总览', type: 'tutorial', file: 'tutorials/overview.html' },
+,
   main: { title: '嵌入式小白完全指南', breadcrumb: '📐 首页 / 📖 小白完全指南', type: 'tutorial', file: 'tutorials/main.html' },
   'arm-gcc': { title: 'ARM GCC 编译工具链', breadcrumb: '📐 首页 / 🔨 ARM GCC', type: 'tutorial', file: 'tutorials/arm-gcc.html' },
   cmake: { title: 'CMake 构建系统', breadcrumb: '📐 首页 / 📦 CMake', type: 'tutorial', file: 'tutorials/cmake.html' },
@@ -375,7 +407,7 @@ const cardsData = [
   ];
   let html = `<div class="home-hero">
     <h1>📐 嵌入式开发教程</h1>
-    <p>从零到实战的完整学习路线，32篇深度教程覆盖编译、调试、MCU、RTOS、通信协议、20个练手项目、前沿技术</p>
+    <p>从零到实战的完整学习路线，33篇深度教程覆盖编译、调试、MCU、RTOS、通信协议、20个练手项目、前沿技术</p>
     <div class="quick-start" onclick="loadPage('main')" style="margin-top:18px;padding:14px 28px;background:linear-gradient(135deg,#238636,#1f6feb);border-radius:12px;cursor:pointer;text-align:center;font-size:1.05em;font-weight:700;color:#fff;display:inline-block">🚀 我是新手，从哪里开始？→ 小白完全指南</div>
   </div>
 
@@ -437,6 +469,38 @@ const cardsData = [
   return html;
 }
 
+// === 骨架屏 ===
+function skeletonContent() {
+  return `<div class="skeleton-wrap">
+    <div class="skeleton-line title"></div>
+    <div class="skeleton-line h2"></div>
+    <div class="skeleton-line p"></div>
+    <div class="skeleton-line p2"></div>
+    <div class="skeleton-line p3"></div>
+    <div class="skeleton-card"><div class="sk-icon"></div><div class="sk-title"></div><div class="sk-text"></div><div class="sk-text2"></div></div>
+    <div class="skeleton-line h2"></div>
+    <div class="skeleton-line p"></div>
+    <div class="skeleton-line short"></div>
+    <div class="skeleton-card"><div class="sk-icon"></div><div class="sk-title"></div><div class="sk-text"></div><div class="sk-text2"></div></div>
+    <div class="skeleton-line h2"></div>
+    <div class="skeleton-line p"></div>
+    <div class="skeleton-line p2"></div>
+  </div>`;
+}
+
+// === 亮暗模式切换 ===
+function toggleTheme() {
+  document.body.classList.toggle('light-mode');
+  const isLight = document.body.classList.contains('light-mode');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = isLight ? '🌙' : '🌓';
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') document.body.classList.add('light-mode');
+})();
+
 // === 加载教程内容 ===
 async function loadPage(pageId) {
   currentPage = pageId;
@@ -470,8 +534,8 @@ async function loadPage(pageId) {
     return;
   }
 
-  // 加载教程HTML
-  content.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  // 加载教程HTML - 骨架屏
+  content.innerHTML = skeletonContent();
   try {
     const resp = await fetch(pageConfig.file);
     if (!resp.ok) throw new Error('加载失败');

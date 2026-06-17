@@ -480,7 +480,7 @@ mark {
   <!-- ============================================================ -->
   <!-- SECTION 1: 烧录方式对比 -->
   <!-- ============================================================ -->
-  <h2 id="sec1"><span class="num">1</span> 烧录方式对比</h2>
+  <h2 id="sec1"><span class="num">1</span> 烧录方式对比<span class="tag g" style="margin-left:8px">🟢入门</span></h2>
 
   <p>烧录（Flash Programming）就是把编译好的程序文件写入芯片内部 Flash 存储器的过程。调试（Debug）则是通过仿真器实时控制芯片运行，观察寄存器、内存、单步执行。不同的工具链适合不同的场景，下面逐一解析。</p>
 
@@ -638,7 +638,7 @@ mark {
   <!-- ============================================================ -->
   <!-- SECTION 2: OpenOCD 安装与配置 -->
   <!-- ============================================================ -->
-  <h2 id="sec2"><span class="num">2</span> OpenOCD 安装与配置</h2>
+  <h2 id="sec2"><span class="num">2</span> OpenOCD 安装与配置<span class="tag o" style="margin-left:8px">🟡进阶</span></h2>
 
   <p><strong>OpenOCD（Open On-Chip Debugger）</strong>是一个开源的片上调试工具，通过调试器（ST-Link / J-Link / DAP-Link 等）与芯片通信，充当 GDB 和芯片之间的"桥梁"。</p>
 
@@ -847,7 +847,7 @@ mark {
   <!-- ============================================================ -->
   <!-- SECTION 3: OpenOCD 命令行操作 -->
   <!-- ============================================================ -->
-  <h2 id="sec3"><span class="num">3</span> OpenOCD 命令行操作</h2>
+  <h2 id="sec3"><span class="num">3</span> OpenOCD 命令行操作<span class="tag o" style="margin-left:8px">🟡进阶</span></h2>
 
   <h3>3.1 启动连接</h3>
 
@@ -1031,7 +1031,7 @@ mark {
   <!-- ============================================================ -->
   <!-- SECTION 4: GDB 基础 -->
   <!-- ============================================================ -->
-  <h2 id="sec4"><span class="num">4</span> GDB 基础</h2>
+  <h2 id="sec4"><span class="num">4</span> GDB 基础<span class="tag g" style="margin-left:8px">🟢入门</span></h2>
 
   <p><strong>GDB（GNU Debugger）</strong>是 Linux 下最强大的程序调试器，ARM 嵌入式使用专门的 <code>arm-none-eabi-gdb</code>。配合 OpenOCD 可以实现源码级调试、寄存器查看、内存修改等功能。</p>
 
@@ -1242,7 +1242,7 @@ mark {
   <!-- ============================================================ -->
   <!-- SECTION 5: GDB 高级 -->
   <!-- ============================================================ -->
-  <h2 id="sec5"><span class="num">5</span> GDB 高级技巧</h2>
+  <h2 id="sec5"><span class="num">5</span> GDB 高级技巧<span class="tag r" style="margin-left:8px">🔴高级</span></h2>
 
   <h3>5.1 条件断点</h3>
 
@@ -1433,7 +1433,7 @@ mark {
   <!-- ============================================================ -->
   <!-- SECTION 6: VS Code Cortex-Debug -->
   <!-- ============================================================ -->
-  <h2 id="sec6"><span class="num">6</span> VS Code Cortex-Debug 配置</h2>
+  <h2 id="sec6"><span class="num">6</span> VS Code Cortex-Debug 配置<span class="tag r" style="margin-left:8px">🟠实战</span></h2>
 
   <p>前面我们用命令行操作 GDB，每次调试都要敲一堆命令。VS Code + Cortex-Debug 插件把这一切可视化，一个按钮完成连接、烧录、调试。</p>
 
@@ -1657,7 +1657,7 @@ mark {
   <!-- ============================================================ -->
   <!-- SECTION 7: 串口 ISP 烧录 -->
   <!-- ============================================================ -->
-  <h2 id="sec7"><span class="num">7</span> 串口 ISP 烧录</h2>
+  <h2 id="sec7"><span class="num">7</span> 串口 ISP 烧录<span class="tag o" style="margin-left:8px">🟡进阶</span></h2>
 
   <p>串口 ISP（In-System Programming）是 STM32 内置的 Bootloader 提供的功能。所有 STM32 芯片都内置了 UART Bootloader，只要把 BOOT0 引脚拉高，就能从内部 ROM 区（0x1FFF0000）启动这个 bootloader，通过串口下载程序。</p>
 
