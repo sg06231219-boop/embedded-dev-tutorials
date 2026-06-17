@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第4章：串口通信 — 单片机与电脑对话 - 嵌入式小白完全指南</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.8;max-width:880px;margin:0 auto;padding:14px}
+h1{font-size:1.55em;text-align:center;padding:16px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:1.15em;color:var(--a);margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--br)}
+h3{font-size:1.02em;color:var(--g);margin:18px 0 7px}
+h4{font-size:.95em;color:var(--o);margin:12px 0 5px}
+pre{background:#1c2128;border:1px solid var(--br);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0 12px;font-size:.82em;line-height:1.6;white-space:pre-wrap;word-break:break-all;position:relative}
+code{font-family:'SF Mono','Fira Code',monospace}
+pre code{color:#e6edf3}
+.note{background:rgba(210,153,29,.08);border:1px solid rgba(210,153,29,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--o)}
+.warn{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--r)}
+.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--g)}
+.example{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.25);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--a)}
+.example b{color:var(--g)}
+.trouble{background:rgba(163,113,247,.06);border:1px solid rgba(163,113,247,.3);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--p)}
+.trouble b{color:var(--p)}
+.card{background:var(--bg2);border:1px solid var(--br);border-radius:10px;margin:14px 0;overflow:hidden}
+.card>.h{padding:10px 14px;background:var(--bg3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card>.h>.name{font-weight:700;font-size:.9em;color:var(--t);font-family:monospace}
+.card>.h>.tag{font-size:.65em;padding:2px 8px;border-radius:8px;white-space:nowrap;border:1px solid var(--br);color:var(--t2)}
+.card>.h>.tag.g{background:rgba(63,185,80,.15);border-color:var(--g);color:var(--g)}
+.card>.h>.tag.y{background:rgba(210,153,29,.15);border-color:var(--o);color:var(--o)}
+.card>.h>.tag.r{background:rgba(248,81,73,.15);border-color:var(--r);color:var(--r)}
+.card>.h>.tag.b{background:rgba(88,166,255,.15);border-color:var(--a);color:var(--a)}
+.card>.h>.tag.p{background:rgba(163,113,247,.15);border-color:var(--p);color:var(--p)}
+.card>.b{padding:10px 14px;font-size:.87em}
+.card>.b>.desc{font-size:.92em;color:var(--t2);margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.81em;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--br)}
+td,th{padding:8px 12px;border-bottom:1px solid var(--br);text-align:left}
+th{background:var(--bg3);color:var(--a);font-weight:600}
+tr:last-child td{border-bottom:none}
+.step{background:var(--bg3);border-radius:6px;padding:8px 13px;margin:6px 0;font-size:.83em}
+.step b{color:var(--a)}
+.summary{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(163,113,247,.1));border:1px solid var(--br);border-radius:10px;padding:12px 16px;margin:18px 0;font-size:.88em;color:var(--t)}
+.summary b{color:var(--a)}
+.analogy{background:rgba(57,197,207,.07);border-left:3px solid var(--c1);padding:8px 13px;margin:8px 0;font-size:.82em;color:var(--c1);border-radius:0 6px 6px 0}
+.analogy b{color:var(--c1)}
+.chnav{display:flex;justify-content:space-between;margin:30px 0 10px;gap:12px;border-top:1px solid var(--br);padding-top:16px;flex-wrap:wrap}
+.chnav a{flex:1;text-align:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;color:var(--a);text-decoration:none;font-size:.85em;transition:all .2s;min-width:120px;cursor:pointer}
+.chnav a:hover{background:var(--bg3);border-color:var(--a)}
+.chnav .toc-link{flex:0;min-width:80px;background:var(--bg3);color:var(--t2)}
+.chnav .toc-link:hover{color:var(--a)}
+.copy-btn{position:absolute;top:4px;right:4px;padding:3px 10px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;color:var(--t2);font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--a);color:var(--bg)}
+.copy-btn.copied{background:var(--g);color:var(--bg);border-color:var(--g)}
+@media(max-width:480px){body{padding:10px}h1{font-size:1.3em}h2{font-size:1.05em}pre{font-size:.75em}}
+</style>
+</head>
+<body>
+
+<h1>第4章：串口通信 — 单片机与电脑对话</h1>
+<div class="summary"><b>📖 小白完全指南 · 4/14</b> | 阅读时间约3分钟</div>
+
+<p>串口(UART)是嵌入式开发<strong>最基础、最常用</strong>的通信方式。单片机的printf输出、调试信息、AT指令控制，全靠串口。可以说：不会串口，嵌入式寸步难行。</p>
+
+<div class="analogy">💡 <b>类比：</b>串口就像<strong>两个人用对讲机通话</strong>——波特率=说话速度（必须一致才能听懂），数据位=每个词的长度，停止位=说完了喘口气，校验位=确认对方听清了。速度不一样就全是乱码，就像一个人说中文、一个说英文。</div>
+
+<h3>串口参数</h3>
+
+<table>
+<tr><th>参数</th><th>常见值</th><th>说明</th></tr>
+<tr><td>波特率(Baud Rate)</td><td>9600 / 115200</td><td>通信速度，双方必须一致</td></tr>
+<tr><td>数据位(Data Bits)</td><td>8</td><td>每个字节的有效位数</td></tr>
+<tr><td>停止位(Stop Bits)</td><td>1</td><td>帧结束标志</td></tr>
+<tr><td>校验位(Parity)</td><td>None</td><td>简单错误检测，通常不用</td></tr>
+<tr><td>流控(Flow Control)</td><td>None</td><td>硬件/软件流控，通常不用</td></tr>
+</table>
+
+<p>日常最常用的配置：<strong>115200 8N1</strong>（115200波特率，8数据位，无校验，1停止位）</p>
+
+<div class="step"><b>先确定COM口：</b>插上USB转TTL后运行：</div>
+<pre><code># 列出所有串口（python命令根据你的环境选择）
+python -m serial.tools.list_ports
+# 如果python命令不存在，试试：python3.14 -m serial.tools.list_ports
+# 如果python命令不存在，试试：
+python3.14 -m serial.tools.list_ports
+# 输出：COM3 - USB-SERIAL CH340 (COM3)
+# 记住这个COM口号，下面所有串口操作都用它</code></pre>
+
+<h3>pyserial：Python串口工具</h3>
+
+<div class="card">
+<div class="h"><span class="name">pyserial</span><span class="tag g">Python串口库</span><span class="tag b">pip install pyserial</span></div>
+<div class="b">
+<div class="desc">Python串口库，命令行工具miniterm超级好用——比PuTTY更灵活，支持十六进制显示、时间戳、日志保存。</div>
+<pre><code># 列出所有串口
+python -m serial.tools.list_ports
+
+# 打开串口终端（最常用！）
+python -m serial.tools.miniterm COM3 115200
+# 如果python命令不存在，试试：python3.14 -m serial.tools.miniterm COM3 115200
+
+# miniterm快捷键
+# Ctrl+] 退出    Ctrl+T 菜单    Ctrl+T Ctrl+H 十六进制显示
+# Ctrl+T Ctrl+T 发送换行    Ctrl+T Ctrl+R 时间戳</code></pre>
+</div></div>
+
+<div class="card">
+<div class="h"><span class="name">Python串口编程</span><span class="tag b">脚本化串口通信</span></div>
+<div class="b">
+<pre><code>import serial
+import time
+
+# 打开串口
+ser = serial.Serial('COM3', 115200, timeout=1)
+
+# 发送数据
+ser.write(b'Hello STM32!\n')
+
+# 接收数据（按行读取）
+line = ser.readline().decode('utf-8').strip()
+print(f"Received: {line}")
+
+# 接收指定字节数
+data = ser.read(10)  # 读10字节
+print(f"Hex: {data.hex()}")
+
+# 关闭
+ser.close()</code></pre>
+</div></div>
+
+<h3>PuTTY串口配置</h3>
+
+<div class="step"><b>步骤1：</b>打开PuTTY → 选择"Serial"连接类型</div>
+<div class="step"><b>步骤2：</b>Serial line填 <code>COM3</code>，Speed填 <code>115200</code></div>
+<div class="step"><b>步骤3：</b>左侧菜单 → Connection → Serial → 确认 8 data bits, 1 stop bits, None parity</div>
+<div class="step"><b>步骤4：</b>点Open连接</div>
+
+<div class="tip">💡 <b>小技巧：</b>PuTTY的串口窗口看不到输入的字符？正常——STM32通常只发不收。如果想看到本地回显：Terminal → Features → 勾选"Local echo"。</div>
+
+<h3>USB转TTL驱动</h3>
+
+<table>
+<tr><th>芯片</th><th>驱动</th><th>识别方法</th></tr>
+<tr><td>CH340/CH341</td><td>www.wch.cn 下载CH340驱动</td><td>设备管理器→端口→"USB-SERIAL CH340"</td></tr>
+<tr><td>CP2102</td><td>silabs.com 下载CP210x驱动</td><td>"Silicon Labs CP210x"</td></tr>
+<tr><td>FT232</td><td>ftdichip.com 下载VCP驱动</td><td>"USB Serial Port"</td></tr>
+<tr><td>PL2303</td><td>Prolific官网</td><td>Win10自带驱动</td></tr>
+</table>
+
+<div class="trouble">🔍 <b>常见问题：设备管理器看不到COM口</b><br>
+1. 检查USB线是否插好（有的线只能充电不能传数据！）<br>
+2. 检查驱动是否安装（设备管理器里黄色感叹号=驱动未装）<br>
+3. CH340在Win10/11有时不需要额外驱动，直接识别<br>
+4. 查看COM口号：<code>python -m serial.tools.list_ports</code>（如果python命令不存在，试试python3.14）</div>
+
+<div class="example-block">
+<div class="ex-title">📝 完整示例：Python串口通信</div>
+<div class="ex-input">安装并检测串口：</div>
+<pre><code>pip install pyserial
+python -m serial.tools.list_ports
+# 如果python命令不存在，试试：python3.14 -m serial.tools.list_ports</code></pre>
+<div class="ex-output">输出结果：</div>
+<pre><code>COM3 - USB-SERIAL CH340 (COM3)
+1 port found</code></pre>
+<div class="ex-input">打开串口终端（STM32已运行，每秒发送温度数据）：</div>
+<pre><code>python -m serial.tools.miniterm COM3 115200
+# 如果python命令不存在：python3.14 -m serial.tools.miniterm COM3 115200</code></pre>
+<div class="ex-output">串口输出：</div>
+<pre><code>--- Miniterm on COM3  115200,8,N,1 ---
+--- Quit: Ctrl+] | Menu: Ctrl+T ---
+[1234] Temperature: 25.3 C
+[2234] Temperature: 25.5 C
+[3234] Temperature: 25.4 C
+^C--- exit ---</pre>
+</div>
+
+<!-- ====== 第5章 ====== -->
+<a id="ch5"></a>
+<div class="summary">📖 <b>第5章学完你能干啥：</b>会用OpenOCD/ST-Link烧录程序，会用GDB调试（断点/单步/查看变量），能配置VS Code Cortex-Debug。</div>
+
+<div class="chnav">
+<a onclick="window.parent.loadPage('guide-ch03')">← 第3章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch05')">第5章 →</a>
+</div>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
