@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第6章：STM32开发实战 - 嵌入式小白完全指南</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.8;max-width:880px;margin:0 auto;padding:14px}
+h1{font-size:1.55em;text-align:center;padding:16px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:1.15em;color:var(--a);margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--br)}
+h3{font-size:1.02em;color:var(--g);margin:18px 0 7px}
+h4{font-size:.95em;color:var(--o);margin:12px 0 5px}
+pre{background:#1c2128;border:1px solid var(--br);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0 12px;font-size:.82em;line-height:1.6;white-space:pre-wrap;word-break:break-all;position:relative}
+code{font-family:'SF Mono','Fira Code',monospace}
+pre code{color:#e6edf3}
+.note{background:rgba(210,153,29,.08);border:1px solid rgba(210,153,29,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--o)}
+.warn{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--r)}
+.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--g)}
+.example{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.25);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--a)}
+.example b{color:var(--g)}
+.trouble{background:rgba(163,113,247,.06);border:1px solid rgba(163,113,247,.3);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--p)}
+.trouble b{color:var(--p)}
+.card{background:var(--bg2);border:1px solid var(--br);border-radius:10px;margin:14px 0;overflow:hidden}
+.card>.h{padding:10px 14px;background:var(--bg3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card>.h>.name{font-weight:700;font-size:.9em;color:var(--t);font-family:monospace}
+.card>.h>.tag{font-size:.65em;padding:2px 8px;border-radius:8px;white-space:nowrap;border:1px solid var(--br);color:var(--t2)}
+.card>.h>.tag.g{background:rgba(63,185,80,.15);border-color:var(--g);color:var(--g)}
+.card>.h>.tag.y{background:rgba(210,153,29,.15);border-color:var(--o);color:var(--o)}
+.card>.h>.tag.r{background:rgba(248,81,73,.15);border-color:var(--r);color:var(--r)}
+.card>.h>.tag.b{background:rgba(88,166,255,.15);border-color:var(--a);color:var(--a)}
+.card>.h>.tag.p{background:rgba(163,113,247,.15);border-color:var(--p);color:var(--p)}
+.card>.b{padding:10px 14px;font-size:.87em}
+.card>.b>.desc{font-size:.92em;color:var(--t2);margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.81em;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--br)}
+td,th{padding:8px 12px;border-bottom:1px solid var(--br);text-align:left}
+th{background:var(--bg3);color:var(--a);font-weight:600}
+tr:last-child td{border-bottom:none}
+.step{background:var(--bg3);border-radius:6px;padding:8px 13px;margin:6px 0;font-size:.83em}
+.step b{color:var(--a)}
+.summary{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(163,113,247,.1));border:1px solid var(--br);border-radius:10px;padding:12px 16px;margin:18px 0;font-size:.88em;color:var(--t)}
+.summary b{color:var(--a)}
+.analogy{background:rgba(57,197,207,.07);border-left:3px solid var(--c1);padding:8px 13px;margin:8px 0;font-size:.82em;color:var(--c1);border-radius:0 6px 6px 0}
+.analogy b{color:var(--c1)}
+.chnav{display:flex;justify-content:space-between;margin:30px 0 10px;gap:12px;border-top:1px solid var(--br);padding-top:16px;flex-wrap:wrap}
+.chnav a{flex:1;text-align:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;color:var(--a);text-decoration:none;font-size:.85em;transition:all .2s;min-width:120px;cursor:pointer}
+.chnav a:hover{background:var(--bg3);border-color:var(--a)}
+.chnav .toc-link{flex:0;min-width:80px;background:var(--bg3);color:var(--t2)}
+.chnav .toc-link:hover{color:var(--a)}
+.copy-btn{position:absolute;top:4px;right:4px;padding:3px 10px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;color:var(--t2);font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--a);color:var(--bg)}
+.copy-btn.copied{background:var(--g);color:var(--bg);border-color:var(--g)}
+@media(max-width:480px){body{padding:10px}h1{font-size:1.3em}h2{font-size:1.05em}pre{font-size:.75em}}
+</style>
+</head>
+<body>
+
+<h1>第6章：STM32开发实战</h1>
+<div class="summary"><b>📖 小白完全指南 · 6/14</b> | 阅读时间约3分钟</div>
+
+<p>STM32是ARM Cortex-M系列最流行的单片机，市场占有率超过50%。学会STM32，其他MCU都是触类旁通。</p>
+
+<div class="analogy">💡 <b>类比：</b>STM32就像一辆<strong>手动挡汽车</strong>——GPIO是方向盘（控制方向），UART是对讲机（通信），TIM是转速表（计时），ADC是油量表（测模拟量）。HAL库就是自动挡模式，LL库是手动挡模式。</div>
+
+<h3>HAL库 vs LL库</h3>
+
+<table>
+<tr><th>特性</th><th>HAL库</th><th>LL库</th></tr>
+<tr><td>抽象层级</td><td>高（封装完善）</td><td>低（接近寄存器）</td></tr>
+<tr><td>代码量</td><td>大</td><td>小</td></tr>
+<tr><td>执行效率</td><td>中等</td><td>高</td></tr>
+<tr><td>学习难度</td><td>低</td><td>高</td></tr>
+<tr><td>适用场景</td><td>快速开发/初学者</td><td>极致优化/专业项目</td></tr>
+</table>
+
+<div class="tip">💡 <b>建议：</b>入门先用HAL库，做产品时关键代码再换LL库优化。两者可以混用！</div>
+
+<h3>GPIO点灯 — 嵌入式的"Hello World"</h3>
+
+<div class="note">⚠️ <b>两种方式二选一：</b><br><br>
+<strong>方式1：纯寄存器（推荐新手，无需任何工具，立即可用）</strong><br>
+不依赖CubeMX和HAL库，直接操作寄存器。适合快速跑通第一个程序。<br><br>
+<strong>方式2：CubeMX + HAL库（正式项目推荐）</strong><br>
+① 下载安装 <a href="https://www.st.com/en/development-tools/stm32cubemx.html" style="color:var(--a)">STM32CubeMX</a>（需注册ST账号，免费）<br>
+② 新建项目→选择MCU型号→配置引脚→生成代码<br>
+③ 生成的工程已包含所有初始化函数，你只需在while(1)中写业务逻辑<br>
+④ 也可以用EIDE/PlatformIO插件创建项目，免去CubeMX<br><br>
+💡 <b>建议：</b>先用方式1跑通，有经验了再学CubeMX。</div>
+
+<h4>方式1：纯寄存器版（无需CubeMX，5分钟跑通）</h4>
+
+<pre><code>// main.c - STM32F103 点亮LED（PC13）— 纯寄存器版
+// 最小依赖：只需要启动文件+链接脚本（见第2章"5分钟快速上手"）
+
+// 寄存器地址定义
+#define RCC_APB2ENR  (*(volatile uint32_t*)0x40021018)
+#define GPIOC_CRH    (*(volatile uint32_t*)0x40011004)
+#define GPIOC_ODR    (*(volatile uint32_t*)0x4001100C)
+
+void delay(volatile uint32_t count) {
+    while(count--);
+}
+
+int main(void) {
+    // 步骤1：使能GPIOC时钟（必须先开时钟，否则引脚不工作！）
+    RCC_APB2ENR |= (1 &lt;&lt; 4);  // bit4 = IOPCEN
+    
+    // 步骤2：配置PC13为推挽输出（50MHz）
+    // CRH控制PC8-PC15，PC13对应bits [23:20]
+    GPIOC_CRH = (GPIOC_CRH &amp; ~0x00F00000) | 0x00300000;
+    
+    // 步骤3：循环翻转LED
+    while (1) {
+        GPIOC_ODR ^= (1 &lt;&lt; 13);  // 翻转PC13（XOR操作）
+        delay(500000);            // 约500ms延时（72MHz下）
+    }
+}</code></pre>
+
+<h4>方式2：CubeMX + HAL库版</h4>
+
+<p>如果你已经安装了STM32CubeMX并生成了工程，把下面的代码放在 <code>/* USER CODE BEGIN */</code> 区域内：</p>
+
+<pre><code>// main.c - STM32F103 点亮LED（PC13）— HAL库版
+// 前提：CubeMX已启用GPIOC Pin13为GPIO_Output
+#include "stm32f1xx_hal.h"
+
+// SystemClock_Config() 等初始化函数由CubeMX自动生成，不要手写！
+
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+    // MX_GPIO_Init() 等初始化由CubeMX生成，自动调用
+
+    while (1) {
+        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);  // 翻转LED
+        HAL_Delay(500);                            // 延时500ms
+    }
+}</code></pre>
+
+<h3>UART发送接收</h3>
+
+<div class="note">⚠️ <b>前提：</b>以下UART代码基于HAL库，需用CubeMX启用USART1并配置为Asynchronous模式。EIDE/PlatformIO创建的项目也包含HAL库。纯寄存器方式见第2章"5分钟快速上手"。</div>
+
+<pre><code>// UART初始化 + printf重定向
+#include &lt;stdio.h&gt;
+
+UART_HandleTypeDef huart1;
+
+// printf重定向到UART1
+int fputc(int ch, FILE *f) {
+    HAL_UART_Transmit(&amp;huart1, (uint8_t *)&amp;ch, 1, HAL_MAX_DELAY);
+    return ch;
+}
+
+// 主循环
+while (1) {
+    printf("Temperature: %.1f C
+", read_temp());
+    HAL_Delay(1000);
+}
+
+// 接收中断
+uint8_t rx_buf[1];
+HAL_UART_Receive_IT(&amp;huart1, rx_buf, 1);
+
+// 中断回调
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart->Instance == USART1) {
+        // 处理接收到的字节 rx_buf[0]
+        HAL_UART_Receive_IT(&amp;huart1, rx_buf, 1);  // 重新开启接收
+    }
+}</code></pre>
+
+<h3>TIM定时器中断</h3>
+
+<pre><code>// 1ms定时器中断
+TIM_HandleTypeDef htim2;
+
+void MX_TIM2_Init(void) {
+    htim2.Instance = TIM2;
+    htim2.Init.Prescaler = 72 - 1;       // 72MHz/72 = 1MHz
+    htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim2.Init.Period = 1000 - 1;         // 1MHz/1000 = 1kHz = 1ms
+    HAL_TIM_Base_Init(&amp;htim2);
+    HAL_TIM_Base_Start_IT(&amp;htim2);
+}
+
+// 中断回调（每1ms执行一次）
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    if (htim->Instance == TIM2) {
+        static uint32_t ms_count = 0;
+        ms_count++;
+    }
+}</code></pre>
+
+<h3>ADC读取</h3>
+
+<pre><code>// 读取PA0引脚的模拟电压
+ADC_HandleTypeDef hadc1;
+
+uint16_t read_adc(void) {
+    HAL_ADC_Start(&amp;hadc1);
+    HAL_ADC_PollForConversion(&amp;hadc1, HAL_MAX_DELAY);
+    return HAL_ADC_GetValue(&amp;hadc1);  // 0-4095 (12位ADC)
+}
+
+float read_voltage(void) {
+    uint16_t raw = read_adc();
+    return raw * 3.3f / 4096.0f;  // 转换为电压值
+}</code></pre>
+
+<h3>中断优先级 NVIC</h3>
+
+<pre><code>// 设置优先级分组（在main开头调用一次）
+HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);  // 4位抢占优先级
+
+// 设置具体中断优先级（数字越小优先级越高）
+HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);   // UART最高优先级
+HAL_NVIC_SetPriority(TIM2_IRQn, 1, 0);      // 定时器次之
+HAL_NVIC_SetPriority(ADC1_IRQn, 2, 0);       // ADC最低
+
+// 使能中断
+HAL_NVIC_EnableIRQ(USART1_IRQn);</code></pre>
+
+<div class="trouble">🔍 <b>常见问题：HAL_Delay卡死</b><br>
+HAL_Delay依赖SysTick中断。如果在其他中断里调用HAL_Delay且优先级高于SysTick，就会死锁。解决：确保调用HAL_Delay的中断优先级数字 > SysTick优先级数字（数字越大优先级越低）。</div>
+
+<div class="example-block">
+<div class="ex-title">📝 完整示例：STM32F103 LED闪烁</div>
+<div class="ex-input">硬件连接：PC13 → LED → 电阻(1K) → GND</div>
+<pre><code>// 烧录后串口输出（115200 8N1）：</code></pre>
+<div class="ex-output">运行效果：</div>
+<pre><code>LED on  (PC13=LOW, LED亮)
+...500ms...
+LED off (PC13=HIGH, LED灭)
+...500ms...
+LED on
+...500ms...
+LED off
+（无限循环）</pre>
+</div>
+
+<!-- ====== 第7章 ====== -->
+<a id="ch7"></a>
+<div class="summary">📖 <b>第7章学完你能干啥：</b>会用esptool烧录ESP32，能搭ESP-IDF环境，会写WiFi扫描/连接程序，了解BLE基础。</div>
+
+<div class="chnav">
+<a onclick="window.parent.loadPage('guide-ch05')">← 第5章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch07')">第7章 →</a>
+</div>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
