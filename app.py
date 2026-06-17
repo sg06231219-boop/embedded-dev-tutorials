@@ -1,13 +1,13 @@
 """
 Embedded Dev Tutorials - FastAPI Backend
-v1.5.1
+v1.6.0
 """
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 
-app = FastAPI(title="Embedded Dev Tutorials", version="1.5.1")
+app = FastAPI(title="Embedded Dev Tutorials", version="1.6.0")
 
 # Static files
 static_dir = os.path.join(os.path.dirname(__file__), "static")
@@ -22,7 +22,7 @@ async def index():
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "version": "1.5.0", "service": "embedded-dev-tutorials"}
+    return {"status": "ok", "version": "1.6.0", "service": "embedded-dev-tutorials"}
 
 
 @app.get("/tutorials/{page_name:path}")
