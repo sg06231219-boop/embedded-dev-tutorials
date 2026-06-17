@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第12章：项目实战 — 环境监测站 - 嵌入式小白完全指南</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.8;max-width:880px;margin:0 auto;padding:14px}
+h1{font-size:1.55em;text-align:center;padding:16px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:1.15em;color:var(--a);margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--br)}
+h3{font-size:1.02em;color:var(--g);margin:18px 0 7px}
+h4{font-size:.95em;color:var(--o);margin:12px 0 5px}
+pre{background:#1c2128;border:1px solid var(--br);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0 12px;font-size:.82em;line-height:1.6;white-space:pre-wrap;word-break:break-all;position:relative}
+code{font-family:'SF Mono','Fira Code',monospace}
+pre code{color:#e6edf3}
+.note{background:rgba(210,153,29,.08);border:1px solid rgba(210,153,29,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--o)}
+.warn{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--r)}
+.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--g)}
+.example{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.25);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--a)}
+.example b{color:var(--g)}
+.trouble{background:rgba(163,113,247,.06);border:1px solid rgba(163,113,247,.3);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--p)}
+.trouble b{color:var(--p)}
+.card{background:var(--bg2);border:1px solid var(--br);border-radius:10px;margin:14px 0;overflow:hidden}
+.card>.h{padding:10px 14px;background:var(--bg3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card>.h>.name{font-weight:700;font-size:.9em;color:var(--t);font-family:monospace}
+.card>.h>.tag{font-size:.65em;padding:2px 8px;border-radius:8px;white-space:nowrap;border:1px solid var(--br);color:var(--t2)}
+.card>.h>.tag.g{background:rgba(63,185,80,.15);border-color:var(--g);color:var(--g)}
+.card>.h>.tag.y{background:rgba(210,153,29,.15);border-color:var(--o);color:var(--o)}
+.card>.h>.tag.r{background:rgba(248,81,73,.15);border-color:var(--r);color:var(--r)}
+.card>.h>.tag.b{background:rgba(88,166,255,.15);border-color:var(--a);color:var(--a)}
+.card>.h>.tag.p{background:rgba(163,113,247,.15);border-color:var(--p);color:var(--p)}
+.card>.b{padding:10px 14px;font-size:.87em}
+.card>.b>.desc{font-size:.92em;color:var(--t2);margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.81em;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--br)}
+td,th{padding:8px 12px;border-bottom:1px solid var(--br);text-align:left}
+th{background:var(--bg3);color:var(--a);font-weight:600}
+tr:last-child td{border-bottom:none}
+.step{background:var(--bg3);border-radius:6px;padding:8px 13px;margin:6px 0;font-size:.83em}
+.step b{color:var(--a)}
+.summary{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(163,113,247,.1));border:1px solid var(--br);border-radius:10px;padding:12px 16px;margin:18px 0;font-size:.88em;color:var(--t)}
+.summary b{color:var(--a)}
+.analogy{background:rgba(57,197,207,.07);border-left:3px solid var(--c1);padding:8px 13px;margin:8px 0;font-size:.82em;color:var(--c1);border-radius:0 6px 6px 0}
+.analogy b{color:var(--c1)}
+.chnav{display:flex;justify-content:space-between;margin:30px 0 10px;gap:12px;border-top:1px solid var(--br);padding-top:16px;flex-wrap:wrap}
+.chnav a{flex:1;text-align:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;color:var(--a);text-decoration:none;font-size:.85em;transition:all .2s;min-width:120px;cursor:pointer}
+.chnav a:hover{background:var(--bg3);border-color:var(--a)}
+.chnav .toc-link{flex:0;min-width:80px;background:var(--bg3);color:var(--t2)}
+.chnav .toc-link:hover{color:var(--a)}
+.copy-btn{position:absolute;top:4px;right:4px;padding:3px 10px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;color:var(--t2);font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--a);color:var(--bg)}
+.copy-btn.copied{background:var(--g);color:var(--bg);border-color:var(--g)}
+@media(max-width:480px){body{padding:10px}h1{font-size:1.3em}h2{font-size:1.05em}pre{font-size:.75em}}
+</style>
+</head>
+<body>
+
+<h1>第12章：项目实战 — 环境监测站</h1>
+<div class="summary"><b>📖 小白完全指南 · 12/14</b> | 阅读时间约4分钟</div>
+
+<p>做一个<strong>完整可运行</strong>的项目：DHT11温湿度传感器 → STM32读取 → 串口输出 → OLED显示屏显示。</p>
+
+<div class="analogy">💡 <b>类比：</b>这个项目就像做一道完整的菜——前面的章节是学切菜、调味、火候，现在要把这些技能组合起来，做一道真正的菜上桌。</div>
+
+<h3>🛠️ 项目创建（二选一）</h3>
+
+<div class="note">⚠️ <b>重要：</b>下面的代码依赖STM32 HAL库。你需要先创建一个HAL库项目，以下是两种方式：</div>
+
+<div class="card">
+<div class="h"><span class="name">方式1：STM32CubeMX（推荐）</span><span class="tag g">自动生成</span></div>
+<div class="b">
+<div class="desc">CubeMX自动生成初始化代码，你只需写业务逻辑。</div>
+<div class="step"><b>步骤1：</b>打开STM32CubeMX → New Project → 搜索 <code>STM32F103C8</code> → 双击选择</div>
+<div class="step"><b>步骤2：</b>配置引脚：PA1=GPIO_Output（DHT11）、PB6=I2C1_SCL、PB7=I2C1_SDA、PA9=USART1_TX、PA10=USART1_RX</div>
+<div class="step"><b>步骤3：</b>左侧配置：Connectivity → USART1 → Mode: Asynchronous → Baud: 115200</div>
+<div class="step"><b>步骤4：</b>Connectivity → I2C1 → 勾选 Enabled</div>
+<div class="step"><b>步骤5：</b>Project Manager → Toolchain: CMake → Generate Code</div>
+<div class="step"><b>步骤6：</b>生成的工程中，在 <code>/* USER CODE BEGIN */</code> 区域内写你的代码</div>
+</div></div>
+
+<div class="card">
+<div class="h"><span class="name">方式2：EIDE/PlatformIO插件（免CubeMX）</span><span class="tag b">VS Code内</span></div>
+<div class="b">
+<div class="desc">已安装的VS Code插件，可以在VS Code内直接创建STM32项目。</div>
+<pre><code>// EIDE方式（推荐）
+// 1. VS Code → Ctrl+Shift+P → "EIDE: New Project"
+// 2. 选择 "Cortex-M Project" → STM32F103C8
+// 3. 项目自动包含HAL库和启动文件
+
+// PlatformIO方式
+// 1. VS Code → PlatformIO → New Project
+// 2. Board: BluePill F103C8 → Framework: STM32Cube
+// 3. 自动下载HAL库和编译工具链</code></pre>
+</div></div>
+
+<div class="tip">💡 <b>还没装CubeMX？</b>项目实战可以先跳过，把前面章节的纯寄存器代码练熟。CubeMX是效率工具，不是必需品。</div>
+
+<h3>硬件连接</h3>
+
+<table>
+<tr><th>DHT11引脚</th><th>STM32引脚</th><th>说明</th></tr>
+<tr><td>VCC</td><td>3.3V</td><td>供电</td></tr>
+<tr><td>GND</td><td>GND</td><td>地</td></tr>
+<tr><td>DATA</td><td>PA1</td><td>数据线（需4.7K上拉）</td></tr>
+</table>
+
+<table>
+<tr><th>OLED(SSD1306)</th><th>STM32引脚</th><th>说明</th></tr>
+<tr><td>VCC</td><td>3.3V</td><td>供电</td></tr>
+<tr><td>GND</td><td>GND</td><td>地</td></tr>
+<tr><td>SCL</td><td>PB6(I2C1_SCL)</td><td>I2C时钟</td></tr>
+<tr><td>SDA</td><td>PB7(I2C1_SDA)</td><td>I2C数据</td></tr>
+</table>
+
+<h3>DHT11驱动代码</h3>
+
+<pre><code>// dht11.h
+#ifndef DHT11_H
+#define DHT11_H
+#include "stm32f1xx_hal.h"
+
+typedef struct {
+    uint8_t humidity_int;    // 湿度整数部分
+    uint8_t humidity_dec;    // 湿度小数部分
+    uint8_t temp_int;        // 温度整数部分
+    uint8_t temp_dec;        // 温度小数部分
+} DHT11_Data_t;
+
+uint8_t DHT11_Read(DHT11_Data_t *data, GPIO_TypeDef *port, uint16_t pin);
+
+#endif</code></pre>
+
+<pre><code>// dht11.c
+#include "dht11.h"
+
+static void delay_us(uint32_t us) {
+    uint32_t ticks = us * (SystemCoreClock / 1000000) / 5;
+    while (ticks--);
+}
+
+uint8_t DHT11_Read(DHT11_Data_t *data, GPIO_TypeDef *port, uint16_t pin) {
+    uint8_t buf[5] = {0};
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    // 主机发送起始信号（拉低18ms）
+    GPIO_InitStruct.Pin = pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(port, &amp;GPIO_InitStruct);
+    HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
+    HAL_Delay(18);
+    HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);
+    delay_us(30);
+
+    // 切换为输入
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(port, &amp;GPIO_InitStruct);
+
+    // 等待DHT11响应
+    uint32_t timeout = 100;
+    while (HAL_GPIO_ReadPin(port, pin) &amp;&amp; timeout--) delay_us(1);
+    if (timeout == 0) return 1;  // 无响应
+
+    // 接收40位数据
+    for (int i = 0; i &lt; 5; i++) {
+        for (int j = 0; j &lt; 8; j++) {
+            timeout = 100;
+            while (!HAL_GPIO_ReadPin(port, pin) &amp;&amp; timeout--) delay_us(1);
+            delay_us(40);
+            if (HAL_GPIO_ReadPin(port, pin)) {
+                buf[i] |= (1 &lt;&lt; (7 - j));
+                timeout = 100;
+                while (HAL_GPIO_ReadPin(port, pin) &amp;&amp; timeout--) delay_us(1);
+            }
+        }
+    }
+
+    // 校验
+    if (buf[4] != (uint8_t)(buf[0] + buf[1] + buf[2] + buf[3]))
+        return 2;  // 校验失败
+
+    data->humidity_int = buf[0];
+    data->humidity_dec = buf[1];
+    data->temp_int     = buf[2];
+    data->temp_dec     = buf[3];
+    return 0;  // 成功
+}</code></pre>
+
+<h3>主程序</h3>
+
+<pre><code>// main.c
+#include "stm32f1xx_hal.h"
+#include "dht11.h"
+#include &lt;stdio.h&gt;
+
+DHT11_Data_t dht;
+extern UART_HandleTypeDef huart1;
+extern I2C_HandleTypeDef hi2c1;
+
+int fputc(int ch, FILE *f) {
+    HAL_UART_Transmit(&amp;huart1, (uint8_t *)&amp;ch, 1, HAL_MAX_DELAY);
+    return ch;
+}
+
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+    MX_GPIO_Init();
+    MX_USART1_UART_Init();
+    MX_I2C1_Init();
+
+    printf("
+=== Environment Monitor ===
+");
+
+    while (1) {
+        uint8_t ret = DHT11_Read(&amp;dht, GPIOA, GPIO_PIN_1);
+        if (ret == 0) {
+            printf("Temp: %d.%d C, Humi: %d.%d %%\n",
+                dht.temp_int, dht.temp_dec,
+                dht.humidity_int, dht.humidity_dec);
+        } else {
+            printf("DHT11 error: %d\n", ret);
+        }
+        HAL_Delay(2000);  // DHT11最小间隔2秒
+    }
+}</code></pre>
+
+<div class="card">
+<div class="h"><span class="name">OLED显示屏扩展</span><span class="tag b">SSD1306 I2C</span><span class="tag y">可选</span></div>
+<div class="b">
+<div class="desc">想让温湿度数据显示在OLED屏上？按以下步骤操作：</div>
+
+<div class="step"><b>步骤1：</b>下载ssd1306驱动：<code>github.com/afiskon/stm32-ssd1306</code>（GitHub可能被墙，替代：淘宝搜"SSD1306 STM32驱动代码"）</div>
+<div class="step"><b>步骤2：</b>将 <code>ssd1306.c</code>、<code>ssd1306.h</code>、<code>ssd1306_fonts.c</code> 复制到你的 <code>src/</code> 和 <code>inc/</code> 目录</div>
+<div class="step"><b>步骤3：</b>在main.c顶部添加：<code>#include "ssd1306.h"</code></div>
+<div class="step"><b>步骤4：</b>在while(1)的DHT11读取成功分支里加入OLED显示代码：</div>
+
+<pre><code>// OLED显示代码（在DHT11读取成功后添加）
+ssd1306_Init();  // 只需调用一次，建议放在main()初始化区
+char buf[32];
+snprintf(buf, sizeof(buf), "Temp:%d.%dC", dht.temp_int, dht.temp_dec);
+ssd1306_SetCursor(0, 0);
+ssd1306_WriteString(buf, Font_7x10, White);
+snprintf(buf, sizeof(buf), "Humi:%d.%d%%", dht.humidity_int, dht.humidity_dec);
+ssd1306_SetCursor(0, 16);
+ssd1306_WriteString(buf, Font_7x10, White);
+ssd1306_UpdateScreen(&amp;hi2c1);</code></pre>
+
+<div class="step"><b>步骤5：</b>CMakeLists.txt的SOURCES中添加：<code>src/ssd1306.c src/ssd1306_fonts.c</code></div>
+
+<div class="tip">💡 <b>暂时没有OLED？</b>没关系！只用串口输出也完全OK，先跑通DHT11传感器再说。OLED是锦上添花。</div>
+</div></div>
+
+<h3>CMakeLists.txt 完整版</h3>
+
+<pre><code>cmake_minimum_required(VERSION 3.20)
+project(env_monitor C ASM)
+
+set(SOURCES
+    src/main.c src/dht11.c src/stm32f1xx_it.c
+    src/system_stm32f1xx.c
+    # 如果要启用OLED显示，取消下行注释：
+    # src/ssd1306.c
+)
+
+include_directories(inc CMSIS)
+
+add_compile_options(
+    -mcpu=cortex-m3 -mthumb -Wall -O2 -g3
+    -ffunction-sections -fdata-sections -DSTM32F103C8T6
+)
+
+add_link_options(
+    -mcpu=cortex-m3 -mthumb -Wl,--gc-sections
+    -T${CMAKE_SOURCE_DIR}/STM32F103C8Tx.ld
+    -Wl,-Map=${PROJECT_NAME}.map
+    --specs=nano.specs --specs=nosys.specs
+)
+
+add_executable(${PROJECT_NAME}.elf ${SOURCES})
+
+add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.bin
+    COMMAND ${CMAKE_OBJCOPY} -O ihex ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex
+    COMMAND ${CMAKE_SIZE} ${PROJECT_NAME}.elf
+    COMMAND echo "Flash: st-flash write ${PROJECT_NAME}.bin 0x08000000"
+)</code></pre>
+
+<div class="tip">💡 <b>扩展方向：</b><br>
+• 加ESP8266/ESP32模块，通过WiFi上传到服务器<br>
+• 加MQTT协议，接入Home Assistant<br>
+• 加蜂鸣器，温度超限报警<br>
+• 加SD卡，记录历史数据</div>
+
+<!-- ====== 第13章 ====== -->
+<a id="ch13"></a>
+<div class="summary">📖 <b>第13章学完你能干啥：</b>有了一整套速查手册——启动文件/链接脚本/GDB命令/Makefile模板/常用寄存器/位操作宏，随时查阅。</div>
+
+<div class="chnav">
+<a onclick="window.parent.loadPage('guide-ch11')">← 第11章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch13')">第13章 →</a>
+</div>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
