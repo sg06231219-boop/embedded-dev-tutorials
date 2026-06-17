@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第11章：调试技巧大全 - 嵌入式小白完全指南</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);line-height:1.8;max-width:880px;margin:0 auto;padding:14px}
+h1{font-size:1.55em;text-align:center;padding:16px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:1.15em;color:var(--a);margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--br)}
+h3{font-size:1.02em;color:var(--g);margin:18px 0 7px}
+h4{font-size:.95em;color:var(--o);margin:12px 0 5px}
+pre{background:#1c2128;border:1px solid var(--br);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0 12px;font-size:.82em;line-height:1.6;white-space:pre-wrap;word-break:break-all;position:relative}
+code{font-family:'SF Mono','Fira Code',monospace}
+pre code{color:#e6edf3}
+.note{background:rgba(210,153,29,.08);border:1px solid rgba(210,153,29,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--o)}
+.warn{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--r)}
+.tip{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.25);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.83em;color:var(--g)}
+.example{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.25);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--a)}
+.example b{color:var(--g)}
+.trouble{background:rgba(163,113,247,.06);border:1px solid rgba(163,113,247,.3);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:.82em;color:var(--p)}
+.trouble b{color:var(--p)}
+.card{background:var(--bg2);border:1px solid var(--br);border-radius:10px;margin:14px 0;overflow:hidden}
+.card>.h{padding:10px 14px;background:var(--bg3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card>.h>.name{font-weight:700;font-size:.9em;color:var(--t);font-family:monospace}
+.card>.h>.tag{font-size:.65em;padding:2px 8px;border-radius:8px;white-space:nowrap;border:1px solid var(--br);color:var(--t2)}
+.card>.h>.tag.g{background:rgba(63,185,80,.15);border-color:var(--g);color:var(--g)}
+.card>.h>.tag.y{background:rgba(210,153,29,.15);border-color:var(--o);color:var(--o)}
+.card>.h>.tag.r{background:rgba(248,81,73,.15);border-color:var(--r);color:var(--r)}
+.card>.h>.tag.b{background:rgba(88,166,255,.15);border-color:var(--a);color:var(--a)}
+.card>.h>.tag.p{background:rgba(163,113,247,.15);border-color:var(--p);color:var(--p)}
+.card>.b{padding:10px 14px;font-size:.87em}
+.card>.b>.desc{font-size:.92em;color:var(--t2);margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.81em;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--br)}
+td,th{padding:8px 12px;border-bottom:1px solid var(--br);text-align:left}
+th{background:var(--bg3);color:var(--a);font-weight:600}
+tr:last-child td{border-bottom:none}
+.step{background:var(--bg3);border-radius:6px;padding:8px 13px;margin:6px 0;font-size:.83em}
+.step b{color:var(--a)}
+.summary{background:linear-gradient(135deg,rgba(88,166,255,.1),rgba(163,113,247,.1));border:1px solid var(--br);border-radius:10px;padding:12px 16px;margin:18px 0;font-size:.88em;color:var(--t)}
+.summary b{color:var(--a)}
+.analogy{background:rgba(57,197,207,.07);border-left:3px solid var(--c1);padding:8px 13px;margin:8px 0;font-size:.82em;color:var(--c1);border-radius:0 6px 6px 0}
+.analogy b{color:var(--c1)}
+.chnav{display:flex;justify-content:space-between;margin:30px 0 10px;gap:12px;border-top:1px solid var(--br);padding-top:16px;flex-wrap:wrap}
+.chnav a{flex:1;text-align:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;color:var(--a);text-decoration:none;font-size:.85em;transition:all .2s;min-width:120px;cursor:pointer}
+.chnav a:hover{background:var(--bg3);border-color:var(--a)}
+.chnav .toc-link{flex:0;min-width:80px;background:var(--bg3);color:var(--t2)}
+.chnav .toc-link:hover{color:var(--a)}
+.copy-btn{position:absolute;top:4px;right:4px;padding:3px 10px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;color:var(--t2);font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--a);color:var(--bg)}
+.copy-btn.copied{background:var(--g);color:var(--bg);border-color:var(--g)}
+@media(max-width:480px){body{padding:10px}h1{font-size:1.3em}h2{font-size:1.05em}pre{font-size:.75em}}
+</style>
+</head>
+<body>
+
+<h1>第11章：调试技巧大全</h1>
+<div class="summary"><b>📖 小白完全指南 · 11/14</b> | 阅读时间约3分钟</div>
+
+<p>写代码的时间占30%，调试的时间占70%。掌握高效的调试方法，是嵌入式工程师最重要的技能。</p>
+
+<div class="analogy">💡 <b>类比：</b>调试就像<strong>破案</strong>——printf=监控摄像头（全局观察），GDB=现场勘查（停下来仔细看），HardFault分析=验尸报告（分析死因），SWO=实时监控（不间断观察）。</div>
+
+<h3>printf调试 — 最简单最常用</h3>
+
+<pre><code>// 重定向printf到UART
+#include &lt;stdio.h&gt;
+
+int fputc(int ch, FILE *f) {
+    HAL_UART_Transmit(&amp;huart1, (uint8_t *)&amp;ch, 1, HAL_MAX_DELAY);
+    return ch;
+}
+
+// 使用ITM（SWO引脚）重定向——比UART快100倍！
+int fputc(int ch, FILE *f) {
+    ITM_SendChar(ch);
+    return ch;
+}
+
+// 调试宏
+#define DEBUG_PRINT(fmt, ...) printf("[%lu] " fmt "
+", HAL_GetTick(), ##__VA_ARGS__)
+// 使用：DEBUG_PRINT("ADC value: %d", adc_val);
+// 输出：[12345] ADC value: 2048</code></pre>
+
+<h3>SWO/ITM 输出</h3>
+
+<p>ITM(Instrumentation Trace Macrocell)是Cortex-M内置的调试输出通道，通过SWO引脚输出数据，比UART快得多且不占用串口资源。</p>
+
+<pre><code>// 在OpenOCD配置中启用SWO
+# openocd.cfg
+swj_newdap $_CHIPNAME cpu -irlen 4 -ircapture 0x1 -irmask 0xf -expected-id $_CPUTAPID
+$_TARGETNAME configure -event gdb-attach {
+    itm port 0 on
+}
+
+// GDB中查看ITM输出
+(gdb) monitor tpiu config internal /tmp/itm.log uart off 72000000
+(gdb) monitor itm port 0 on</code></pre>
+
+<h3>HardFault分析 — 程序崩溃急救</h3>
+
+<div class="note">⚠️ <b>注意：</b>下面的汇编代码使用了Thumb-2指令（<code>ITE EQ</code>），仅适用于Cortex-M3/M4/M7。Cortex-M0/M0+不支持，如STM32F0/G0系列需改用条件分支写法。</div>
+
+<pre><code>// HardFault处理函数（放在main.c中）
+void HardFault_Handler(void) {
+    __asm volatile (
+        "TST LR, #4
+"          // 检查使用哪个栈
+        "ITE EQ
+"
+        "MRSEQ R0, MSP
+"       // 主栈
+        "MRSNE R0, PSP
+"       // 进程栈
+        "B Hard_Fault_Handler
+" // 跳到C函数
+    );
+}
+
+void Hard_Fault_Handler(uint32_t *stack_frame) {
+    printf("
+==== HardFault! ====
+");
+    printf("R0  = 0x%08X
+", stack_frame[0]);
+    printf("R1  = 0x%08X
+", stack_frame[1]);
+    printf("R2  = 0x%08X
+", stack_frame[2]);
+    printf("R3  = 0x%08X
+", stack_frame[3]);
+    printf("R12 = 0x%08X
+", stack_frame[4]);
+    printf("LR  = 0x%08X
+", stack_frame[5]);   // 返回地址
+    printf("PC  = 0x%08X
+", stack_frame[6]);   // 崩溃地址！
+    printf("PSR = 0x%08X
+", stack_frame[7]);
+
+    // 在.map文件或反汇编中查找PC地址对应的函数
+    volatile uint32_t fault_addr = stack_frame[6];
+    while (1);  // 停在这里，用GDB查看
+}
+
+// GDB中查看崩溃位置
+(gdb) info line *0x08001234    // 把PC值换成实际的
+(gdb) list *0x08001234         // 显示源码</code></pre>
+
+<h3>常见Bug模式</h3>
+
+<table>
+<tr><th>Bug类型</th><th>症状</th><th>特征</th><th>排查方法</th></tr>
+<tr><td>空指针</td><td>HardFault</td><td>PC在非法地址</td><td>检查指针是否为NULL</td></tr>
+<tr><td>栈溢出</td><td>变量莫名变化、HardFault</td><td>局部变量被覆盖</td><td>uxTaskGetStackHighWaterMark()</td></tr>
+<tr><td>中断竞争</td><td>数据偶发错误</td><td>中断中修改共享变量</td><td>关中断保护或用原子操作</td></tr>
+<tr><td>未初始化变量</td><td>行为随机</td><td>上电第一次不正常</td><td>开启-Wall -Wuninitialized</td></tr>
+<tr><td>看门狗复位</td><td>程序周期性重启</td><td>IWDG超时</td><td>检查长阻塞代码</td></tr>
+</table>
+
+<div class="trouble">🔍 <b>常见问题：程序偶尔跑飞，无法稳定复现</b><br>
+90%是中断竞争。排查：<br>
+1. 检查中断和主循环是否访问同一变量<br>
+2. 如果是，用 <code>__disable_irq()</code> / <code>__enable_irq()</code> 保护<br>
+3. 或用 <code>volatile</code> 关键字声明共享变量<br>
+4. 更好的方案：用FreeRTOS队列/信号量</div>
+
+<div class="tip">💡 <b>调试黄金法则：</b><br>
+① 先让Bug稳定复现（100%复现=解决了一半）<br>
+② 二分法注释代码，缩小Bug范围<br>
+③ 看.map文件确认代码/数据地址<br>
+④ 永远开启 <code>-Wall -Werror</code> 编译</div>
+
+<!-- ====== 第12章 ====== -->
+<a id="ch12"></a>
+<div class="summary">📖 <b>第12章学完你能干啥：</b>能独立完成一个完整的嵌入式项目——从硬件接线到软件编写到烧录运行。</div>
+
+<div class="chnav">
+<a onclick="window.parent.loadPage('guide-ch10')">← 第10章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch12')">第12章 →</a>
+</div>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  };
+  pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
