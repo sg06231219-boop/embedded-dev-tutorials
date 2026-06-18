@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第6章：STM32开发实战 - 嵌入式小白完全指南</title>
+<title>绗?绔狅細STM32寮€鍙戝疄鎴?- 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,44 +57,85 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第6章：STM32开发实战</h1>
-<div class="summary"><b>📖 小白完全指南 · 6/14</b> | 阅读时间约3分钟</div>
+<h1>绗?绔狅細STM32寮€鍙戝疄鎴?/h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 6/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
 
-<p>STM32是ARM Cortex-M系列最流行的单片机，市场占有率超过50%。学会STM32，其他MCU都是触类旁通。</p>
+<p>STM32鏄疉RM Cortex-M绯诲垪鏈€娴佽鐨勫崟鐗囨満锛屽競鍦哄崰鏈夌巼瓒呰繃50%銆傚浼歋TM32锛屽叾浠朚CU閮芥槸瑙︾被鏃侀€氥€?/p>
 
-<div class="analogy">💡 <b>类比：</b>STM32就像一辆<strong>手动挡汽车</strong>——GPIO是方向盘（控制方向），UART是对讲机（通信），TIM是转速表（计时），ADC是油量表（测模拟量）。HAL库就是自动挡模式，LL库是手动挡模式。</div>
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>STM32灏卞儚涓€杈?strong>鎵嬪姩鎸℃苯杞?/strong>鈥斺€擥PIO鏄柟鍚戠洏锛堟帶鍒舵柟鍚戯級锛孶ART鏄璁叉満锛堥€氫俊锛夛紝TIM鏄浆閫熻〃锛堣鏃讹級锛孉DC鏄补閲忚〃锛堟祴妯℃嫙閲忥級銆侶AL搴撳氨鏄嚜鍔ㄦ尅妯″紡锛孡L搴撴槸鎵嬪姩鎸℃ā寮忋€?/div>
 
-<h3>HAL库 vs LL库</h3>
+<h3>HAL搴?vs LL搴?/h3>
 
 <table>
-<tr><th>特性</th><th>HAL库</th><th>LL库</th></tr>
-<tr><td>抽象层级</td><td>高（封装完善）</td><td>低（接近寄存器）</td></tr>
-<tr><td>代码量</td><td>大</td><td>小</td></tr>
-<tr><td>执行效率</td><td>中等</td><td>高</td></tr>
-<tr><td>学习难度</td><td>低</td><td>高</td></tr>
-<tr><td>适用场景</td><td>快速开发/初学者</td><td>极致优化/专业项目</td></tr>
+<tr><th>鐗规€?/th><th>HAL搴?/th><th>LL搴?/th></tr>
+<tr><td>鎶借薄灞傜骇</td><td>楂橈紙灏佽瀹屽杽锛?/td><td>浣庯紙鎺ヨ繎瀵勫瓨鍣級</td></tr>
+<tr><td>浠ｇ爜閲?/td><td>澶?/td><td>灏?/td></tr>
+<tr><td>鎵ц鏁堢巼</td><td>涓瓑</td><td>楂?/td></tr>
+<tr><td>瀛︿範闅惧害</td><td>浣?/td><td>楂?/td></tr>
+<tr><td>閫傜敤鍦烘櫙</td><td>蹇€熷紑鍙?鍒濆鑰?/td><td>鏋佽嚧浼樺寲/涓撲笟椤圭洰</td></tr>
 </table>
 
-<div class="tip">💡 <b>建议：</b>入门先用HAL库，做产品时关键代码再换LL库优化。两者可以混用！</div>
+<div class="tip">馃挕 <b>寤鸿锛?/b>鍏ラ棬鍏堢敤HAL搴擄紝鍋氫骇鍝佹椂鍏抽敭浠ｇ爜鍐嶆崲LL搴撲紭鍖栥€備袱鑰呭彲浠ユ贩鐢紒</div>
 
-<h3>GPIO点灯 — 嵌入式的"Hello World"</h3>
+<h3>鏃堕挓绯荤粺锛氱悊瑙TM32鐨勫績鑴?/h3>
 
-<div class="note">⚠️ <b>两种方式二选一：</b><br><br>
-<strong>方式1：纯寄存器（推荐新手，无需任何工具，立即可用）</strong><br>
-不依赖CubeMX和HAL库，直接操作寄存器。适合快速跑通第一个程序。<br><br>
-<strong>方式2：CubeMX + HAL库（正式项目推荐）</strong><br>
-① 下载安装 <a href="https://www.st.com/en/development-tools/stm32cubemx.html" style="color:var(--a)">STM32CubeMX</a>（需注册ST账号，免费）<br>
-② 新建项目→选择MCU型号→配置引脚→生成代码<br>
-③ 生成的工程已包含所有初始化函数，你只需在while(1)中写业务逻辑<br>
-④ 也可以用EIDE/PlatformIO插件创建项目，免去CubeMX<br><br>
-💡 <b>建议：</b>先用方式1跑通，有经验了再学CubeMX。</div>
+<div class="card">
+<div class="h"><span class="name">STM32F103鏃堕挓鏍?/span><span class="tag b">杩涢樁</span></div>
+<div class="b">
+<div class="desc">鏃堕挓鏄疭TM32鏈€瀹规槗琚拷瑙嗕絾鏈€鍏抽敭鐨勯厤缃€傛椂閽熶笉瀵癸紝鎵€鏈夊璁撅紙UART娉㈢壒鐜囥€乀IM瀹氭椂銆丄DC閲囨牱鐜囷級閮戒細鍑洪敊銆係TM32F103鐨勬椂閽熸潵婧愶細</div>
+<table>
+<tr><th>鏃堕挓婧?/th><th>棰戠巼</th><th>绮惧害</th><th>鐢ㄩ€?/th></tr>
+<tr><td>HSE锛堝閮ㄩ珮閫燂級</td><td>4-16MHz锛堝父鐢?MHz锛?/td><td>卤10ppm</td><td>涓绘椂閽熸簮锛堟帹鑽愶級</td></tr>
+<tr><td>HSI锛堝唴閮ㄩ珮閫燂級</td><td>8MHz</td><td>卤1%锛堟牎鍑嗗悗锛?/td><td>澶囩敤/浣庡姛鑰?/td></tr>
+<tr><td>LSE锛堝閮ㄤ綆閫燂級</td><td>32.768kHz</td><td>卤5ppm</td><td>RTC鏃堕挓</td></tr>
+<tr><td>LSI锛堝唴閮ㄤ綆閫燂級</td><td>~40kHz</td><td>宸紙娓╁害婕傜Щ澶э級</td><td>鐪嬮棬鐙?浣庡姛鑰楀敜閱?/td></tr>
+<tr><td>PLL锛堥攣鐩哥幆锛?/td><td>HSI鎴朒SE鍊嶉</td><td>鍙栧喅浜庤緭鍏?/td><td>浜х敓72MHz绯荤粺鏃堕挓</td></tr>
+</table>
+<pre><code>// 鎵嬪姩閰嶇疆鏃堕挓锛堜笉鍚獺AL搴擄級
+// 鐩爣锛欻SE(8MHz) 鈫?PLLx9 鈫?SYSCLK=72MHz
 
-<h4>方式1：纯寄存器版（无需CubeMX，5分钟跑通）</h4>
+// 1. 绛夊緟HSE绋冲畾
+RCC->CR |= RCC_CR_HSEON;            // 寮€鍚疕SE
+while (!(RCC->CR & RCC_CR_HSERDY)); // 绛夊緟HSE灏辩华
 
-<pre><code>// main.c - STM32F103 点亮LED（PC13）— 纯寄存器版
-// 最小依赖：只需要启动文件+链接脚本（见第2章"5分钟快速上手"）
+// 2. 閰嶇疆Flash寤舵椂锛?2MHz闇€瑕?涓瓑寰呭懆鏈燂級
+FLASH->ACR |= FLASH_ACR_LATENCY_2;
 
-// 寄存器地址定义
+// 3. 閰嶇疆PLL: HSE浣滀负杈撳叆锛屽€嶉9 鈫?8MHz脳9=72MHz
+RCC->CFGR |= RCC_CFGR_PLLSRC;       // HSE浣滀负PLL杈撳叆
+RCC->CFGR |= RCC_CFGR_PLLMULL9;     // 9鍊嶉
+
+// 4. 閰嶇疆AHB/APB1/APB2棰勫垎棰?RCC->CFGR |= RCC_CFGR_HPRE_DIV1;    // AHB=72MHz
+RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;   // APB1=36MHz锛堟渶澶?6MHz锛侊級
+RCC->CFGR |= RCC_CFGR_PPRE2_DIV1;   // APB2=72MHz
+
+// 5. 浣胯兘PLL锛岀瓑寰呴攣瀹?RCC->CR |= RCC_CR_PLLON;
+while (!(RCC->CR & RCC_CR_PLLRDY));
+
+// 6. 鍒囨崲鍒癙LL浣滀负绯荤粺鏃堕挓
+RCC->CFGR |= RCC_CFGR_SW_PLL;
+while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
+
+// 瀹屾垚锛丼YSCLK=72MHz, AHB=72MHz, APB1=36MHz, APB2=72MHz</code></pre>
+<div class="note">鈿狅笍 <b>閲嶈闄愬埗锛?/b>APB1鏈€澶ч鐜囨槸<strong>36MHz</strong>锛佸鏋滀綘鎶夾PB1涔熼厤鎴?2MHz锛岃姱鐗囦笉浼氱儳锛堟湁淇濇姢鐢佃矾锛夛紝浣嗗璁惧彲鑳藉伐浣滃紓甯搞€俇ART/TIM2-7鎸傚湪APB1涓婏紝娉ㄦ剰鏃堕挓鏉ユ簮銆?/div>
+</div></div>
+
+<h3>GPIO鐐圭伅 鈥?宓屽叆寮忕殑"Hello World"</h3>
+
+<div class="note">鈿狅笍 <b>涓ょ鏂瑰紡浜岄€変竴锛?/b><br><br>
+<strong>鏂瑰紡1锛氱函瀵勫瓨鍣紙鎺ㄨ崘鏂版墜锛屾棤闇€浠讳綍宸ュ叿锛岀珛鍗冲彲鐢級</strong><br>
+涓嶄緷璧朇ubeMX鍜孒AL搴擄紝鐩存帴鎿嶄綔瀵勫瓨鍣ㄣ€傞€傚悎蹇€熻窇閫氱涓€涓▼搴忋€?br><br>
+<strong>鏂瑰紡2锛欳ubeMX + HAL搴擄紙姝ｅ紡椤圭洰鎺ㄨ崘锛?/strong><br>
+鈶?涓嬭浇瀹夎 <a href="https://www.st.com/en/development-tools/stm32cubemx.html" style="color:var(--a)">STM32CubeMX</a>锛堥渶娉ㄥ唽ST璐﹀彿锛屽厤璐癸級<br>
+鈶?鏂板缓椤圭洰鈫掗€夋嫨MCU鍨嬪彿鈫掗厤缃紩鑴氣啋鐢熸垚浠ｇ爜<br>
+鈶?鐢熸垚鐨勫伐绋嬪凡鍖呭惈鎵€鏈夊垵濮嬪寲鍑芥暟锛屼綘鍙渶鍦╳hile(1)涓啓涓氬姟閫昏緫<br>
+鈶?涔熷彲浠ョ敤EIDE/PlatformIO鎻掍欢鍒涘缓椤圭洰锛屽厤鍘籆ubeMX<br><br>
+馃挕 <b>寤鸿锛?/b>鍏堢敤鏂瑰紡1璺戦€氾紝鏈夌粡楠屼簡鍐嶅CubeMX銆?/div>
+
+<h4>鏂瑰紡1锛氱函瀵勫瓨鍣ㄧ増锛堟棤闇€CubeMX锛?鍒嗛挓璺戦€氾級</h4>
+
+<pre><code>// main.c - STM32F103 鐐逛寒LED锛圥C13锛夆€?绾瘎瀛樺櫒鐗?// 鏈€灏忎緷璧栵細鍙渶瑕佸惎鍔ㄦ枃浠?閾炬帴鑴氭湰锛堣绗?绔?5鍒嗛挓蹇€熶笂鎵?锛?
+// 瀵勫瓨鍣ㄥ湴鍧€瀹氫箟
 #define RCC_APB2ENR  (*(volatile uint32_t*)0x40021018)
 #define GPIOC_CRH    (*(volatile uint32_t*)0x40011004)
 #define GPIOC_ODR    (*(volatile uint32_t*)0x4001100C)
@@ -104,79 +145,72 @@ void delay(volatile uint32_t count) {
 }
 
 int main(void) {
-    // 步骤1：使能GPIOC时钟（必须先开时钟，否则引脚不工作！）
+    // 姝ラ1锛氫娇鑳紾PIOC鏃堕挓锛堝繀椤诲厛寮€鏃堕挓锛屽惁鍒欏紩鑴氫笉宸ヤ綔锛侊級
     RCC_APB2ENR |= (1 &lt;&lt; 4);  // bit4 = IOPCEN
     
-    // 步骤2：配置PC13为推挽输出（50MHz）
-    // CRH控制PC8-PC15，PC13对应bits [23:20]
+    // 姝ラ2锛氶厤缃甈C13涓烘帹鎸借緭鍑猴紙50MHz锛?    // CRH鎺у埗PC8-PC15锛孭C13瀵瑰簲bits [23:20]
     GPIOC_CRH = (GPIOC_CRH &amp; ~0x00F00000) | 0x00300000;
     
-    // 步骤3：循环翻转LED
+    // 姝ラ3锛氬惊鐜炕杞琇ED
     while (1) {
-        GPIOC_ODR ^= (1 &lt;&lt; 13);  // 翻转PC13（XOR操作）
-        delay(500000);            // 约500ms延时（72MHz下）
+        GPIOC_ODR ^= (1 &lt;&lt; 13);  // 缈昏浆PC13锛圶OR鎿嶄綔锛?        delay(500000);            // 绾?00ms寤舵椂锛?2MHz涓嬶級
     }
 }</code></pre>
 
-<h4>方式2：CubeMX + HAL库版</h4>
+<h4>鏂瑰紡2锛欳ubeMX + HAL搴撶増</h4>
 
-<p>如果你已经安装了STM32CubeMX并生成了工程，把下面的代码放在 <code>/* USER CODE BEGIN */</code> 区域内：</p>
+<p>濡傛灉浣犲凡缁忓畨瑁呬簡STM32CubeMX骞剁敓鎴愪簡宸ョ▼锛屾妸涓嬮潰鐨勪唬鐮佹斁鍦?<code>/* USER CODE BEGIN */</code> 鍖哄煙鍐咃細</p>
 
-<pre><code>// main.c - STM32F103 点亮LED（PC13）— HAL库版
-// 前提：CubeMX已启用GPIOC Pin13为GPIO_Output
+<pre><code>// main.c - STM32F103 鐐逛寒LED锛圥C13锛夆€?HAL搴撶増
+// 鍓嶆彁锛欳ubeMX宸插惎鐢℅PIOC Pin13涓篏PIO_Output
 #include "stm32f1xx_hal.h"
 
-// SystemClock_Config() 等初始化函数由CubeMX自动生成，不要手写！
+// SystemClock_Config() 绛夊垵濮嬪寲鍑芥暟鐢盋ubeMX鑷姩鐢熸垚锛屼笉瑕佹墜鍐欙紒
 
 int main(void) {
     HAL_Init();
     SystemClock_Config();
-    // MX_GPIO_Init() 等初始化由CubeMX生成，自动调用
-
+    // MX_GPIO_Init() 绛夊垵濮嬪寲鐢盋ubeMX鐢熸垚锛岃嚜鍔ㄨ皟鐢?
     while (1) {
-        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);  // 翻转LED
-        HAL_Delay(500);                            // 延时500ms
+        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);  // 缈昏浆LED
+        HAL_Delay(500);                            // 寤舵椂500ms
     }
 }</code></pre>
 
-<h3>UART发送接收</h3>
+<h3>UART鍙戦€佹帴鏀?/h3>
 
-<div class="note">⚠️ <b>前提：</b>以下UART代码基于HAL库，需用CubeMX启用USART1并配置为Asynchronous模式。EIDE/PlatformIO创建的项目也包含HAL库。纯寄存器方式见第2章"5分钟快速上手"。</div>
+<div class="note">鈿狅笍 <b>鍓嶆彁锛?/b>浠ヤ笅UART浠ｇ爜鍩轰簬HAL搴擄紝闇€鐢–ubeMX鍚敤USART1骞堕厤缃负Asynchronous妯″紡銆侲IDE/PlatformIO鍒涘缓鐨勯」鐩篃鍖呭惈HAL搴撱€傜函瀵勫瓨鍣ㄦ柟寮忚绗?绔?5鍒嗛挓蹇€熶笂鎵?銆?/div>
 
-<pre><code>// UART初始化 + printf重定向
-#include &lt;stdio.h&gt;
+<pre><code>// UART鍒濆鍖?+ printf閲嶅畾鍚?#include &lt;stdio.h&gt;
 
 UART_HandleTypeDef huart1;
 
-// printf重定向到UART1
+// printf閲嶅畾鍚戝埌UART1
 int fputc(int ch, FILE *f) {
     HAL_UART_Transmit(&amp;huart1, (uint8_t *)&amp;ch, 1, HAL_MAX_DELAY);
     return ch;
 }
 
-// 主循环
-while (1) {
+// 涓诲惊鐜?while (1) {
     printf("Temperature: %.1f C
 ", read_temp());
     HAL_Delay(1000);
 }
 
-// 接收中断
+// 鎺ユ敹涓柇
 uint8_t rx_buf[1];
 HAL_UART_Receive_IT(&amp;huart1, rx_buf, 1);
 
-// 中断回调
+// 涓柇鍥炶皟
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart->Instance == USART1) {
-        // 处理接收到的字节 rx_buf[0]
-        HAL_UART_Receive_IT(&amp;huart1, rx_buf, 1);  // 重新开启接收
-    }
+        // 澶勭悊鎺ユ敹鍒扮殑瀛楄妭 rx_buf[0]
+        HAL_UART_Receive_IT(&amp;huart1, rx_buf, 1);  // 閲嶆柊寮€鍚帴鏀?    }
 }</code></pre>
 
-<h3>TIM定时器中断</h3>
+<h3>TIM瀹氭椂鍣ㄤ腑鏂?/h3>
 
-<pre><code>// 1ms定时器中断
-TIM_HandleTypeDef htim2;
+<pre><code>// 1ms瀹氭椂鍣ㄤ腑鏂?TIM_HandleTypeDef htim2;
 
 void MX_TIM2_Init(void) {
     htim2.Instance = TIM2;
@@ -187,7 +221,7 @@ void MX_TIM2_Init(void) {
     HAL_TIM_Base_Start_IT(&amp;htim2);
 }
 
-// 中断回调（每1ms执行一次）
+// 涓柇鍥炶皟锛堟瘡1ms鎵ц涓€娆★級
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM2) {
         static uint32_t ms_count = 0;
@@ -195,61 +229,57 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     }
 }</code></pre>
 
-<h3>ADC读取</h3>
+<h3>ADC璇诲彇</h3>
 
-<pre><code>// 读取PA0引脚的模拟电压
-ADC_HandleTypeDef hadc1;
+<pre><code>// 璇诲彇PA0寮曡剼鐨勬ā鎷熺數鍘?ADC_HandleTypeDef hadc1;
 
 uint16_t read_adc(void) {
     HAL_ADC_Start(&amp;hadc1);
     HAL_ADC_PollForConversion(&amp;hadc1, HAL_MAX_DELAY);
-    return HAL_ADC_GetValue(&amp;hadc1);  // 0-4095 (12位ADC)
+    return HAL_ADC_GetValue(&amp;hadc1);  // 0-4095 (12浣岮DC)
 }
 
 float read_voltage(void) {
     uint16_t raw = read_adc();
-    return raw * 3.3f / 4096.0f;  // 转换为电压值
-}</code></pre>
+    return raw * 3.3f / 4096.0f;  // 杞崲涓虹數鍘嬪€?}</code></pre>
 
-<h3>中断优先级 NVIC</h3>
+<h3>涓柇浼樺厛绾?NVIC</h3>
 
-<pre><code>// 设置优先级分组（在main开头调用一次）
-HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);  // 4位抢占优先级
+<pre><code>// 璁剧疆浼樺厛绾у垎缁勶紙鍦╩ain寮€澶磋皟鐢ㄤ竴娆★級
+HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);  // 4浣嶆姠鍗犱紭鍏堢骇
 
-// 设置具体中断优先级（数字越小优先级越高）
-HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);   // UART最高优先级
-HAL_NVIC_SetPriority(TIM2_IRQn, 1, 0);      // 定时器次之
-HAL_NVIC_SetPriority(ADC1_IRQn, 2, 0);       // ADC最低
-
-// 使能中断
+// 璁剧疆鍏蜂綋涓柇浼樺厛绾э紙鏁板瓧瓒婂皬浼樺厛绾ц秺楂橈級
+HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);   // UART鏈€楂樹紭鍏堢骇
+HAL_NVIC_SetPriority(TIM2_IRQn, 1, 0);      // 瀹氭椂鍣ㄦ涔?HAL_NVIC_SetPriority(ADC1_IRQn, 2, 0);       // ADC鏈€浣?
+// 浣胯兘涓柇
 HAL_NVIC_EnableIRQ(USART1_IRQn);</code></pre>
 
-<div class="trouble">🔍 <b>常见问题：HAL_Delay卡死</b><br>
-HAL_Delay依赖SysTick中断。如果在其他中断里调用HAL_Delay且优先级高于SysTick，就会死锁。解决：确保调用HAL_Delay的中断优先级数字 > SysTick优先级数字（数字越大优先级越低）。</div>
+<div class="trouble">馃攳 <b>甯歌闂锛欻AL_Delay鍗℃</b><br>
+HAL_Delay渚濊禆SysTick涓柇銆傚鏋滃湪鍏朵粬涓柇閲岃皟鐢℉AL_Delay涓斾紭鍏堢骇楂樹簬SysTick锛屽氨浼氭閿併€傝В鍐筹細纭繚璋冪敤HAL_Delay鐨勪腑鏂紭鍏堢骇鏁板瓧 > SysTick浼樺厛绾ф暟瀛楋紙鏁板瓧瓒婂ぇ浼樺厛绾ц秺浣庯級銆?/div>
 
 <div class="example-block">
-<div class="ex-title">📝 完整示例：STM32F103 LED闪烁</div>
-<div class="ex-input">硬件连接：PC13 → LED → 电阻(1K) → GND</div>
-<pre><code>// 烧录后串口输出（115200 8N1）：</code></pre>
-<div class="ex-output">运行效果：</div>
-<pre><code>LED on  (PC13=LOW, LED亮)
+<div class="ex-title">馃摑 瀹屾暣绀轰緥锛歋TM32F103 LED闂儊</div>
+<div class="ex-input">纭欢杩炴帴锛歅C13 鈫?LED 鈫?鐢甸樆(1K) 鈫?GND</div>
+<pre><code>// 鐑у綍鍚庝覆鍙ｈ緭鍑猴紙115200 8N1锛夛細</code></pre>
+<div class="ex-output">杩愯鏁堟灉锛?/div>
+<pre><code>LED on  (PC13=LOW, LED浜?
 ...500ms...
-LED off (PC13=HIGH, LED灭)
+LED off (PC13=HIGH, LED鐏?
 ...500ms...
 LED on
 ...500ms...
 LED off
-（无限循环）</pre>
+锛堟棤闄愬惊鐜級</pre>
 </div>
 
-<!-- ====== 第7章 ====== -->
+<!-- ====== 绗?绔?====== -->
 <a id="ch7"></a>
-<div class="summary">📖 <b>第7章学完你能干啥：</b>会用esptool烧录ESP32，能搭ESP-IDF环境，会写WiFi扫描/连接程序，了解BLE基础。</div>
+<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>浼氱敤esptool鐑у綍ESP32锛岃兘鎼璄SP-IDF鐜锛屼細鍐橶iFi鎵弿/杩炴帴绋嬪簭锛屼簡瑙LE鍩虹銆?/div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch05')">← 第5章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
-<a onclick="window.parent.loadPage('guide-ch07')">第7章 →</a>
+<a onclick="window.parent.loadPage('guide-ch05')">鈫?绗?绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
+<a onclick="window.parent.loadPage('guide-ch07')">绗?绔?鈫?/a>
 </div>
 
 <script>
@@ -267,10 +297,140 @@ document.querySelectorAll('pre').forEach(pre => {
   pre.appendChild(btn);
 });
 </script>
+
+<h2>馃敡 HAL搴撴繁搴﹁В鏋?/h2>
+
+<p>HAL锛圚ardware Abstraction Layer锛夋槸STM32瀹樻柟鐨勭‖浠舵娊璞″眰锛屼絾寰堝缁嗚妭鏂囨。涓嶈銆傝繖涓€鑺傝ˉ鍏呴偅浜涜浣犱粠"鑳界敤"鍒?浼氱敤"鐨勫叧閿煡璇嗐€?/p>
+
+<h3>HAL搴撶姸鎬佹満</h3>
+
+<pre><code>// 姣忎釜HAL鍑芥暟杩斿洖HAL_StatusTypeDef
+typedef enum {
+  HAL_OK       = 0x00,  // 鎴愬姛
+  HAL_ERROR    = 0x01,  // 涓€鑸敊璇?  HAL_BUSY     = 0x02,  // 璧勬簮蹇欙紙DMA/澶栬姝ｅ湪浣跨敤锛?  HAL_TIMEOUT  = 0x03   // 瓒呮椂锛堥€氬父澶栬娌″搷搴旓級
+} HAL_StatusTypeDef;
+
+// 榛勯噾娉曞垯锛氭案杩滄鏌ヨ繑鍥炲€硷紒
+if (HAL_UART_Transmit(&huart2, data, len, 100) != HAL_OK) {
+    // 鍙戦€佸け璐ワ紝璁板綍閿欒鎴栭噸璇?    Error_Handler();
+}</code></pre>
+
+<h3>Tick瀹氭椂鍣ㄤ笌HAL_Delay</h3>
+
+<div class="warn">鈿?<b>鍏抽敭鍧戯細</b>HAL_Delay渚濊禆SysTick涓柇銆傚鏋滀綘鍦ㄤ腑鏂湇鍔″嚱鏁帮紙灏ゅ叾鏄紭鍏堢骇楂樹簬SysTick鐨勪腑鏂級閲岃皟鐢℉AL_Delay锛屼細姝诲惊鐜€斺€斿洜涓篠ysTick涓柇琚樆濉炰簡锛岃鏁板櫒姘歌繙涓嶄細鏇存柊锛?/div>
+
+<pre><code">// 姝ｇ‘鍋氭硶锛氱敤闈為樆濉炲欢鏃?uint32_t tickstart = HAL_GetTick();
+while ((HAL_GetTick() - tickstart) < timeout) {
+    // 鍙互鍋氬叾浠栦簨锛屾垨鑰呯洿鎺ョ瓑
+    if (HAL_UART_Transmit(&huart2, data, 1, 1) == HAL_OK) break;
+}
+
+// 鎴栬€呭疄鐜拌嚜宸辩殑寰寤舵椂锛堜笉鐢⊿ysTick锛?void delay_us(uint32_t us) {
+    uint32_t cnt = us * (SystemCoreClock / 1000000) / 5;
+    while (cnt--) __NOP();
+}</code></pre>
+
+<h3>GPIO閫熷害绛夌骇</h3>
+
+<table>
+<tr><th>閫熷害</th><th>鏈€澶ч鐜?/th><th>閫傜敤鍦烘櫙</th></tr>
+<tr><td>GPIO_SPEED_FREQ_LOW</td><td>2 MHz</td><td>LED銆佹寜閽€佷綆閫熶俊鍙?/td></tr>
+<tr><td>GPIO_SPEED_FREQ_MEDIUM</td><td>25 MHz</td><td>鏅€欼O銆乁ART銆両2C</td></tr>
+<tr><td>GPIO_SPEED_FREQ_HIGH</td><td>50 MHz</td><td>SPI銆丳WM銆侀珮閫熶俊鍙?/td></tr>
+<tr><td>GPIO_SPEED_FREQ_VERY_HIGH</td><td>100 MHz</td><td>FMC/SDRAM銆侀珮閫熷苟琛屾€荤嚎</td></tr>
+</table>
+
+<div class="note">馃拪 <b>EMI鎻愮ず锛?/b>涓嶈鎶婁笉蹇呰鐨勯珮閫烮O璁惧お楂樷€斺€旈€熷害瓒婂揩锛岀數纾佸共鎵?EMI)瓒婂ぇ锛屽姛鑰椾篃鏇撮珮銆侺ED鐢↙ow灏卞浜嗐€?/div>
+
+<h2>馃摗 DMA锛堢洿鎺ュ瓨鍌ㄥ櫒璁块棶锛夊疄鎴?/h2>
+
+<p>DMA鏄疭TM32鏈€寮哄ぇ鐨勭壒鎬т箣涓€銆傜悊瑙ｅ畠锛屼綘鐨勭▼搴忔晥鐜囪兘鎻愬崌10鍊嶃€?/p>
+
+<pre><code>// ADC + DMA 杩炵画閲囨牱锛欳PU闆跺共棰勯噰闆?048涓牱鏈?#define ADC_BUF_SIZE 2048
+uint16_t adc_buffer[ADC_BUF_SIZE];
+
+void ADC_DMA_Init(void) {
+    // 1. 閰嶇疆ADC锛堢暐锛?    // 2. 閰嶇疆DMA
+    __HAL_RCC_DMA1_CLK_ENABLE();
+    
+    hdma_adc.Instance = DMA1_Channel1;
+    hdma_adc.Init.Direction = DMA_PERIPH_TO_MEMORY;       // 澶栬鈫掑唴瀛?    hdma_adc.Init.PeriphInc = DMA_PINC_DISABLE;           // 澶栬鍦板潃涓嶅彉
+    hdma_adc.Init.MemInc = DMA_MINC_ENABLE;               // 鍐呭瓨鍦板潃閫掑
+    hdma_adc.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD; // 16浣?    hdma_adc.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_adc.Init.Mode = DMA_CIRCULAR;                    // 寰幆妯″紡
+    hdma_adc.Init.Priority = DMA_PRIORITY_HIGH;
+    HAL_DMA_Init(&hdma_adc);
+    
+    __HAL_LINKDMA(&hadc1, DMA_Handle, hdma_adc);
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, ADC_BUF_SIZE);
+}
+
+// DMA浼犺緭瀹屾垚鍥炶皟
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+    // 2048涓牱鏈噰闆嗗畬姣曪紝鍙互澶勭悊浜?    // adc_buffer[] 宸茬粡鑷姩濉厖锛屾棤闇€CPU閫愪釜璇诲彇锛?    float avg = 0;
+    for (int i = 0; i < ADC_BUF_SIZE; i++) avg += adc_buffer[i];
+    avg /= ADC_BUF_SIZE;
+}</code></pre>
+
+<div class="card">
+<div class="h"><span class="name">DMA浼犺緭鏂瑰悜</span><span class="tag b">杩涢樁</span></div>
+<div class="b">
+<div class="desc">DMA涓嶅彧鏀寔澶栬鈫掑唴瀛橈紝瀹屾暣鏂瑰悜濡備笅锛?/div>
+<table>
+<tr><th>鏂瑰悜</th><th>鍏稿瀷搴旂敤</th></tr>
+<tr><td>鍐呭瓨鈫掑璁?(MEMORY_TO_PERIPH)</td><td>UART鍙戦€佸ぇ娈垫暟鎹€丼PI鍙戦€佹樉绀虹紦鍐插尯</td></tr>
+<tr><td>澶栬鈫掑唴瀛?(PERIPH_TO_MEMORY)</td><td>ADC杩炵画閲囨牱銆乁ART鎺ユ敹涓嶅畾闀挎暟鎹?/td></tr>
+<tr><td>鍐呭瓨鈫掑唴瀛?(MEMORY_TO_MEMORY)</td><td>蹇€焟emcpy锛堜笉鐢–PU锛屼絾鍗燚MA甯﹀锛?/td></tr>
+</table>
+</div></div>
+
+<h2>馃帥 绯荤粺鏃堕挓閰嶇疆瀹炴垬</h2>
+
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>STM32鐨勬椂閽熸爲灏卞儚涓€妫靛€掔潃闀跨殑澶ф爲鈥斺€?b>鏍戝共</b>(HSE 8MHz/HSI 16MHz) 鈫?<b>绮楁灊</b>(PLL鍊嶉鍒?2/168/480MHz) 鈫?<b>缁嗘灊</b>(AHB/APB1/APB2鍒嗛鍣? 鈫?<b>鏍戝彾</b>(鍚勫璁?</div>
+
+<pre><code>// F103锛?MHz澶栭儴鏅舵尟 鈫?PLL 脳9 鈫?72MHz绯荤粺鏃堕挓
+void SystemClock_Config(void) {
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+    
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+    RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;  // 8脳9=72MHz
+    HAL_RCC_OscConfig(&RCC_OscInitStruct);
+    
+    // F4: 8MHz 鈫?PLL_M=8 鈫?PLL_N=336 鈫?PLL_P=2 鈫?168MHz
+    // F7: 8MHz 鈫?PLL_M=8 鈫?PLL_N=432 鈫?PLL_P=2 鈫?216MHz
+}</code></pre>
+
+<div class="trouble">馃攳 <b>甯歌閿欒锛氭椂閽熼厤缃笉瀵癸紝绋嬪簭璺戦鎴栧璁句笉宸ヤ綔</b><br>
+鐢–ubeMX鐢熸垚鏃堕挓閰嶇疆鍚庯紝鍔″繀妫€鏌ワ細鈶燞SE_VALUE瀹忚绛変簬浣犵殑鏅舵尟棰戠巼锛堝父瑙?MHz/25MHz锛夆憽APB1鏈€澶?6MHz(F103)/42MHz(F4)锛孉PB2鏈€澶?2MHz(F103)/84MHz(F4) 鈶SB瑕佺敤48MHz锛岄渶瑕佺簿纭殑PLL閰嶇疆</div>
+
+<h2>馃幆 瀹炴垬缁冧範</h2>
+
+<div class="tip">馃摑 <b>缁冧範1锛?/b>鐢–ubeMX閰嶇疆STM32F103C8T6宸ョ▼锛屽疄鐜癠SART1+DMA鍙戦€?+ USART2+DMA鎺ユ敹锛岀粍鎴愪竴涓暟鎹浆鍙戝櫒銆?br><br>
+馃摑 <b>缁冧範2锛?/b>瀹炵幇TIM2浜х敓1KHz PWM锛堝崰绌烘瘮50%锛夛紝鐢═IM3杈撳叆鎹曡幏娴嬮噺杩欎釜PWM鐨勯鐜囧拰鍗犵┖姣斻€?br><br>
+馃摑 <b>缁冧範3锛?/b>鐢ˋDC+DMA杩炵画閲囨牱4涓€氶亾锛岄厤鍚圱IM瑙﹀彂瀹炵幇1KHz鍥哄畾閲囨牱鐜囷紝閫氳繃USART涓婁紶鍒颁覆鍙ｇ粯鍥惧伐鍏枫€?/div>
+
+<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
+<div class="summary">
+<b>鉁?STM32寮€鍙戞牳蹇冿細</b><br>
+鈥?HAL_OK妫€鏌ワ細姣忎釜HAL鍑芥暟蹇呴』妫€鏌ヨ繑鍥炲€?br>
+鈥?ISR涓笉鐢℉AL_Delay锛氭寰幆鐨勬牴鍥狅紝鐢ㄩ潪闃诲杞<br>
+鈥?DMA涓夋柟鍚戯細P鈫扢(ADC閲囨牱)銆丮鈫扨(UART鍙戦€?銆丮鈫扢(蹇€焟emcpy)<br>
+鈥?鏃堕挓鏍戯細HSE鈫扨LL鈫扐HB鈫扐PB1/APB2鈫掑璁?br>
+鈥?GPIO閫熷害锛氫綆閫熻澶囦笉瑕佽楂橀€燂紝鐪佺數鍑廍MI<br>
+<b>馃洜 CubeMX鎶€宸э細</b><br>
+鈥?鐢熸垚浠ｇ爜鍓嶆鏌inout鈫掑垪鍑烘墍鏈夊紩鑴氬啿绐?br>
+鈥?Clock Configuration鈫掓鏌?8MHz for USB<br>
+鈥?Project Manager鈫扖ode Generator鈫掑嬀閫?Generate peripheral initialization as a pair of .c/.h"
+</div>
+
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch05')">◀ 上一章：烧录调试</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
-  <a onclick="window.parent.loadPage('guide-ch07')">ESP32 ：下一章 ▶</a>
+  <a onclick="window.parent.loadPage('guide-ch05')">鈼€ 涓婁竴绔狅細鐑у綍璋冭瘯</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
+  <a onclick="window.parent.loadPage('guide-ch07')">ESP32 锛氫笅涓€绔?鈻?/a>
 </div>
 </body>
 </html>
