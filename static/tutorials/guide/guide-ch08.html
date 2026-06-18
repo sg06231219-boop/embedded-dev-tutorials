@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第8章：FreeRTOS入门 - 嵌入式小白完全指南</title>
+<title>绗?绔狅細FreeRTOS鍏ラ棬 - 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,28 +57,27 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第8章：FreeRTOS入门</h1>
-<div class="summary"><b>📖 小白完全指南 · 8/14</b> | 阅读时间约3分钟</div>
+<h1>绗?绔狅細FreeRTOS鍏ラ棬</h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 8/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
 
-<p>裸机程序（super loop）就像<strong>一个人干所有事</strong>——烧水、切菜、炒菜、摆盘，只能一件一件来。RTOS让多个任务<strong>同时运行</strong>（实际是快速切换），就像雇了多个厨师各司其职。</p>
+<p>瑁告満绋嬪簭锛坰uper loop锛夊氨鍍?strong>涓€涓汉骞叉墍鏈変簨</strong>鈥斺€旂儳姘淬€佸垏鑿溿€佺倰鑿溿€佹憜鐩橈紝鍙兘涓€浠朵竴浠舵潵銆俁TOS璁╁涓换鍔?strong>鍚屾椂杩愯</strong>锛堝疄闄呮槸蹇€熷垏鎹級锛屽氨鍍忛泧浜嗗涓帹甯堝悇鍙稿叾鑱屻€?/p>
 
-<div class="analogy">💡 <b>类比：</b>RTOS就像<strong>餐厅后厨</strong>——任务(Task)=厨师（各干各的活），队列(Queue)=传菜窗口（任务间传递数据），信号量(Semaphore)=叫号器（通知"饭好了"），互斥量(Mutex)=独占灶台（同一时间只有一个厨师用）。</div>
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>RTOS灏卞儚<strong>椁愬巺鍚庡帹</strong>鈥斺€斾换鍔?Task)=鍘ㄥ笀锛堝悇骞插悇鐨勬椿锛夛紝闃熷垪(Queue)=浼犺彍绐楀彛锛堜换鍔￠棿浼犻€掓暟鎹級锛屼俊鍙烽噺(Semaphore)=鍙彿鍣紙閫氱煡"楗ソ浜?锛夛紝浜掓枼閲?Mutex)=鐙崰鐏跺彴锛堝悓涓€鏃堕棿鍙湁涓€涓帹甯堢敤锛夈€?/div>
 
-<h3>任务创建与管理</h3>
+<h3>浠诲姟鍒涘缓涓庣鐞?/h3>
 
 <pre><code>#include "FreeRTOS.h"
 #include "task.h"
 
-// 任务1：LED闪烁
+// 浠诲姟1锛歀ED闂儊
 void vLEDTask(void *pvParameters) {
     while (1) {
         HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-        vTaskDelay(pdMS_TO_TICKS(500));  // 延时500ms
+        vTaskDelay(pdMS_TO_TICKS(500));  // 寤舵椂500ms
     }
 }
 
-// 任务2：串口打印
-void vPrintTask(void *pvParameters) {
+// 浠诲姟2锛氫覆鍙ｆ墦鍗?void vPrintTask(void *pvParameters) {
     while (1) {
         printf("System running, tick: %lu
 ", xTaskGetTickCount());
@@ -90,27 +89,24 @@ int main(void) {
     HAL_Init();
     SystemClock_Config();
 
-    // 创建任务（参数：函数、名称、栈大小、参数、优先级、句柄）
+    // 鍒涘缓浠诲姟锛堝弬鏁帮細鍑芥暟銆佸悕绉般€佹爤澶у皬銆佸弬鏁般€佷紭鍏堢骇銆佸彞鏌勶級
     xTaskCreate(vLEDTask,    "LED",   128, NULL, 1, NULL);
     xTaskCreate(vPrintTask,  "Print", 256, NULL, 2, NULL);
 
-    // 启动调度器
-    vTaskStartScheduler();
+    // 鍚姩璋冨害鍣?    vTaskStartScheduler();
 
-    while (1) {}  // 永远不会到这里
-}</code></pre>
+    while (1) {}  // 姘歌繙涓嶄細鍒拌繖閲?}</code></pre>
 
-<h3>队列通信</h3>
+<h3>闃熷垪閫氫俊</h3>
 
-<pre><code>// 队列：任务间传递数据的"管道"
+<pre><code>// 闃熷垪锛氫换鍔￠棿浼犻€掓暟鎹殑"绠￠亾"
 QueueHandle_t xTempQueue;
 
 void vSensorTask(void *p) {
     float temp;
     while (1) {
         temp = read_temperature();
-        // 发送到队列（等待最多10ms）
-        xQueueSend(xTempQueue, &amp;temp, pdMS_TO_TICKS(10));
+        // 鍙戦€佸埌闃熷垪锛堢瓑寰呮渶澶?0ms锛?        xQueueSend(xTempQueue, &amp;temp, pdMS_TO_TICKS(10));
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
@@ -118,23 +114,21 @@ void vSensorTask(void *p) {
 void vDisplayTask(void *p) {
     float temp;
     while (1) {
-        // 从队列接收（等待最多100ms）
-        if (xQueueReceive(xTempQueue, &amp;temp, pdMS_TO_TICKS(100))) {
+        // 浠庨槦鍒楁帴鏀讹紙绛夊緟鏈€澶?00ms锛?        if (xQueueReceive(xTempQueue, &amp;temp, pdMS_TO_TICKS(100))) {
             printf("Temp: %.1f C
 ", temp);
         }
     }
 }
 
-// 创建队列（容量5，每项sizeof(float)字节）
-xTempQueue = xQueueCreate(5, sizeof(float));</code></pre>
+// 鍒涘缓闃熷垪锛堝閲?锛屾瘡椤箂izeof(float)瀛楄妭锛?xTempQueue = xQueueCreate(5, sizeof(float));</code></pre>
 
-<h3>信号量与互斥量</h3>
+<h3>淇″彿閲忎笌浜掓枼閲?/h3>
 
-<pre><code>// 二值信号量：通知"事件发生了"
+<pre><code>// 浜屽€间俊鍙烽噺锛氶€氱煡"浜嬩欢鍙戠敓浜?
 SemaphoreHandle_t xButtonSem;
 
-// ISR中释放信号量
+// ISR涓噴鏀句俊鍙烽噺
 void HAL_GPIO_EXTI_Callback(uint16_t pin) {
     if (pin == BUTTON_PIN) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -143,7 +137,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t pin) {
     }
 }
 
-// 任务中等待信号量
+// 浠诲姟涓瓑寰呬俊鍙烽噺
 void vButtonTask(void *p) {
     while (1) {
         if (xSemaphoreTake(xButtonSem, portMAX_DELAY)) {
@@ -152,7 +146,7 @@ void vButtonTask(void *p) {
     }
 }
 
-// 互斥量：保护共享资源
+// 浜掓枼閲忥細淇濇姢鍏变韩璧勬簮
 SemaphoreHandle_t xUartMutex;
 
 void task1(void *p) {
@@ -166,13 +160,13 @@ void task1(void *p) {
     }
 }
 
-// 创建
+// 鍒涘缓
 xButtonSem = xSemaphoreCreateBinary();
 xUartMutex  = xSemaphoreCreateMutex();</code></pre>
 
-<h3>软件定时器</h3>
+<h3>杞欢瀹氭椂鍣?/h3>
 
-<pre><code>// 周期性定时器（每5秒喂狗）
+<pre><code>// 鍛ㄦ湡鎬у畾鏃跺櫒锛堟瘡5绉掑杺鐙楋級
 void vFeedDogCallback(TimerHandle_t xTimer) {
     HAL_GPIO_WritePin(GPIOB, WDI_PIN, GPIO_PIN_SET);
     HAL_Delay(1);
@@ -180,87 +174,77 @@ void vFeedDogCallback(TimerHandle_t xTimer) {
 }
 
 TimerHandle_t xWdTimer = xTimerCreate(
-    "Watchdog",              // 名称
-    pdMS_TO_TICKS(5000),     // 周期5秒
-    pdTRUE,                  // 自动重载
-    NULL,                    // 参数
-    vFeedDogCallback         // 回调函数
+    "Watchdog",              // 鍚嶇О
+    pdMS_TO_TICKS(5000),     // 鍛ㄦ湡5绉?    pdTRUE,                  // 鑷姩閲嶈浇
+    NULL,                    // 鍙傛暟
+    vFeedDogCallback         // 鍥炶皟鍑芥暟
 );
 xTimerStart(xWdTimer, 0);</code></pre>
 
-<div class="trouble">🔍 <b>常见问题：任务栈溢出</b><br>
-症状：程序跑飞、HardFault、变量莫名其妙变化。<br>
-排查：<code>uxTaskGetStackHighWaterMark(NULL)</code> 检查剩余栈空间，如果接近0就增大栈大小。<br>
-预防：创建任务时给足栈空间（printf需要至少256字节），开启 <code>configCHECK_FOR_STACK_OVERFLOW</code>。</div>
+<div class="trouble">馃攳 <b>甯歌闂锛氫换鍔℃爤婧㈠嚭</b><br>
+鐥囩姸锛氱▼搴忚窇椋炪€丠ardFault銆佸彉閲忚帿鍚嶅叾濡欏彉鍖栥€?br>
+鎺掓煡锛?code>uxTaskGetStackHighWaterMark(NULL)</code> 妫€鏌ュ墿浣欐爤绌洪棿锛屽鏋滄帴杩?灏卞澶ф爤澶у皬銆?br>
+棰勯槻锛氬垱寤轰换鍔℃椂缁欒冻鏍堢┖闂达紙printf闇€瑕佽嚦灏?56瀛楄妭锛夛紝寮€鍚?<code>configCHECK_FOR_STACK_OVERFLOW</code>銆?/div>
 
-<h3>FreeRTOS移植到STM32</h3>
+<h3>FreeRTOS绉绘鍒癝TM32</h3>
 
-<p>上面的代码假设FreeRTOS已经在项目中。实际需要以下步骤：</p>
+<p>涓婇潰鐨勪唬鐮佸亣璁綟reeRTOS宸茬粡鍦ㄩ」鐩腑銆傚疄闄呴渶瑕佷互涓嬫楠わ細</p>
 
-<div class="step"><b>步骤1：</b>下载FreeRTOS源码：<code>github.com/FreeRTOS/FreeRTOS</code>（或从 <code>freertos.org</code> 下载）</div>
-<div class="step"><b>步骤2：</b>拷贝核心文件到项目：</div>
-<pre><code>FreeRTOS/Source/      → 复制到你的项目
-├── tasks.c           ← 必须
-├── queue.c           ← 必须
-├── list.c            ← 必须
-├── timers.c          ← 可选（软件定时器）
-├── event_groups.c    ← 可选（事件组）
-├── include/          ← 头文件目录
-├── portable/
-│   ├── MemMang/heap_4.c  ← 必须（内存管理方案4）
-│   └── GCC/ARM_CM3/      ← 必须（Cortex-M3移植文件）
-│       ├── port.c
-│       └── portmacro.h</code></pre>
-<div class="step"><b>步骤3：</b>创建 <code>FreeRTOSConfig.h</code>（配置文件，关键参数）：</div>
-<pre><code>#define configUSE_PREEMPTION        1    // 抢占式调度
-#define configCPU_CLOCK_HZ          72000000UL  // STM32F103主频72MHz
-#define configTICK_RATE_HZ          1000  // Tick频率1kHz（1ms）
-#define configMAX_PRIORITIES        5     // 最大优先级数
-#define configMINIMAL_STACK_SIZE    128   // 最小栈大小（单位：word）
-#define configTOTAL_HEAP_SIZE       (15 * 1024)  // 堆大小15KB
+<div class="step"><b>姝ラ1锛?/b>涓嬭浇FreeRTOS婧愮爜锛?code>github.com/FreeRTOS/FreeRTOS</code>锛堟垨浠?<code>freertos.org</code> 涓嬭浇锛?/div>
+<div class="step"><b>姝ラ2锛?/b>鎷疯礉鏍稿績鏂囦欢鍒伴」鐩細</div>
+<pre><code>FreeRTOS/Source/      鈫?澶嶅埗鍒颁綘鐨勯」鐩?鈹溾攢鈹€ tasks.c           鈫?蹇呴』
+鈹溾攢鈹€ queue.c           鈫?蹇呴』
+鈹溾攢鈹€ list.c            鈫?蹇呴』
+鈹溾攢鈹€ timers.c          鈫?鍙€夛紙杞欢瀹氭椂鍣級
+鈹溾攢鈹€ event_groups.c    鈫?鍙€夛紙浜嬩欢缁勶級
+鈹溾攢鈹€ include/          鈫?澶存枃浠剁洰褰?鈹溾攢鈹€ portable/
+鈹?  鈹溾攢鈹€ MemMang/heap_4.c  鈫?蹇呴』锛堝唴瀛樼鐞嗘柟妗?锛?鈹?  鈹斺攢鈹€ GCC/ARM_CM3/      鈫?蹇呴』锛圕ortex-M3绉绘鏂囦欢锛?鈹?      鈹溾攢鈹€ port.c
+鈹?      鈹斺攢鈹€ portmacro.h</code></pre>
+<div class="step"><b>姝ラ3锛?/b>鍒涘缓 <code>FreeRTOSConfig.h</code>锛堥厤缃枃浠讹紝鍏抽敭鍙傛暟锛夛細</div>
+<pre><code>#define configUSE_PREEMPTION        1    // 鎶㈠崰寮忚皟搴?#define configCPU_CLOCK_HZ          72000000UL  // STM32F103涓婚72MHz
+#define configTICK_RATE_HZ          1000  // Tick棰戠巼1kHz锛?ms锛?#define configMAX_PRIORITIES        5     // 鏈€澶т紭鍏堢骇鏁?#define configMINIMAL_STACK_SIZE    128   // 鏈€灏忔爤澶у皬锛堝崟浣嶏細word锛?#define configTOTAL_HEAP_SIZE       (15 * 1024)  // 鍫嗗ぇ灏?5KB
 #define configSUPPORT_STATIC_ALLOCATION  0
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 #define configUSE_MUTEXES           1
 #define configUSE_COUNTING_SEMAPHORES  1
 
-// 钩子函数
-#define configCHECK_FOR_STACK_OVERFLOW  2    // 栈溢出检测等级2
+// 閽╁瓙鍑芥暟
+#define configCHECK_FOR_STACK_OVERFLOW  2    // 鏍堟孩鍑烘娴嬬瓑绾?
 #define configUSE_IDLE_HOOK          0
 #define configUSE_TICK_HOOK          0
 
-// 中断优先级（Cortex-M特有）
-#define configKERNEL_INTERRUPT_PRIORITY         (5 &lt;&lt; 4)  // 优先级5
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    (3 &lt;&lt; 4)  // 优先级3
+// 涓柇浼樺厛绾э紙Cortex-M鐗规湁锛?#define configKERNEL_INTERRUPT_PRIORITY         (5 &lt;&lt; 4)  // 浼樺厛绾?
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    (3 &lt;&lt; 4)  // 浼樺厛绾?
 
-// 需要实现的函数
+// 闇€瑕佸疄鐜扮殑鍑芥暟
 void vApplicationStackOverflowHook(TaskHandle_t, char*);
 void vApplicationMallocFailedHook(void);</code></pre>
-<div class="step"><b>步骤4：</b>修改 <code>stm32f1xx_it.c</code>，把SysTick中断改为调用FreeRTOS：</div>
-<pre><code>// 替换原有的 SysTick_Handler
+<div class="step"><b>姝ラ4锛?/b>淇敼 <code>stm32f1xx_it.c</code>锛屾妸SysTick涓柇鏀逛负璋冪敤FreeRTOS锛?/div>
+<pre><code>// 鏇挎崲鍘熸湁鐨?SysTick_Handler
 void SysTick_Handler(void) {
     if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
-        xPortSysTickHandler();  // FreeRTOS的Tick处理
+        xPortSysTickHandler();  // FreeRTOS鐨凾ick澶勭悊
     }
-    HAL_IncTick();  // 保留HAL库的Tick
+    HAL_IncTick();  // 淇濈暀HAL搴撶殑Tick
 }
 </code></pre>
 
-<div class="warn">⚠️ <b>HAL_Delay与FreeRTOS冲突：</b>HAL_Delay用轮询方式等待SysTick，在FreeRTOS任务中调用会<strong>阻塞整个系统</strong>！解决方案：<br>
-① 在任务中用 <code>vTaskDelay(pdMS_TO_TICKS(ms))</code> 代替 <code>HAL_Delay(ms)</code><br>
-② 在中断中可以用HAL_Delay（但不推荐，中断应尽快返回）<br>
-③ 如果必须用HAL_Delay，确保调用它的代码不在FreeRTOS任务内（如SystemClock_Config等初始化函数）</div>
-<div class="step"><b>步骤5：</b>在CMakeLists.txt/Makefile中添加源文件，编译即可</div>
+<div class="warn">鈿狅笍 <b>HAL_Delay涓嶧reeRTOS鍐茬獊锛?/b>HAL_Delay鐢ㄨ疆璇㈡柟寮忕瓑寰匰ysTick锛屽湪FreeRTOS浠诲姟涓皟鐢ㄤ細<strong>闃诲鏁翠釜绯荤粺</strong>锛佽В鍐虫柟妗堬細<br>
+鈶?鍦ㄤ换鍔′腑鐢?<code>vTaskDelay(pdMS_TO_TICKS(ms))</code> 浠ｆ浛 <code>HAL_Delay(ms)</code><br>
+鈶?鍦ㄤ腑鏂腑鍙互鐢℉AL_Delay锛堜絾涓嶆帹鑽愶紝涓柇搴斿敖蹇繑鍥烇級<br>
+鈶?濡傛灉蹇呴』鐢℉AL_Delay锛岀‘淇濊皟鐢ㄥ畠鐨勪唬鐮佷笉鍦‵reeRTOS浠诲姟鍐咃紙濡係ystemClock_Config绛夊垵濮嬪寲鍑芥暟锛?/div>
+<div class="step"><b>姝ラ5锛?/b>鍦–MakeLists.txt/Makefile涓坊鍔犳簮鏂囦欢锛岀紪璇戝嵆鍙?/div>
 
-<div class="tip">💡 <b>更简单的方式：</b>CubeMX可以直接添加FreeRTOS！<code>Middleware → FREERTOS → Interface: CMSIS_V1</code>，生成代码已包含FreeRTOS。PlatformIO也支持 <code>lib_deps = FreeRTOS</code>。</div>
+<div class="tip">馃挕 <b>鏇寸畝鍗曠殑鏂瑰紡锛?/b>CubeMX鍙互鐩存帴娣诲姞FreeRTOS锛?code>Middleware 鈫?FREERTOS 鈫?Interface: CMSIS_V1</code>锛岀敓鎴愪唬鐮佸凡鍖呭惈FreeRTOS銆侾latformIO涔熸敮鎸?<code>lib_deps = FreeRTOS</code>銆?/div>
 
-<!-- ====== 第9章 ====== -->
+<!-- ====== 绗?绔?====== -->
 <a id="ch9"></a>
-<div class="summary">📖 <b>第9章学完你能干啥：</b>理解I2C/SPI/UART三种协议原理和区别，知道什么时候用哪种，会用逻辑分析仪抓信号。</div>
+<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>鐞嗚ВI2C/SPI/UART涓夌鍗忚鍘熺悊鍜屽尯鍒紝鐭ラ亾浠€涔堟椂鍊欑敤鍝锛屼細鐢ㄩ€昏緫鍒嗘瀽浠姄淇″彿銆?/div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch07')">← 第7章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
-<a onclick="window.parent.loadPage('guide-ch09')">第9章 →</a>
+<a onclick="window.parent.loadPage('guide-ch07')">鈫?绗?绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
+<a onclick="window.parent.loadPage('guide-ch09')">绗?绔?鈫?/a>
 </div>
 
 <script>
@@ -278,10 +262,154 @@ document.querySelectorAll('pre').forEach(pre => {
   pre.appendChild(btn);
 });
 </script>
+
+<h2>馃搳 闃熷垪锛圦ueue锛夎瑙?/h2>
+
+<p>闃熷垪鏄疐reeRTOS浠诲姟闂撮€氫俊鐨勪富鍔涘伐鍏枫€傚畠鏄竴涓狥IFO缂撳啿鍖猴紝涓€涓换鍔″線閲屾斁锛屽彟涓€涓粠閲屽彇锛屽ぉ鐒剁嚎绋嬪畨鍏ㄣ€?/p>
+
+<pre><code>// 鍒涘缓闃熷垪锛氬瓨鏀?0涓猣loat鍊?QueueHandle_t sensor_queue;
+sensor_queue = xQueueCreate(10, sizeof(float));
+
+// 浠诲姟A锛氬彂閫佹暟鎹紙鐢熶骇鑰咃級
+void vSensorTask(void* pv) {
+    float temp;
+    for (;;) {
+        temp = read_temperature();
+        // 鍙戦€佸埌闃熷垪锛岀瓑鏈€澶?00ms
+        if (xQueueSend(sensor_queue, &temp, pdMS_TO_TICKS(100)) != pdTRUE) {
+            // 闃熷垪婊′簡锛佹秷璐硅€呭お鎱?        }
+        vTaskDelay(pdMS_TO_TICKS(1000));  // 1绉掗噰鏍蜂竴娆?    }
+}
+
+// 浠诲姟B锛氭帴鏀舵暟鎹紙娑堣垂鑰咃級
+void vDisplayTask(void* pv) {
+    float temp;
+    for (;;) {
+        // 闃诲绛夊緟鏁版嵁锛堟棤闄愮瓑锛?        if (xQueueReceive(sensor_queue, &temp, portMAX_DELAY) == pdTRUE) {
+            printf("娓╁害: %.1f掳C\n", temp);
+        }
+    }
+}</code></pre>
+
+<h3>闃熷垪API鍙樹綋</h3>
+
+<table>
+<tr><th>API</th><th>琛屼负</th><th>閫傜敤鍦烘櫙</th></tr>
+<tr><td><code>xQueueSend</code></td><td>闃熷垪婊″垯绛夊緟</td><td>涓€鑸彂閫?/td></tr>
+<tr><td><code>xQueueSendToBack</code></td><td>鍙戦€佸埌闃熷熬锛堝悓xQueueSend锛?/td><td>FIFO鍙戦€?/td></tr>
+<tr><td><code>xQueueSendToFront</code></td><td>鍙戦€佸埌闃熼锛堟彃闃燂級</td><td>绱ф€ユ秷鎭?/td></tr>
+<tr><td><code>xQueueOverwrite</code></td><td>闃熷垪婊″垯瑕嗙洊鏈€鏃ф暟鎹?/td><td>鍙叧蹇冩渶鏂板€硷紙濡備紶鎰熷櫒璇绘暟锛?/td></tr>
+<tr><td><code>xQueuePeek</code></td><td>璇诲彇浣嗕笉绉婚櫎</td><td>棰勮涓嬩竴涓暟鎹?/td></tr>
+<tr><td><code>xQueueReceive</code></td><td>璇诲彇骞剁Щ闄?/td><td>涓€鑸帴鏀?/td></tr>
+</table>
+
+<h2>馃攼 淇″彿閲忥紙Semaphore锛夎瑙?/h2>
+
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>浜屽€间俊鍙烽噺鍍?b>涓€涓护鐗?/b>鈥斺€旀嬁鍒颁护鐗岀殑鎵嶈兘杩涘叆涓寸晫鍖猴紝鍏朵粬浜烘帓闃熴€傝鏁颁俊鍙烽噺鍍?b>鍋滆溅鍦虹殑杞︿綅</b>鈥斺€旀湁鍑犱釜绌轰綅灏辫兘杩涘嚑杈嗚溅銆?/div>
+
+<h3>浜屽€间俊鍙烽噺锛氫簰鏂ヨ闂?/h3>
+
+<pre><code">SemaphoreHandle_t i2c_mutex;
+
+// 鍒濆鍖?i2c_mutex = xSemaphoreCreateBinary();
+xSemaphoreGive(i2c_mutex);  // 鍒濆鍖栦负"鍙敤"
+
+// 浠诲姟A锛氫娇鐢↖2C
+void vTaskA(void* pv) {
+    for (;;) {
+        // 鑾峰彇I2C浣跨敤鏉冿紙绛夋渶澶?0ms锛?        if (xSemaphoreTake(i2c_mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+            read_sensor_i2c();       // 浣跨敤I2C
+            xSemaphoreGive(i2c_mutex); // 閲婃斁
+        }
+    }
+}
+
+// 浠诲姟B锛氫篃鐢↖2C锛堜笉浼氬啿绐侊紒锛?void vTaskB(void* pv) {
+    for (;;) {
+        if (xSemaphoreTake(i2c_mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+            write_display_i2c();     // 浣跨敤I2C
+            xSemaphoreGive(i2c_mutex); // 閲婃斁
+        }
+    }
+}</code></pre>
+
+<h3>淇″彿閲?vs 浜掓枼閲忥紙Mutex锛?/h3>
+
+<div class="warn">鈿?<b>鍏抽敭鍖哄埆锛?/b>鐢ㄤ簰鏂ラ噺(Mutex)鑰屼笉鏄簩鍊间俊鍙烽噺鍋氳祫婧愪簰鏂ワ紒Mutex鏈?b>浼樺厛绾х户鎵?/b>鏈哄埗锛堥槻姝紭鍏堢骇鍙嶈浆锛夛紝浜屽€间俊鍙烽噺娌℃湁銆?/div>
+
+<table>
+<tr><th>鐗规€?/th><th>浜屽€间俊鍙烽噺</th><th>浜掓枼閲?Mutex)</th></tr>
+<tr><td>鐢ㄩ€?/td><td>浠诲姟鍚屾锛堥€氱煡淇″彿锛?/td><td>璧勬簮浜掓枼锛堜繚鎶や复鐣屽尯锛?/td></tr>
+<tr><td>浼樺厛绾х户鎵?/td><td>鉂?鏃?/td><td>鉁?鏈夛紙鑷姩鎻愬崌鎸佹湁鑰呬紭鍏堢骇锛?/td></tr>
+<tr><td>閫掑綊閿?/td><td>鉂?涓嶆敮鎸?/td><td>鉁?鏀寔(xSemaphoreCreateRecursiveMutex)</td></tr>
+<tr><td>ISR涓娇鐢?/td><td>鉁?鍙互</td><td>鉂?涓嶈兘锛堝彧鑳戒换鍔￠棿浣跨敤锛?/td></tr>
+<tr><td>鍏稿瀷鍦烘櫙</td><td>ISR閫氱煡浠诲姟"鏁版嵁灏辩华"</td><td>淇濇姢I2C/SPI/涓插彛绛夊叡浜璁?/td></tr>
+</table>
+
+<h2>鈴?杞欢瀹氭椂鍣?/h2>
+
+<pre><code>// 涓嶉渶瑕佸崟鐙换鍔★紒FreeRTOS Daemon浠诲姟甯綘鎵ц鍥炶皟
+TimerHandle_t led_timer;
+
+void led_timer_callback(TimerHandle_t xTimer) {
+    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);  // 姣忕缈昏浆LED
+}
+
+void create_timers(void) {
+    led_timer = xTimerCreate(
+        "LED_Blink",                   // 鍚嶇О
+        pdMS_TO_TICKS(1000),           // 鍛ㄦ湡1000ms
+        pdTRUE,                        // 鑷姩閲嶈浇锛堝懆鏈熸€э級
+        (void*)0,                      // 瀹氭椂鍣↖D
+        led_timer_callback             // 鍥炶皟鍑芥暟
+    );
+    xTimerStart(led_timer, 0);  // 鍚姩
+}
+
+// 涓€娆℃€у畾鏃跺櫒锛氳秴鏃跺悗鑷姩鍒犻櫎
+TimerHandle_t oneshot = xTimerCreate("Oneshot",
+    pdMS_TO_TICKS(5000), pdFALSE, (void*)0, callback);
+xTimerStart(oneshot, 0);
+// 5绉掑悗callback鎵ц涓€娆★紝瀹氭椂鍣ㄨ嚜姣?/code></pre>
+
+<div class="card">
+<div class="h"><span class="name">浼樺厛绾у弽杞棶棰?/span><span class="tag r">杩涢樁</span></div>
+<div class="b">
+<div class="desc">
+<b>鍦烘櫙锛?/b>浣庝紭鍏堢骇浠诲姟A鎸佹湁閿?鈫?楂樹紭鍏堢骇浠诲姟C涔熸兂鎷块攣 鈫?C琚樆濉?鈫?涓紭鍏堢骇浠诲姟B鎶㈠崰A锛圓鏀句笉浜嗛攣锛?鈫?C鏃犻檺绛夊緟锛?br><br>
+<b>瑙ｅ喅锛?/b>鐢?b>Mutex</b>浠ｆ浛浜屽€间俊鍙烽噺锛孧utex浼氳嚜鍔ㄥ皢鎸佹湁鑰匒鐨勪紭鍏堢骇涓存椂鎻愬崌鍒癈鐨勭骇鍒紙浼樺厛绾х户鎵匡級锛岃A蹇€熷畬鎴愰噴鏀鹃攣銆?br><br>
+<b>CMSIS RTOS2 API锛?/b><br>
+<pre><code>// CMSIS RTOS2 (STM32Cube榛樿)
+osMutexId_t i2c_mutex = osMutexNew(NULL);
+osMutexAcquire(i2c_mutex, osWaitForever);
+osMutexRelease(i2c_mutex);</code></pre>
+</div></div></div>
+
+<h2>馃幆 瀹炴垬缁冧範</h2>
+
+<div class="tip">馃摑 <b>缁冧範1锛?/b>鍒涘缓3涓换鍔★細鈶燣ED闂儊(100ms) 鈶℃寜閿壂鎻?20ms杞) 鈶LED鏄剧ず(1s鍒锋柊)銆傜敤闃熷垪浼犻€掓寜閿簨浠剁粰鏄剧ず浠诲姟銆?br><br>
+馃摑 <b>缁冧範2锛?/b>鐢ㄤ簰鏂ラ噺淇濇姢I2C鎬荤嚎锛岃涓や釜浠诲姟锛堟俯婀垮害浼犳劅鍣ㄨ鍙?+ OLED鏄剧ず锛夊畨鍏ㄥ叡浜獻2C澶栬銆?br><br>
+馃摑 <b>缁冧範3锛?/b>瀹炵幇涓€涓蒋浠跺畾鏃跺櫒+璁℃暟淇″彿閲忥細瀹氭椂鍣ㄦ瘡100ms Give涓€娆′俊鍙烽噺锛屼换鍔ake鍒板悗绱姞璁℃暟鍣ㄥ苟鏄剧ず銆?/div>
+
+<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
+<div class="summary">
+<b>鉁?FreeRTOS鏍稿績IPC锛?/b><br>
+鈥?闃熷垪锛氫换鍔￠棿鏁版嵁浼犻€掞紝FIFO锛岀嚎绋嬪畨鍏?br>
+鈥?浜屽€间俊鍙烽噺锛氫换鍔?ISR鍚屾锛堥€氱煡淇″彿锛?br>
+鈥?浜掓枼閲?Mutex)锛氳祫婧愪簰鏂ワ紝鏈変紭鍏堢骇缁ф壙<br>
+鈥?璁℃暟淇″彿閲忥細绠＄悊澶氫釜鍚岀被璧勬簮<br>
+鈥?杞欢瀹氭椂鍣細涓嶉渶瑕佸崟鐙换鍔★紝Daemon浠诲姟鎵ц鍥炶皟<br>
+<b>鈿?鍏抽敭鍘熷垯锛?/b><br>
+鈥?璧勬簮浜掓枼鐢∕utex锛屼笉瑕佺敤浜屽€间俊鍙烽噺<br>
+鈥?ISR涓彧鑳紾ive淇″彿閲忥紝涓嶈兘Take<br>
+鈥?姘歌繙涓嶈鍦ㄩ珮浼樺厛绾SR閲岃皟鐢ㄩ樆濉濧PI<br>
+鈥?闃熷垪婊℃椂涓嶄涪鏁版嵁鐢▁QueueSend锛屽彧鍏冲績鏈€鏂板€肩敤xQueueOverwrite
+</div>
+
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch07')">◀ 上一章：ESP32</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
-  <a onclick="window.parent.loadPage('guide-ch09')">通信协议 ：下一章 ▶</a>
+  <a onclick="window.parent.loadPage('guide-ch07')">鈼€ 涓婁竴绔狅細ESP32</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
+  <a onclick="window.parent.loadPage('guide-ch09')">閫氫俊鍗忚 锛氫笅涓€绔?鈻?/a>
 </div>
 </body>
 </html>
