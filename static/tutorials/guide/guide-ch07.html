@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第7章：ESP32开发实战 - 嵌入式小白完全指南</title>
+<title>绗?绔狅細ESP32寮€鍙戝疄鎴?- 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,42 +57,42 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第7章：ESP32开发实战</h1>
-<div class="summary"><b>📖 小白完全指南 · 7/14</b> | 阅读时间约3分钟</div>
+<h1>绗?绔狅細ESP32寮€鍙戝疄鎴?/h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 7/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
 
-<p>ESP32=单片机界的<strong>瑞士军刀</strong>——自带WiFi+蓝牙，双核240MHz，520KB RAM，¥10一片。做物联网项目首选。</p>
+<p>ESP32=鍗曠墖鏈虹晫鐨?strong>鐟炲＋鍐涘垁</strong>鈥斺€旇嚜甯iFi+钃濈墮锛屽弻鏍?40MHz锛?20KB RAM锛屄?0涓€鐗囥€傚仛鐗╄仈缃戦」鐩閫夈€?/p>
 
-<div class="analogy">💡 <b>类比：</b>如果STM32是精工手表（精准、低功耗），ESP32就是智能手机（功能全面、联网、性能强）。做精确控制用STM32，做联网应用用ESP32。</div>
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>濡傛灉STM32鏄簿宸ユ墜琛紙绮惧噯銆佷綆鍔熻€楋級锛孍SP32灏辨槸鏅鸿兘鎵嬫満锛堝姛鑳藉叏闈€佽仈缃戙€佹€ц兘寮猴級銆傚仛绮剧‘鎺у埗鐢⊿TM32锛屽仛鑱旂綉搴旂敤鐢‥SP32銆?/div>
 
-<h3>esptool 烧录</h3>
+<h3>esptool 鐑у綍</h3>
 
-<pre><code># 查看ESP32信息
+<pre><code># 鏌ョ湅ESP32淇℃伅
 esptool.py --chip esp32 -p COM3 chip_id
 
-# 烧录固件
+# 鐑у綍鍥轰欢
 esptool.py --chip esp32 -p COM3 -b 460800     write_flash -z 0x1000 bootloader.bin     0x8000 partitions.bin     0x10000 firmware.bin
 
-# 擦除Flash
+# 鎿﹂櫎Flash
 esptool.py --chip esp32 -p COM3 erase_flash
 
-# 读取Flash
+# 璇诲彇Flash
 esptool.py --chip esp32 -p COM3 read_flash 0 0x400000 flash_dump.bin</code></pre>
 
-<h3>ESP-IDF 基础（官方开发框架）</h3>
+<h3>ESP-IDF 鍩虹锛堝畼鏂瑰紑鍙戞鏋讹級</h3>
 
-<div class="warn">⚠️ <b>前提条件：</b>ESP-IDF需要完整安装（约2-3GB），<strong>初学者可先跳过</strong>，用Arduino框架也能跑ESP32。<br><br>
-<strong>Windows安装步骤：</strong><br>
-① 下载离线安装包：<a href="https://dl.espressif.com/dl/esp-idf/" style="color:var(--a)">dl.espressif.com/dl/esp-idf/</a>（推荐，包含所有依赖）<br>
-② 双击安装，选择默认路径 <code>C:\Espressif</code>，勾选"添加到PATH"<br>
-③ 安装约需10-20分钟，取决于网速<br>
-④ 安装完成后，打开"ESP-IDF 5.x CMD"快捷方式（安装器创建的）<br>
-⑤ 验证：<code>idf.py --version</code> → 输出版本号即成功<br><br>
-<strong>如果离线包下载慢：</strong><br>
-• 用手机热点试试（有时比WiFi快）<br>
-• 在有VPN的环境下载后拷贝过来<br>
-• 用PlatformIO插件（VS Code里装了）创建ESP32项目，无需单独装ESP-IDF</div>
+<div class="warn">鈿狅笍 <b>鍓嶆彁鏉′欢锛?/b>ESP-IDF闇€瑕佸畬鏁村畨瑁咃紙绾?-3GB锛夛紝<strong>鍒濆鑰呭彲鍏堣烦杩?/strong>锛岀敤Arduino妗嗘灦涔熻兘璺慐SP32銆?br><br>
+<strong>Windows瀹夎姝ラ锛?/strong><br>
+鈶?涓嬭浇绂荤嚎瀹夎鍖咃細<a href="https://dl.espressif.com/dl/esp-idf/" style="color:var(--a)">dl.espressif.com/dl/esp-idf/</a>锛堟帹鑽愶紝鍖呭惈鎵€鏈変緷璧栵級<br>
+鈶?鍙屽嚮瀹夎锛岄€夋嫨榛樿璺緞 <code>C:\Espressif</code>锛屽嬀閫?娣诲姞鍒癙ATH"<br>
+鈶?瀹夎绾﹂渶10-20鍒嗛挓锛屽彇鍐充簬缃戦€?br>
+鈶?瀹夎瀹屾垚鍚庯紝鎵撳紑"ESP-IDF 5.x CMD"蹇嵎鏂瑰紡锛堝畨瑁呭櫒鍒涘缓鐨勶級<br>
+鈶?楠岃瘉锛?code>idf.py --version</code> 鈫?杈撳嚭鐗堟湰鍙峰嵆鎴愬姛<br><br>
+<strong>濡傛灉绂荤嚎鍖呬笅杞芥參锛?/strong><br>
+鈥?鐢ㄦ墜鏈虹儹鐐硅瘯璇曪紙鏈夋椂姣擶iFi蹇級<br>
+鈥?鍦ㄦ湁VPN鐨勭幆澧冧笅杞藉悗鎷疯礉杩囨潵<br>
+鈥?鐢≒latformIO鎻掍欢锛圴S Code閲岃浜嗭級鍒涘缓ESP32椤圭洰锛屾棤闇€鍗曠嫭瑁匛SP-IDF</div>
 
-<pre><code>// WiFi扫描示例
+<pre><code>// WiFi鎵弿绀轰緥
 #include "esp_wifi.h"
 #include "esp_event.h"
 
@@ -106,7 +106,7 @@ void wifi_scan(void) {
 
     esp_wifi_set_mode(WIFI_MODE_STA);
     esp_wifi_start();
-    esp_wifi_scan_start(&amp;scan_config, true);  // 阻塞扫描
+    esp_wifi_scan_start(&amp;scan_config, true);  // 闃诲鎵弿
 
     uint16_t ap_count = 0;
     esp_wifi_scan_get_ap_num(&amp;ap_count);
@@ -122,9 +122,9 @@ void wifi_scan(void) {
     free(ap_list);
 }</code></pre>
 
-<h3>WiFi连接</h3>
+<h3>WiFi杩炴帴</h3>
 
-<pre><code>// 连接WiFi
+<pre><code>// 杩炴帴WiFi
 void wifi_connect(const char *ssid, const char *password) {
     wifi_config_t wifi_config = {0};
     strncpy((char *)wifi_config.sta.ssid, ssid, 31);
@@ -135,64 +135,61 @@ void wifi_connect(const char *ssid, const char *password) {
     esp_wifi_start();
     esp_wifi_connect();
 
-    // 等待连接成功事件
-    // 在事件处理函数中处理 WIFI_EVENT_STA_CONNECTED
+    // 绛夊緟杩炴帴鎴愬姛浜嬩欢
+    // 鍦ㄤ簨浠跺鐞嗗嚱鏁颁腑澶勭悊 WIFI_EVENT_STA_CONNECTED
 }</code></pre>
 
 <h3>Arduino vs ESP-IDF</h3>
 
 <table>
-<tr><th>特性</th><th>Arduino</th><th>ESP-IDF</th></tr>
-<tr><td>上手难度</td><td>极低</td><td>中等</td></tr>
-<tr><td>灵活性</td><td>受限</td><td>完全控制</td></tr>
-<tr><td>性能优化</td><td>一般</td><td>极致</td></tr>
-<tr><td>FreeRTOS</td><td>隐藏使用</td><td>显式使用</td></tr>
-<tr><td>适合</td><td>原型验证/初学者</td><td>产品开发/进阶</td></tr>
+<tr><th>鐗规€?/th><th>Arduino</th><th>ESP-IDF</th></tr>
+<tr><td>涓婃墜闅惧害</td><td>鏋佷綆</td><td>涓瓑</td></tr>
+<tr><td>鐏垫椿鎬?/td><td>鍙楅檺</td><td>瀹屽叏鎺у埗</td></tr>
+<tr><td>鎬ц兘浼樺寲</td><td>涓€鑸?/td><td>鏋佽嚧</td></tr>
+<tr><td>FreeRTOS</td><td>闅愯棌浣跨敤</td><td>鏄惧紡浣跨敤</td></tr>
+<tr><td>閫傚悎</td><td>鍘熷瀷楠岃瘉/鍒濆鑰?/td><td>浜у搧寮€鍙?杩涢樁</td></tr>
 </table>
 
-<div class="tip">💡 <b>建议：</b>Arduino快速验证想法，ESP-IDF做正式产品。PlatformIO支持两种框架切换。</div>
+<div class="tip">馃挕 <b>寤鸿锛?/b>Arduino蹇€熼獙璇佹兂娉曪紝ESP-IDF鍋氭寮忎骇鍝併€侾latformIO鏀寔涓ょ妗嗘灦鍒囨崲銆?/div>
 
-<h3>⚡ ESP32 5分钟快速上手（Arduino框架）</h3>
+<h3>鈿?ESP32 5鍒嗛挓蹇€熶笂鎵嬶紙Arduino妗嗘灦锛?/h3>
 
-<div class="note">⚠️ <b>最快的方式：</b>用PlatformIO创建ESP32 Arduino项目，无需单独装ESP-IDF！</div>
+<div class="note">鈿狅笍 <b>鏈€蹇殑鏂瑰紡锛?/b>鐢≒latformIO鍒涘缓ESP32 Arduino椤圭洰锛屾棤闇€鍗曠嫭瑁匛SP-IDF锛?/div>
 
-<div class="step"><b>步骤1：</b>VS Code → PlatformIO → New Project → Board: ESP32 Dev Module → Framework: Arduino</div>
-<div class="step"><b>步骤2：</b>把下面的代码粘贴到 <code>src/main.cpp</code></div>
-<pre><code>// ESP32 LED闪烁 + 串口输出（Arduino框架，5分钟跑通）
-// 大多数ESP32开发板的LED在GPIO2
+<div class="step"><b>姝ラ1锛?/b>VS Code 鈫?PlatformIO 鈫?New Project 鈫?Board: ESP32 Dev Module 鈫?Framework: Arduino</div>
+<div class="step"><b>姝ラ2锛?/b>鎶婁笅闈㈢殑浠ｇ爜绮樿创鍒?<code>src/main.cpp</code></div>
+<pre><code>// ESP32 LED闂儊 + 涓插彛杈撳嚭锛圓rduino妗嗘灦锛?鍒嗛挓璺戦€氾級
+// 澶у鏁癊SP32寮€鍙戞澘鐨凩ED鍦℅PIO2
 
 void setup() {
-    Serial.begin(115200);  // 初始化串口
-    pinMode(2, OUTPUT);     // GPIO2设为输出
+    Serial.begin(115200);  // 鍒濆鍖栦覆鍙?    pinMode(2, OUTPUT);     // GPIO2璁句负杈撳嚭
     Serial.println("ESP32 Started!");
 }
 
 void loop() {
-    digitalWrite(2, HIGH);   // LED亮
-    Serial.println("LED ON");
+    digitalWrite(2, HIGH);   // LED浜?    Serial.println("LED ON");
     delay(500);
-    digitalWrite(2, LOW);    // LED灭
-    Serial.println("LED OFF");
+    digitalWrite(2, LOW);    // LED鐏?    Serial.println("LED OFF");
     delay(500);
 }
 </code></pre>
-<div class="step"><b>步骤3：</b>连接ESP32 → 点击PlatformIO的→箭头按钮（Upload） → 自动编译+烧录</div>
-<div class="step"><b>步骤4：</b>打开串口监视器（PlatformIO插头图标），看到"LED ON/OFF"交替输出就成功了！</div>
+<div class="step"><b>姝ラ3锛?/b>杩炴帴ESP32 鈫?鐐瑰嚮PlatformIO鐨勨啋绠ご鎸夐挳锛圲pload锛?鈫?鑷姩缂栬瘧+鐑у綍</div>
+<div class="step"><b>姝ラ4锛?/b>鎵撳紑涓插彛鐩戣鍣紙PlatformIO鎻掑ご鍥炬爣锛夛紝鐪嬪埌"LED ON/OFF"浜ゆ浛杈撳嚭灏辨垚鍔熶簡锛?/div>
 
-<div class="trouble">🔍 <b>常见问题：esptool连接失败</b><br>
-1. 按住BOOT键再点RST键，进入下载模式<br>
-2. 检查COM口号是否正确<br>
-3. 某些ESP32板需要手动按BOOT进入下载模式<br>
-4. USB驱动：CP2102/CH340确认已安装</div>
+<div class="trouble">馃攳 <b>甯歌闂锛歟sptool杩炴帴澶辫触</b><br>
+1. 鎸変綇BOOT閿啀鐐筊ST閿紝杩涘叆涓嬭浇妯″紡<br>
+2. 妫€鏌OM鍙ｅ彿鏄惁姝ｇ‘<br>
+3. 鏌愪簺ESP32鏉块渶瑕佹墜鍔ㄦ寜BOOT杩涘叆涓嬭浇妯″紡<br>
+4. USB椹卞姩锛欳P2102/CH340纭宸插畨瑁?/div>
 
-<!-- ====== 第8章 ====== -->
+<!-- ====== 绗?绔?====== -->
 <a id="ch8"></a>
-<div class="summary">📖 <b>第8章学完你能干啥：</b>理解RTOS概念，会创建任务/队列/信号量/互斥量，能把FreeRTOS移植到STM32上。</div>
+<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>鐞嗚ВRTOS姒傚康锛屼細鍒涘缓浠诲姟/闃熷垪/淇″彿閲?浜掓枼閲忥紝鑳芥妸FreeRTOS绉绘鍒癝TM32涓娿€?/div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch06')">← 第6章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
-<a onclick="window.parent.loadPage('guide-ch08')">第8章 →</a>
+<a onclick="window.parent.loadPage('guide-ch06')">鈫?绗?绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
+<a onclick="window.parent.loadPage('guide-ch08')">绗?绔?鈫?/a>
 </div>
 
 <script>
@@ -210,10 +207,173 @@ document.querySelectorAll('pre').forEach(pre => {
   pre.appendChild(btn);
 });
 </script>
+
+<h2>馃摱 WiFi寮€鍙戝疄鎴?/h2>
+
+<p>ESP32鐨勬牳蹇冧紭鍔挎槸鍙屾āWiFi+钃濈墮銆傝繖涓€鑺備粠闆跺紑濮嬫帉鎻iFi缂栫▼銆?/p>
+
+<h3>WiFi Station妯″紡锛堣繛鎺ヨ矾鐢卞櫒锛?/h3>
+
+<pre><code>#include "esp_wifi.h"
+#include "esp_event.h"
+#include "nvs_flash.h"
+
+#define WIFI_SSID "YourWiFi"
+#define WIFI_PASS "YourPassword"
+
+static void wifi_event_handler(void* arg, esp_event_base_t base,
+    int32_t id, void* data) {
+    if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START)
+        esp_wifi_connect();
+    else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
+        ip_event_got_ip_t* ev = (ip_event_got_ip_t*)data;
+        printf("Got IP: " IPSTR "\n", IP2STR(&ev->ip_info.ip));
+    }
+}
+
+void wifi_init_sta(void) {
+    nvs_flash_init();
+    esp_netif_init();
+    esp_event_loop_create_default();
+    esp_netif_create_default_wifi_sta();
+    
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    esp_wifi_init(&cfg);
+    
+    esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
+        &wifi_event_handler, NULL);
+    esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP,
+        &wifi_event_handler, NULL);
+    
+    wifi_config_t wifi_cfg = {
+        .sta = {.ssim = WIFI_SSID, .password = WIFI_PASS}
+    };
+    esp_wifi_set_mode(WIFI_MODE_STA);
+    esp_wifi_set_config(WIFI_IF_STA, &wifi_cfg);
+    esp_wifi_start();
+}</code></pre>
+
+<h3>HTTP瀹㈡埛绔紙GET璇锋眰锛?/h3>
+
+<pre><code>#include "esp_http_client.h"
+
+void http_get_example(void) {
+    esp_http_client_config_t cfg = {
+        .url = "http://api.openweathermap.org/data/2.5/weather?q=Beijing",
+        .method = HTTP_METHOD_GET,
+        .timeout_ms = 5000,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&cfg);
+    esp_err_t err = esp_http_client_perform(client);
+    
+    if (err == ESP_OK) {
+        int status = esp_http_client_get_status_code(client);
+        int len = esp_http_client_get_content_length(client);
+        printf("HTTP %d, Response: %d bytes\n", status, len);
+        // 璇诲彇鍝嶅簲浣?        char buf[512];
+        int read = esp_http_client_read(client, buf, sizeof(buf)-1);
+        buf[read] = 0;
+        printf("%s\n", buf);
+    }
+    esp_http_client_cleanup(client);
+}</code></pre>
+
+<h2>馃敺 钃濈墮BLE瀹炴垬</h2>
+
+<div class="card">
+<div class="h"><span class="name">BLE鏍稿績姒傚康</span><span class="tag g">蹇呴』鐞嗚В</span></div>
+<div class="b">
+<div class="desc">BLE涓嶆槸浼犵粺钃濈墮锛佺悊瑙ｈ繖浜涙蹇垫槸鍏ラ棬鍏抽敭锛?/div>
+<table>
+<tr><th>姒傚康</th><th>璇存槑</th><th>绫绘瘮</th></tr>
+<tr><td>GAP</td><td>璁惧鍙戠幇涓庤繛鎺?/td><td>鎻℃墜鍜屼氦鎹㈠悕鐗?/td></tr>
+<tr><td>GATT</td><td>鏁版嵁浼犺緭鍗忚</td><td>璋堣瘽鐨勫唴瀹瑰拰鏍煎紡</td></tr>
+<tr><td>Service</td><td>鍔熻兘闆嗗悎锛圲UID鏍囪瘑锛?/td><td>涓€涓?閮ㄩ棬"</td></tr>
+<tr><td>Characteristic</td><td>鍏蜂綋鏁版嵁鐐?/td><td>閮ㄩ棬閲岀殑"鍔炲叕妗?</td></tr>
+<tr><td>Descriptor</td><td>Characteristic鐨勫厓鏁版嵁</td><td>妗屼笂鐨?鏍囩璇存槑"</td></tr>
+</table>
+</div></div>
+
+<pre><code>// 鍒涘缓鑷畾涔塀LE鏈嶅姟锛氭俯搴︿紶鎰熷櫒
+// Service UUID: 0000180a-0000-1000-8000-00805f9b34fb
+// Characteristic UUID: 00002a6e-0000-1000-8000-00805f9b34fb
+
+static const uint16_t GATTS_SERVICE_UUID = 0x00FF;
+static const uint16_t GATTS_CHAR_UUID    = 0xFF01;
+
+// BLE骞挎挱鏁版嵁璁剧疆
+static void gap_event_handler(esp_gap_ble_cb_event_t event,
+    esp_ble_gap_cb_param_t* param) {
+    switch (event) {
+    case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
+        esp_ble_gap_start_advertising(&adv_params);
+        break;
+    }
+}
+
+void ble_server_init(void) {
+    esp_ble_gatts_app_register(PROFILE_APP_ID);
+    // 閰嶇疆GATT鏁版嵁搴擄細娣诲姞Service + Characteristic
+    // 璁剧疆Characteristic鍊硷細NOTIFY + READ灞炴€?    // 寮€濮嬪箍鎾紝鎵嬫満APP鎵弿鍗冲彲鍙戠幇
+}</code></pre>
+
+<h2>馃攧 OTA杩滅▼鍗囩骇</h2>
+
+<div class="warn">鈿?<b>OTA鏄疎SP32鏈€鍏峰晢涓氫环鍊肩殑鐗规€с€?/b>鏈変簡瀹冿紝閮ㄧ讲鍚庣殑璁惧鍙互杩滅▼鏇存柊鍥轰欢锛屾棤闇€鐗╃悊鎺ヨЕ銆?/div>
+
+<pre><code>// OTA鍗囩骇娴佺▼
+// 1. 涓嬭浇鏂板浐浠跺埌OTA鍒嗗尯
+// 2. 楠岃瘉鍥轰欢瀹屾暣鎬э紙checksum/绛惧悕锛?// 3. 璁剧疆鍚姩鍒嗗尯锛岄噸鍚?
+#include "esp_ota_ops.h"
+#include "esp_https_ota.h"
+
+void do_ota_update(const char* firmware_url) {
+    esp_http_client_config_t cfg = {
+        .url = firmware_url,
+        .cert_pem = server_cert_pem_start,  // HTTPS璇佷功
+    };
+    esp_https_ota_config_t ota_cfg = {
+        .http_config = &cfg,
+    };
+    esp_err_t ret = esp_https_ota(&ota_cfg);
+    if (ret == ESP_OK) {
+        printf("OTA鎴愬姛锛屽噯澶囬噸鍚?..\n");
+        esp_restart();  // 閲嶅惎杩涘叆鏂板浐浠?    }
+}
+
+// 鍏抽敭閰嶇疆锛氬垎鍖鸿〃蹇呴』鏈塷ta_0鍜宱ta_1涓や釜app鍒嗗尯
+// partitions.csv:
+// # Name,   Type, SubType, Offset,  Size
+// nvs,      data, nvs,     0x9000,  0x6000
+// otadata,  data, ota,     0xf000,  0x2000
+// phy_init, data, phy,     0x11000, 0x1000
+// factory,  app,  factory, 0x12000, 0x1E0000
+// ota_0,    app,  ota_0,   0x20000, 0x1E0000  # 杩愯鍖?// ota_1,    app,  ota_1,   ,        0x1E0000  # 涓嬭浇鍖?/code></pre>
+
+<h2>馃幆 瀹炴垬缁冧範</h2>
+
+<div class="tip">馃摑 <b>缁冧範1锛?/b>瀹炵幇WiFi SmartConfig閰嶇綉鍔熻兘锛堟寜涓€涓寜閽嚜鍔ㄨ繛鎺iFi锛屾墜鏈篈PP閰嶇綉锛夈€?br><br>
+馃摑 <b>缁冧範2锛?/b>鍒涘缓涓€涓狟LE娓╁害璁℃湇鍔★細ESP32璇诲彇DHT11 鈫?BLE骞挎挱娓╁害鍊?鈫?鎵嬫満nRF Connect APP鎺ユ敹鏄剧ず銆?br><br>
+馃摑 <b>缁冧範3锛?/b>鎼缓绠€鏄揙TA鏈嶅姟鍣紙鍙互鐢≒ython鐨刪ttp.server锛夛紝瀹炵幇ESP32浠庢湇鍔″櫒涓嬭浇骞舵洿鏂板浐浠躲€?/div>
+
+<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
+<div class="summary">
+<b>鉁?ESP32鏍稿績鑳藉姏锛?/b><br>
+鈥?WiFi鍙屾ā锛歋tation(杩炶矾鐢? + SoftAP(鑷缓鐑偣)<br>
+鈥?BLE锛欸AP(骞挎挱/鎵弿/杩炴帴) + GATT(Service/Characteristic/Descriptor)<br>
+鈥?OTA锛氳繙绋嬪浐浠跺崌绾э紝鍙屽垎鍖?ota_0/ota_1)淇濊瘉鍗囩骇瀹夊叏<br>
+鈥?ESP-IDF vs Arduino锛氫笓涓氶」鐩敤IDF锛堟€ц兘濂?鍔熻兘鍏級锛屽揩閫熷師鍨嬬敤Arduino<br>
+<b>馃洜 甯哥敤璧勬簮锛?/b><br>
+鈥?ESP-IDF Programming Guide (docs.espressif.com)<br>
+鈥?ESP RainMaker锛氬畼鏂笽oT浜戝钩鍙?br>
+鈥?ESP-MDF/Matter锛氭櫤鑳藉灞呭崗璁敮鎸?br>
+鈥?nRF Connect App锛欱LE璋冭瘯蹇呭宸ュ叿
+</div>
+
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch06')">◀ 上一章：STM32</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
-  <a onclick="window.parent.loadPage('guide-ch08')">FreeRTOS ：下一章 ▶</a>
+  <a onclick="window.parent.loadPage('guide-ch06')">鈼€ 涓婁竴绔狅細STM32</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
+  <a onclick="window.parent.loadPage('guide-ch08')">FreeRTOS 锛氫笅涓€绔?鈻?/a>
 </div>
 </body>
 </html>
