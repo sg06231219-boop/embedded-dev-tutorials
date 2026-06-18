@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>宓屽叆寮忓紑鍙戞暀绋?/title>
+<title>嵌入式开发教程</title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf;--sidebar-w:280px}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--t);display:flex;min-height:100vh}
 
-/* === 渚ц竟鏍?=== */
+/* === 侧边栏 === */
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--br);overflow-y:auto;z-index:100;transition:transform .3s;display:flex;flex-direction:column}
 .sidebar-header{padding:16px;border-bottom:1px solid var(--br);flex-shrink:0}
 .sidebar-header h1{font-size:1.1em;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
@@ -31,7 +31,7 @@ body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--
 .badge-hot{background:rgba(248,81,73,.15);color:var(--r)}
 .sidebar-footer{padding:12px 16px;border-top:1px solid var(--br);font-size:.7em;color:var(--t2);flex-shrink:0}
 
-/* === 涓诲唴瀹瑰尯 === */
+/* === 主内容区 === */
 .main{margin-left:var(--sidebar-w);flex:1;min-width:0}
 .topbar{position:sticky;top:0;z-index:50;background:var(--bg2);border-bottom:1px solid var(--br);padding:10px 20px;display:flex;align-items:center;gap:12px}
 .topbar .menu-btn{display:none;background:none;border:1px solid var(--br);color:var(--t);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:1.1em}
@@ -42,7 +42,7 @@ body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--
 .topbar .search-box input:focus{border-color:var(--a)}
 .topbar .search-box .icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t2);font-size:.85em}
 
-/* === 鍐呭 === */
+/* === 内容 === */
 .content{max-width:900px;margin:0 auto;padding:24px 28px 60px}
 .content h1{font-size:1.6em;text-align:center;padding:20px 0;background:linear-gradient(135deg,var(--a),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
 .content h2{font-size:1.25em;color:var(--a);margin:32px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--br)}
@@ -72,9 +72,10 @@ body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--
 .content .tag.o{background:rgba(210,153,29,.15);color:var(--o)}.content .tag.r{background:rgba(248,81,73,.15);color:var(--r)}.content .tag.p{background:rgba(163,113,247,.15);color:var(--p)}
 .content a{color:var(--a);text-decoration:none}
 .content a:hover{text-decoration:underline}
-.content img{max-width:100%;border-radius:8px;margin:8px 0}
+.content img{max-width:100%;border-radius:8px;cursor:pointer;margin:8px 0;transition:transform .2s}
+.content img:hover{transform:scale(1.02)}
 
-/* === 棣栭〉 === */
+/* === 首页 === */
 .home-hero{text-align:center;padding:40px 20px 30px}
 .home-hero h1{font-size:2em;margin-bottom:8px}
 .home-hero p{color:var(--t2);font-size:1.05em;max-width:600px;margin:0 auto}
@@ -97,17 +98,17 @@ body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--
 .home-card .tags{margin-top:8px;display:flex;gap:5px;flex-wrap:wrap}
 .home-card .size{font-size:.7em;color:var(--t2);margin-top:6px}
 
-/* === 鐩綍TOC === */
+/* === 目录TOC === */
 .toc-float{position:fixed;right:20px;top:60px;width:200px;max-height:70vh;overflow-y:auto;font-size:.78em;border-left:2px solid var(--br);padding-left:12px;z-index:40}
 .toc-float a{display:block;color:var(--t2);text-decoration:none;padding:3px 0;line-height:1.5;transition:color .15s}
 .toc-float a:hover,.toc-float a.active{color:var(--a)}
 
-/* === 澶嶅埗鎸夐挳 === */
+/* === 复制按钮 === */
 .copy-btn{position:absolute;top:6px;right:6px;background:var(--bg3);border:1px solid var(--br);color:var(--t2);padding:3px 8px;border-radius:4px;font-size:.72em;cursor:pointer;opacity:0;transition:opacity .2s}
 pre:hover .copy-btn{opacity:1}
 .copy-btn.copied{color:var(--g);border-color:var(--g)}
 
-/* === 绉诲姩绔?=== */
+/* === 移动端 === */
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
@@ -121,21 +122,21 @@ pre:hover .copy-btn{opacity:1}
   .topbar .search-box{display:none}
 }
 
-/* === 鍔犺浇鍔ㄧ敾 === */
+/* === 加载动画 === */
 .loading{display:flex;justify-content:center;padding:40px}
 .loading .spinner{width:32px;height:32px;border:3px solid var(--br);border-top-color:var(--a);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* === 鍥炲埌椤堕儴 === */
+/* === 回到顶部 === */
 .back-top{position:fixed;bottom:24px;right:24px;width:40px;height:40px;background:var(--bg2);border:1px solid var(--br);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:1.1em;z-index:90;opacity:0;transition:all .3s;pointer-events:none}
 .back-top.show{opacity:1;pointer-events:auto}
 .back-top:hover{color:var(--a);border-color:var(--a)}
 
-/* 杩涘害鏉?*/
+/* 进度条 */
 .progress-bar{position:fixed;top:0;left:0;height:2px;background:var(--a);z-index:200;transition:width .15s;width:0}
 
-/* === v1.5.0 鏂板鏍峰紡 === */
-/* 瀛︿範璺嚎鍥?*/
+/* === v1.5.0 新增样式 === */
+/* 学习路线图 */
 .roadmap{background:var(--bg2);border:1px solid var(--br);border-radius:14px;padding:20px 24px;margin:20px 0}
 .roadmap h3{color:var(--a);margin-bottom:14px;font-size:1.1em}
 .roadmap-steps{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
@@ -148,7 +149,7 @@ pre:hover .copy-btn{opacity:1}
 .roadmap-step.s4 .step-num{background:rgba(248,81,73,.2);color:var(--r)}
 .roadmap-arrow{color:var(--t2);font-size:1.2em}
 
-/* 闅惧害鎸囩ず鍣?*/
+/* 难度指示器 */
 .difficulty{display:flex;gap:3px;align-items:center;margin-top:6px}
 .difficulty .dot{width:8px;height:8px;border-radius:50%;background:var(--br)}
 .difficulty .dot.on{background:var(--g)}
@@ -156,17 +157,17 @@ pre:hover .copy-btn{opacity:1}
 .difficulty.d3 .dot.on{background:var(--o)}
 .difficulty.d4 .dot.on{background:var(--r)}
 
-/* 棣栭〉hero鍔ㄧ敾 */
+/* 首页hero动画 */
 .home-hero h1{animation:heroFadeIn .8s ease-out}
 @keyframes heroFadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 .quick-start{animation:pulse 2.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(35,134,54,.4)}50%{box-shadow:0 0 0 10px rgba(35,134,54,0)}}
 
-/* 娣辫壊妯″紡鍒囨崲锛堥鐣欙級 */
+/* 深色模式切换（预留） */
 .theme-toggle{background:none;border:1px solid var(--br);color:var(--t2);padding:4px 8px;border-radius:6px;cursor:pointer;font-size:.85em;transition:all .2s}
 .theme-toggle:hover{color:var(--a);border-color:var(--a)}
 
-/* 鏁欑▼鍐匱OC */
+/* 教程内TOC */
 .toc-inline{background:var(--bg2);border:1px solid var(--br);border-radius:10px;padding:14px 18px;margin:16px 0}
 .toc-inline summary{cursor:pointer;color:var(--a);font-weight:600;font-size:.92em;user-select:none}
 .toc-inline ol{padding-left:20px;margin-top:8px}
@@ -174,24 +175,24 @@ pre:hover .copy-btn{opacity:1}
 .toc-inline li a{color:var(--t2);text-decoration:none;transition:color .15s}
 .toc-inline li a:hover{color:var(--a)}
 
-/* 閿洏蹇嵎閿彁绀?*/
+/* 键盘快捷键提示 */
 .kbd{background:var(--bg3);border:1px solid var(--br);border-radius:4px;padding:1px 6px;font-size:.75em;font-family:monospace;color:var(--t2)}
 
-/* 杩斿洖棣栭〉鎸夐挳 */
+/* 返回首页按钮 */
 .home-fab{position:fixed;bottom:24px;left:calc(var(--sidebar-w) + 16px);width:40px;height:40px;background:var(--bg2);border:1px solid var(--br);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:1em;z-index:90;opacity:0;transition:all .3s;pointer-events:none}
 .home-fab.show{opacity:1;pointer-events:auto}
 .home-fab:hover{color:var(--a);border-color:var(--a)}
 @media(max-width:900px){.home-fab{left:16px}}
 
-/* 缁熻鍗＄墖鍔ㄧ敾 */
+/* 统计卡片动画 */
 .home-stat{transition:transform .2s}
 .home-stat:hover{transform:translateY(-2px)}
 
-/* 鎼滅储澧炲己 */
+/* 搜索增强 */
 .search-results-count{color:var(--t2);font-size:.85em;margin-bottom:12px}
 .search-highlight{background:rgba(88,166,255,.25);padding:1px 3px;border-radius:3px}
 
-/* 鈺愨晲 v1.5.1 鏂板: 鏀惰棌澶?& 杩涘害 鈺愨晲 */
+/* ══ v1.5.1 新增: 收藏夹 & 进度 ══ */
 .bookmark-btn{background:none;border:none;font-size:1.2em;cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .15s;opacity:.4;vertical-align:middle}
 .bookmark-btn:hover{opacity:1;transform:scale(1.2)}
 .bookmark-btn.active{opacity:1}
@@ -211,7 +212,7 @@ pre:hover .copy-btn{opacity:1}
 .sort-btn{padding:4px 10px;border:1px solid var(--br);border-radius:6px;font-size:.78em;cursor:pointer;background:var(--bg2);color:var(--t2);transition:all .15s}
 .sort-btn:hover,.sort-btn.active{border-color:var(--a);color:var(--a);background:var(--bg3)}
 
-/* 鈺愨晲 楠ㄦ灦灞?鈺愨晲 */
+/* ══ 骨架屏 ══ */
 .skeleton-wrap{padding:24px 28px}
 .skeleton-line{height:14px;background:var(--bg2);border-radius:6px;margin:10px 0;position:relative;overflow:hidden}
 .skeleton-line.title{height:28px;width:55%;margin:20px 0 16px}
@@ -229,7 +230,7 @@ pre:hover .copy-btn{opacity:1}
 @keyframes shimmer{to{left:100%}}
 @media(prefers-reduced-motion:reduce){.skeleton-line::after,.skeleton-card::after{animation:none}}
 
-/* 鈺愨晲 浜壊妯″紡 鈺愨晲 */
+/* ══ 亮色模式 ══ */
 body.light-mode{--bg:#f5f7fa;--bg2:#eef1f6;--bg3:#e4e8ef;--br:#d1d5db;--t:#1a202c;--t2:#4a5568;--a:#3b82f6;--g:#16a34a;--o:#d97706;--r:#dc2626;--p:#7c3aed;--c1:#0891b2}
 body.light-mode .sidebar{background:#fff;border-right-color:#e5e7eb}
 body.light-mode .topbar{background:#fff;border-bottom-color:#e5e7eb}
@@ -240,7 +241,7 @@ body.light-mode .home-stat{background:#fff;border-color:#e5e7eb}
 body.light-mode .skeleton-line,body.light-mode .skeleton-card{background:#e8ebf0}
 body.light-mode .skeleton-card .sk-icon,body.light-mode .skeleton-card .sk-title,body.light-mode .skeleton-card .sk-text,body.light-mode .skeleton-card .sk-text2{background:#dde1e8}
 
-/* 鈺愨晲 v1.6.4: 涓撴敞闃呰妯″紡 鈺愨晲 */
+/* ══ v1.7.0: 专注阅读模式 ══ */
 body.focus-mode .sidebar{transform:translateX(-100%)}
 body.focus-mode .main{margin-left:0!important}
 body.focus-mode .content{max-width:820px!important;margin:0 auto!important;padding:20px 32px 80px!important}
@@ -249,7 +250,7 @@ body.focus-mode .topbar .focus-indicator{display:inline-block;font-size:.75em;co
 .focus-btn:hover{border-color:var(--p);color:var(--p)}
 .focus-btn.active{border-color:var(--p);color:var(--p);background:rgba(163,113,247,.1)}
 
-/* 鈺愨晲 v1.6.4: 鎵撳嵃鏍峰紡 鈺愨晲 */
+/* ══ v1.7.0: 打印样式 ══ */
 @media print{
   .sidebar,.topbar,.progress-bar,.page-nav,.chnav,.copy-btn{display:none!important}
   .main{margin-left:0!important}
@@ -266,7 +267,33 @@ body.focus-mode .topbar .focus-indicator{display:inline-block;font-size:.75em;co
 }
 
 
-/* 鈺愨晲 v1.6.4: 蹇嵎閿潰鏉?鈺愨晲 */
+
+/* ══ v1.7.0: 语法高亮 ══ */
+.syn-kw{color:#ff7b72}        /* 关键字 */
+.syn-pp{color:#ff7b72}        /* 预处理 */
+.syn-type{color:#ffa657}      /* 类型 */
+.syn-str{color:#a5d6ff}       /* 字符串 */
+.syn-com{color:#8b949e;font-style:italic} /* 注释 */
+.syn-num{color:#79c0ff}       /* 数字 */
+.syn-fn{color:#d2a8ff}        /* 函数 */
+.syn-op{color:#ff7b72}        /* 运算符 */
+/* ══ v1.7.0: 面包屑 ══ */
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:.78em;color:var(--t2);margin:0 0 16px;padding:6px 0;flex-wrap:wrap}
+.breadcrumb a{color:var(--a)}
+.breadcrumb .sep{color:var(--br)}
+/* ══ v1.7.0: 复制提示 ══ */
+.copy-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:8px 20px;border-radius:8px;font-size:.85em;z-index:400;pointer-events:none;opacity:0;transition:opacity .3s,transform .3s}
+.copy-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
+/* ══ v1.7.0: 相关教程 ══ */
+.related-tutorials{margin:24px 0;padding:16px 0;border-top:1px solid var(--br)}
+.related-tutorials h3{font-size:.95em;color:var(--a);margin-bottom:10px}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.related-card{background:var(--bg2);border:1px solid var(--br);border-radius:8px;padding:10px 14px;cursor:pointer;transition:border-color .2s;font-size:.82em}
+.related-card:hover{border-color:var(--a)}
+.related-card .rt-tag{display:inline-block;font-size:.65em;padding:1px 6px;border-radius:4px;margin-right:4px;background:var(--bg3);color:var(--t2)}
+@media(max-width:600px){.related-grid{grid-template-columns:1fr}}
+
+/* ══ v1.7.0: 快捷键面板 ══ */
 .shortcuts-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .shortcuts-overlay.show{opacity:1;pointer-events:all}
 .shortcuts-panel{background:var(--bg2);border:1px solid var(--br);border-radius:12px;padding:24px 28px;max-width:440px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.5)}
@@ -278,7 +305,7 @@ body.focus-mode .topbar .focus-indicator{display:inline-block;font-size:.75em;co
 .shortcut-hint{position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;padding:6px 14px;font-size:.75em;color:var(--t2);z-index:50;opacity:.85;transition:opacity .5s;pointer-events:none}
 @media(max-width:600px){.shortcut-hint{display:none}}
 
-/* 鈺愨晲 v1.6.4: 绔犺妭杩涘害鎸囩ず鍣?鈺愨晲 */
+/* ══ v1.7.0: 章节进度指示器 ══ */
 .guide-progress{display:flex;align-items:center;gap:2px;margin:8px 0;flex-wrap:wrap;justify-content:center}
 .guide-progress .gdot{width:10px;height:10px;border-radius:50%;background:var(--bg3);transition:all .3s;cursor:pointer}
 .guide-progress .gdot:hover{background:var(--a);transform:scale(1.4)}
@@ -286,7 +313,7 @@ body.focus-mode .topbar .focus-indicator{display:inline-block;font-size:.75em;co
 .guide-progress .gdot.done{background:var(--g)}
 .guide-progress .glabel{font-size:.7em;color:var(--t2);margin:0 4px}
 
-/* 鈺愨晲 v1.6.4: 闃呰鏃堕棿 + 鐩稿叧鎺ㄨ崘 鈺愨晲 */
+/* ══ v1.7.0: 阅读时间 + 相关推荐 ══ */
 .read-time{display:inline-block;font-size:.45em;font-weight:400;background:var(--bg3);color:var(--t2);padding:2px 8px;border-radius:10px;vertical-align:middle;margin-left:8px;white-space:nowrap}
 .related-links{margin-top:40px;padding-top:20px;border-top:1px solid var(--br)}
 .related-links h3{font-size:.9em;color:var(--t2);margin-bottom:12px}
@@ -296,274 +323,286 @@ body.focus-mode .topbar .focus-indicator{display:inline-block;font-size:.75em;co
 .related-icon{font-size:1.2em;flex-shrink:0}
 .related-title{font-size:.85em;color:var(--a);font-weight:600}
 .related-desc{font-size:.7em;color:var(--t2);margin-left:auto}
+
+/* === 图片灯箱 === */
+.lightbox-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.lightbox-overlay.hidden{display:none}
+.lightbox-img{max-width:90vw;max-height:90vh;object-fit:contain;box-shadow:0 0 40px rgba(0,0,0,.5)}
+.lightbox-close{position:fixed;top:20px;right:20px;font-size:32px;color:#fff;cursor:pointer;z-index:10000;width:40px;height:40px;line-height:40px;text-align:center;border-radius:50%;background:rgba(255,255,255,.1)}
+.lightbox-close:hover{background:rgba(255,255,255,.2)}
 </style>
 
+<link rel="manifest" href="/static/manifest.json">
 </head>
 <body>
 
 <div class="progress-bar" id="progressBar"></div>
 
-<!-- 渚ц竟鏍?-->
+<div class="lightbox-overlay hidden" id="lightboxOverlay" onclick="closeLightbox()"><img class="lightbox-img" onclick="event.stopPropagation()"><div class="lightbox-close" onclick="closeLightbox()">×</div></div>
+
+<!-- 侧边栏 -->
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h1>馃搻 宓屽叆寮忓紑鍙戞暀绋?/h1>
-    <p>浠庨浂鍒板疄鎴?路 33绡囨繁搴︽暀绋?/p>
+    <h1>📐 嵌入式开发教程</h1>
+    <p>从零到实战 · 33篇深度教程</p>
   </div>
   <div class="sidebar-nav" id="sidebarNav">
     <div class="nav-group">
-      <div class="nav-group-title">馃彔 棣栭〉</div>
-      <a class="nav-item active" data-page="home" onclick="loadPage('home')">鏁欑▼棣栭〉</a>
-      <a class="nav-item" data-page="overview" onclick="loadPage('overview')">馃搳 鏁欑▼鎬昏 <span class="badge badge-new">鏂?/span></a>
+      <div class="nav-group-title">🏠 首页</div>
+      <a class="nav-item active" data-page="home" onclick="loadPage('home')">教程首页</a>
+      <a class="nav-item" data-page="overview" onclick="loadPage('overview')">📊 教程总览 <span class="badge badge-new">新</span></a>
     </div>
     <div class="nav-group collapsible">
-      <div class="nav-group-title" onclick="toggleNavGroup(this)">馃摉 灏忕櫧瀹屽叏鎸囧崡 <span class="toggle-icon">鈻?/span> <span class="badge badge-hot">14绔?/span></div>
-      <a class="nav-item" data-page="guide" onclick="loadPage('guide')">馃搼 绔犺妭鐩綍</a>
-      <a class="nav-item" data-page="guide-ch00" onclick="loadPage('guide-ch00')">0. 鐜鎼缓</a>
+      <div class="nav-group-title" onclick="toggleNavGroup(this)">📖 小白完全指南 <span class="toggle-icon">▸</span> <span class="badge badge-hot">14章</span></div>
+      <a class="nav-item" data-page="guide" onclick="loadPage('guide')">📑 章节目录</a>
+      <a class="nav-item" data-page="guide-ch00" onclick="loadPage('guide-ch00')">0. 环境搭建</a>
       <a class="nav-item" data-page="guide-ch01" onclick="loadPage('guide-ch01')">1. ARM GCC</a>
       <a class="nav-item" data-page="guide-ch02" onclick="loadPage('guide-ch02')">2. CMake</a>
       <a class="nav-item" data-page="guide-ch03" onclick="loadPage('guide-ch03')">3. Makefile</a>
-      <a class="nav-item" data-page="guide-ch04" onclick="loadPage('guide-ch04')">4. 涓插彛閫氫俊</a>
-      <a class="nav-item" data-page="guide-ch05" onclick="loadPage('guide-ch05')">5. 鐑у綍璋冭瘯</a>
+      <a class="nav-item" data-page="guide-ch04" onclick="loadPage('guide-ch04')">4. 串口通信</a>
+      <a class="nav-item" data-page="guide-ch05" onclick="loadPage('guide-ch05')">5. 烧录调试</a>
       <a class="nav-item" data-page="guide-ch06" onclick="loadPage('guide-ch06')">6. STM32</a>
       <a class="nav-item" data-page="guide-ch07" onclick="loadPage('guide-ch07')">7. ESP32</a>
       <a class="nav-item" data-page="guide-ch08" onclick="loadPage('guide-ch08')">8. FreeRTOS</a>
-      <a class="nav-item" data-page="guide-ch09" onclick="loadPage('guide-ch09')">9. 閫氫俊鍗忚</a>
-      <a class="nav-item" data-page="guide-ch10" onclick="loadPage('guide-ch10')">10. PCB纭欢</a>
-      <a class="nav-item" data-page="guide-ch11" onclick="loadPage('guide-ch11')">11. 璋冭瘯鎶€宸?/a>
-      <a class="nav-item" data-page="guide-ch12" onclick="loadPage('guide-ch12')">12. 椤圭洰瀹炴垬</a>
-      <a class="nav-item" data-page="guide-ch13" onclick="loadPage('guide-ch13')">13. 浠ｇ爜閫熸煡</a>
+      <a class="nav-item" data-page="guide-ch09" onclick="loadPage('guide-ch09')">9. 通信协议</a>
+      <a class="nav-item" data-page="guide-ch10" onclick="loadPage('guide-ch10')">10. PCB硬件</a>
+      <a class="nav-item" data-page="guide-ch11" onclick="loadPage('guide-ch11')">11. 调试技巧</a>
+      <a class="nav-item" data-page="guide-ch12" onclick="loadPage('guide-ch12')">12. 项目实战</a>
+      <a class="nav-item" data-page="guide-ch13" onclick="loadPage('guide-ch13')">13. 代码速查</a>
     </div>
     <div class="nav-group">
-      <div class="nav-group-title">馃敤 缂栬瘧鏋勫缓</div>
-      <a class="nav-item" data-page="arm-gcc" onclick="loadPage('arm-gcc')">ARM GCC 宸ュ叿閾?/a>
-      <a class="nav-item" data-page="cmake" onclick="loadPage('cmake')">CMake 鏋勫缓绯荤粺</a>
-      <a class="nav-item" data-page="makefile" onclick="loadPage('makefile')">Makefile 瀹炴垬</a>
+      <div class="nav-group-title">🔨 编译构建</div>
+      <a class="nav-item" data-page="arm-gcc" onclick="loadPage('arm-gcc')">ARM GCC 工具链</a>
+      <a class="nav-item" data-page="cmake" onclick="loadPage('cmake')">CMake 构建系统</a>
+      <a class="nav-item" data-page="makefile" onclick="loadPage('makefile')">Makefile 实战</a>
     </div>
     <div class="nav-group">
-      <div class="nav-group-title">馃攲 鐑у綍璋冭瘯</div>
-      <a class="nav-item" data-page="flash-debug" onclick="loadPage('flash-debug')">鐑у綍涓庤皟璇?/a>
-      <a class="nav-item" data-page="serial" onclick="loadPage('serial')">涓插彛閫氫俊</a>
+      <div class="nav-group-title">🔌 烧录调试</div>
+      <a class="nav-item" data-page="flash-debug" onclick="loadPage('flash-debug')">烧录与调试</a>
+      <a class="nav-item" data-page="serial" onclick="loadPage('serial')">串口通信</a>
     </div>
     <div class="nav-group">
-      <div class="nav-group-title">馃幆 鑺墖妗嗘灦</div>
-      <a class="nav-item" data-page="stm32" onclick="loadPage('stm32')">STM32 寮€鍙?/a>
-      <a class="nav-item" data-page="esp32" onclick="loadPage('esp32')">ESP32 寮€鍙?/a>
-      <a class="nav-item" data-page="freertos" onclick="loadPage('freertos')">FreeRTOS 鍏ラ棬</a>
+      <div class="nav-group-title">🎯 芯片框架</div>
+      <a class="nav-item" data-page="stm32" onclick="loadPage('stm32')">STM32 开发</a>
+      <a class="nav-item" data-page="esp32" onclick="loadPage('esp32')">ESP32 开发</a>
+      <a class="nav-item" data-page="freertos" onclick="loadPage('freertos')">FreeRTOS 入门</a>
     </div>
     <div class="nav-group">
-      <div class="nav-group-title">馃摗 閫氫俊鍗忚</div>
+      <div class="nav-group-title">📡 通信协议</div>
       <a class="nav-item" data-page="protocols" onclick="loadPage('protocols')">I2C/SPI/UART/CAN</a>
     </div>
     <div class="nav-group">
-      <div class="nav-group-title">馃殌 瀹炴垬涓庡墠娌?/div>
-      <a class="nav-item" data-page="practice-projects" onclick="loadPage('practice-projects')">缁冩墜鏂瑰悜 <span class="badge badge-new">鏂?/span></a>
-      <a class="nav-item" data-page="bci-2026" onclick="loadPage('bci-2026')">鑴戞満鎺ュ彛2026 <span class="badge badge-hot">鐑偣</span></a>
+      <div class="nav-group-title">🚀 实战与前沿</div>
+      <a class="nav-item" data-page="practice-projects" onclick="loadPage('practice-projects')">练手方向 <span class="badge badge-new">新</span></a>
+      <a class="nav-item" data-page="bci-2026" onclick="loadPage('bci-2026')">脑机接口2026 <span class="badge badge-hot">热点</span></a>
     </div>
     <div class="nav-group collapsible">
-      <div class="nav-group-title" onclick="toggleNavGroup(this)">馃煝 鍏ラ棬椤圭洰 <span class="toggle-icon">鈻?/span></div>
-      <a class="nav-item" data-page="proj-led-button" onclick="loadPage('proj-led-button')">LED+鎸夐敭</a>
-      <a class="nav-item" data-page="proj-uart-hello" onclick="loadPage('proj-uart-hello')">涓插彛Hello</a>
-      <a class="nav-item" data-page="proj-oled-display" onclick="loadPage('proj-oled-display')">OLED鏄剧ず</a>
-      <a class="nav-item" data-page="proj-dht11-monitor" onclick="loadPage('proj-dht11-monitor')">娓╂箍搴︾洃娴?/a>
+      <div class="nav-group-title" onclick="toggleNavGroup(this)">🟢 入门项目 <span class="toggle-icon">▸</span></div>
+      <a class="nav-item" data-page="proj-led-button" onclick="loadPage('proj-led-button')">LED+按键</a>
+      <a class="nav-item" data-page="proj-uart-hello" onclick="loadPage('proj-uart-hello')">串口Hello</a>
+      <a class="nav-item" data-page="proj-oled-display" onclick="loadPage('proj-oled-display')">OLED显示</a>
+      <a class="nav-item" data-page="proj-dht11-monitor" onclick="loadPage('proj-dht11-monitor')">温湿度监测</a>
     </div>
     <div class="nav-group collapsible">
-      <div class="nav-group-title" onclick="toggleNavGroup(this)">馃煛 杩涢樁椤圭洰 <span class="toggle-icon">鈻?/span></div>
-      <a class="nav-item" data-page="proj-pwm-motor" onclick="loadPage('proj-pwm-motor')">PWM鐢垫満</a>
-      <a class="nav-item" data-page="proj-servo-control" onclick="loadPage('proj-servo-control')">鑸垫満鎺у埗</a>
-      <a class="nav-item" data-page="proj-ir-remote" onclick="loadPage('proj-ir-remote')">绾㈠閬ユ帶</a>
-      <a class="nav-item" data-page="proj-ultrasonic" onclick="loadPage('proj-ultrasonic')">瓒呭０娉㈡祴璺?/a>
-      <a class="nav-item" data-page="proj-stepper-motor" onclick="loadPage('proj-stepper-motor')">姝ヨ繘鐢垫満</a>
+      <div class="nav-group-title" onclick="toggleNavGroup(this)">🟡 进阶项目 <span class="toggle-icon">▸</span></div>
+      <a class="nav-item" data-page="proj-pwm-motor" onclick="loadPage('proj-pwm-motor')">PWM电机</a>
+      <a class="nav-item" data-page="proj-servo-control" onclick="loadPage('proj-servo-control')">舵机控制</a>
+      <a class="nav-item" data-page="proj-ir-remote" onclick="loadPage('proj-ir-remote')">红外遥控</a>
+      <a class="nav-item" data-page="proj-ultrasonic" onclick="loadPage('proj-ultrasonic')">超声波测距</a>
+      <a class="nav-item" data-page="proj-stepper-motor" onclick="loadPage('proj-stepper-motor')">步进电机</a>
     </div>
     <div class="nav-group collapsible">
-      <div class="nav-group-title" onclick="toggleNavGroup(this)">馃煚 瀹炴垬椤圭洰 <span class="toggle-icon">鈻?/span></div>
-      <a class="nav-item" data-page="proj-freertos-station" onclick="loadPage('proj-freertos-station')">FreeRTOS绔?/a>
-      <a class="nav-item" data-page="proj-smart-car" onclick="loadPage('proj-smart-car')">鏅鸿兘灏忚溅</a>
-      <a class="nav-item" data-page="proj-can-bus" onclick="loadPage('proj-can-bus')">CAN鎬荤嚎</a>
-      <a class="nav-item" data-page="proj-sd-logger" onclick="loadPage('proj-sd-logger')">SD鍗¤褰曚华</a>
-      <a class="nav-item" data-page="proj-esp32-iot" onclick="loadPage('proj-esp32-iot')">ESP32鐗╄仈缃?/a>
+      <div class="nav-group-title" onclick="toggleNavGroup(this)">🟠 实战项目 <span class="toggle-icon">▸</span></div>
+      <a class="nav-item" data-page="proj-freertos-station" onclick="loadPage('proj-freertos-station')">FreeRTOS站</a>
+      <a class="nav-item" data-page="proj-smart-car" onclick="loadPage('proj-smart-car')">智能小车</a>
+      <a class="nav-item" data-page="proj-can-bus" onclick="loadPage('proj-can-bus')">CAN总线</a>
+      <a class="nav-item" data-page="proj-sd-logger" onclick="loadPage('proj-sd-logger')">SD卡记录仪</a>
+      <a class="nav-item" data-page="proj-esp32-iot" onclick="loadPage('proj-esp32-iot')">ESP32物联网</a>
     </div>
     <div class="nav-group collapsible">
-      <div class="nav-group-title" onclick="toggleNavGroup(this)">馃敶 楂樼骇椤圭洰 <span class="toggle-icon">鈻?/span></div>
-      <a class="nav-item" data-page="proj-low-power" onclick="loadPage('proj-low-power')">浣庡姛鑰?/a>
-      <a class="nav-item" data-page="proj-bootloader-iap" onclick="loadPage('proj-bootloader-iap')">IAP鍗囩骇</a>
+      <div class="nav-group-title" onclick="toggleNavGroup(this)">🔴 高级项目 <span class="toggle-icon">▸</span></div>
+      <a class="nav-item" data-page="proj-low-power" onclick="loadPage('proj-low-power')">低功耗</a>
+      <a class="nav-item" data-page="proj-bootloader-iap" onclick="loadPage('proj-bootloader-iap')">IAP升级</a>
       <a class="nav-item" data-page="proj-dma-adc" onclick="loadPage('proj-dma-adc')">DMA+ADC</a>
       <a class="nav-item" data-page="proj-usb-hid" onclick="loadPage('proj-usb-hid')">USB HID</a>
-      <a class="nav-item" data-page="proj-s32k144-auto" onclick="loadPage('proj-s32k144-auto')">姹借溅鐢靛瓙</a>
-      <a class="nav-item" data-page="proj-oscilloscope-debug" onclick="loadPage('proj-oscilloscope-debug')">绀烘尝鍣ㄨ皟璇?/a>
+      <a class="nav-item" data-page="proj-s32k144-auto" onclick="loadPage('proj-s32k144-auto')">汽车电子</a>
+      <a class="nav-item" data-page="proj-oscilloscope-debug" onclick="loadPage('proj-oscilloscope-debug')">示波器调试</a>
     </div>
   </div>
   <div class="bookmarks-section" id="bookmarksSection" style="display:none">
-    <div class="bookmarks-title">猸?鏀惰棌澶?<span class="bookmarks-count" id="bmCount">0</span></div>
+    <div class="bookmarks-title">⭐ 收藏夹 <span class="bookmarks-count" id="bmCount">0</span></div>
     <div id="bookmarkList"></div>
   </div>
   <div class="sidebar-footer">
-    v1.6.4 路 2026-06-17 路 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="鍒囨崲浜壊/鏆楄壊">馃寵</button> 路 鈱笍 <span class="kbd">/</span> 鎼滅储
+    v1.6.4 · 2026-06-17 · <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换亮色/暗色">🌙</button> · ⌨️ <span class="kbd">/</span> 搜索
   </div>
 </nav>
 
-<!-- 涓诲尯鍩?-->
+<!-- 主区域 -->
 <div class="main">
   <div class="topbar">
-    <button class="menu-btn" onclick="toggleSidebar()">鈽?/button>
-    <div class="breadcrumb" id="breadcrumb">馃搻 宓屽叆寮忓紑鍙戞暀绋?/div>
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="breadcrumb" id="breadcrumb">📐 嵌入式开发教程</div>
     <div class="search-box">
-      <span class="icon">馃攳</span>
-      <input type="text" id="searchInput" placeholder="鎼滅储鏁欑▼鍐呭..." oninput="handleSearch(this.value)">
+      <span class="icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="搜索教程内容..." oninput="handleSearch(this.value)">
     </div>
     
-    <button class="focus-btn" id="focusBtn" onclick="toggleFocus()" title="涓撴敞闃呰妯″紡 (Ctrl+F)">馃摉 涓撴敞</button>
-    <button class="bookmark-btn" id="bmToggle" onclick="toggleBookmark(currentPage)" title="鏀惰棌褰撳墠鏁欑▼" style="display:none">鈽?/button>
+    <button class="focus-btn" id="focusBtn" onclick="toggleFocus()" title="专注阅读模式 (Ctrl+F)">📖 专注</button>
+    <button class="bookmark-btn" id="bmToggle" onclick="toggleBookmark(currentPage)" title="收藏当前教程" style="display:none">☆</button>
   </div>
   <div class="content" id="contentArea">
-    <!-- 鍔ㄦ€佸姞杞藉唴瀹?-->
+    <!-- 动态加载内容 -->
   </div>
 </div>
 
-<!-- 鍥炲埌椤堕儴 -->
-<div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">鈫?/div>
-<!-- 杩斿洖棣栭〉 -->
-<div class="home-fab" id="homeFab" onclick="loadPage('home')" title="杩斿洖棣栭〉">馃彔</div>
+<!-- 回到顶部 -->
+<div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+<!-- 返回首页 -->
+<div class="home-fab" id="homeFab" onclick="loadPage('home')" title="返回首页">🏠</div>
 
 <script>
-// === 椤甸潰閰嶇疆 ===
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/service-worker.js').catch(function(){});}
+
+// === 页面配置 ===
 const PAGES = {
-  home: { title: '鏁欑▼棣栭〉', breadcrumb: '馃搻 棣栭〉', type: 'home' }
-  overview: { title: '鏁欑▼鎬昏', breadcrumb: '馃搻 棣栭〉 / 馃搳 鏁欑▼鎬昏', type: 'tutorial', file: 'tutorials/overview.html' },
+  home: { title: '教程首页', breadcrumb: '📐 首页', type: 'home' }
+  overview: { title: '教程总览', breadcrumb: '📐 首页 / 📊 教程总览', type: 'tutorial', file: 'tutorials/overview.html' },
 ,
-  guide: { title: '灏忕櫧瀹屽叏鎸囧崡 - 鐩綍', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧瀹屽叏鎸囧崡', type: 'tutorial', file: 'tutorials/guide/index.html' },
-  'guide-ch00': { title: '绗?绔狅細鐜鎼缓', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch00.html' },
-  'guide-ch01': { title: '绗?绔狅細ARM GCC', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch01.html' },
-  'guide-ch02': { title: '绗?绔狅細CMake', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch02.html' },
-  'guide-ch03': { title: '绗?绔狅細Makefile', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch03.html' },
-  'guide-ch04': { title: '绗?绔狅細涓插彛閫氫俊', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch04.html' },
-  'guide-ch05': { title: '绗?绔狅細鐑у綍璋冭瘯', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch05.html' },
-  'guide-ch06': { title: '绗?绔狅細STM32', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch06.html' },
-  'guide-ch07': { title: '绗?绔狅細ESP32', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch07.html' },
-  'guide-ch08': { title: '绗?绔狅細FreeRTOS', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch08.html' },
-  'guide-ch09': { title: '绗?绔狅細閫氫俊鍗忚', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch09.html' },
-  'guide-ch10': { title: '绗?0绔狅細PCB纭欢', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?0绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch10.html' },
-  'guide-ch11': { title: '绗?1绔狅細璋冭瘯鎶€宸?, breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?1绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch11.html' },
-  'guide-ch12': { title: '绗?2绔狅細椤圭洰瀹炴垬', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?2绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch12.html' },
-  'guide-ch13': { title: '绗?3绔狅細浠ｇ爜閫熸煡', breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧鎸囧崡 / 绗?3绔?, type: 'tutorial', file: 'tutorials/guide/guide-ch13.html' },
-  main: { title: '宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?, breadcrumb: '馃搻 棣栭〉 / 馃摉 灏忕櫧瀹屽叏鎸囧崡', type: 'tutorial', file: 'tutorials/main.html' },
-  'arm-gcc': { title: 'ARM GCC 缂栬瘧宸ュ叿閾?, breadcrumb: '馃搻 棣栭〉 / 馃敤 ARM GCC', type: 'tutorial', file: 'tutorials/arm-gcc.html' },
-  cmake: { title: 'CMake 鏋勫缓绯荤粺', breadcrumb: '馃搻 棣栭〉 / 馃摝 CMake', type: 'tutorial', file: 'tutorials/cmake.html' },
-  makefile: { title: 'Makefile 瀹炴垬', breadcrumb: '馃搻 棣栭〉 / 馃摐 Makefile', type: 'tutorial', file: 'tutorials/makefile.html' },
-  'flash-debug': { title: '鐑у綍涓庤皟璇?, breadcrumb: '馃搻 棣栭〉 / 鈿?鐑у綍涓庤皟璇?, type: 'tutorial', file: 'tutorials/flash-debug.html' },
-  serial: { title: '涓插彛閫氫俊', breadcrumb: '馃搻 棣栭〉 / 馃摗 涓插彛閫氫俊', type: 'tutorial', file: 'tutorials/serial.html' },
-  stm32: { title: 'STM32 寮€鍙?, breadcrumb: '馃搻 棣栭〉 / 馃數 STM32', type: 'tutorial', file: 'tutorials/stm32.html' },
-  esp32: { title: 'ESP32 寮€鍙?, breadcrumb: '馃搻 棣栭〉 / 馃煝 ESP32', type: 'tutorial', file: 'tutorials/esp32.html' },
-  freertos: { title: 'FreeRTOS 鍏ラ棬', breadcrumb: '馃搻 棣栭〉 / 馃攧 FreeRTOS', type: 'tutorial', file: 'tutorials/freertos.html' },
-  protocols: { title: '閫氫俊鍗忚', breadcrumb: '馃搻 棣栭〉 / 馃攲 閫氫俊鍗忚', type: 'tutorial', file: 'tutorials/protocols.html' },
-  'practice-projects': { title: '缁冩墜鏂瑰悜澶у叏', breadcrumb: '馃搻 棣栭〉 / 馃敩 缁冩墜鏂瑰悜', type: 'tutorial', file: 'tutorials/practice-projects.html' },
-  'bci-2026': { title: '鑴戞満鎺ュ彛2026鍏ㄧ悆杩涘睍', breadcrumb: '馃搻 棣栭〉 / 馃 鑴戞満鎺ュ彛2026', type: 'tutorial', file: 'tutorials/bci-2026.html' },
-  'proj-led-button': { title: 'LED璺戦┈鐏?鎸夐敭鎺у埗', breadcrumb: '馃搻 棣栭〉 / 馃煝 LED+鎸夐敭', type: 'tutorial', file: 'tutorials/proj-led-button.html' },
-  'proj-uart-hello': { title: '涓插彛Hello World', breadcrumb: '馃搻 棣栭〉 / 馃煝 涓插彛Hello', type: 'tutorial', file: 'tutorials/proj-uart-hello.html' },
-  'proj-oled-display': { title: 'OLED鏄剧ず', breadcrumb: '馃搻 棣栭〉 / 馃煝 OLED鏄剧ず', type: 'tutorial', file: 'tutorials/proj-oled-display.html' },
-  'proj-dht11-monitor': { title: '娓╂箍搴︾洃娴?, breadcrumb: '馃搻 棣栭〉 / 馃煝 娓╂箍搴?, type: 'tutorial', file: 'tutorials/proj-dht11-monitor.html' },
-  'proj-pwm-motor': { title: 'PWM鐢垫満鎺у埗', breadcrumb: '馃搻 棣栭〉 / 馃煛 PWM鐢垫満', type: 'tutorial', file: 'tutorials/proj-pwm-motor.html' },
-  'proj-servo-control': { title: '鑸垫満鎺у埗', breadcrumb: '馃搻 棣栭〉 / 馃煛 鑸垫満鎺у埗', type: 'tutorial', file: 'tutorials/proj-servo-control.html' },
-  'proj-ir-remote': { title: '绾㈠閬ユ帶瑙ｇ爜', breadcrumb: '馃搻 棣栭〉 / 馃煛 绾㈠閬ユ帶', type: 'tutorial', file: 'tutorials/proj-ir-remote.html' },
-  'proj-ultrasonic': { title: '瓒呭０娉㈡祴璺?, breadcrumb: '馃搻 棣栭〉 / 馃煛 瓒呭０娉㈡祴璺?, type: 'tutorial', file: 'tutorials/proj-ultrasonic.html' },
-  'proj-stepper-motor': { title: '姝ヨ繘鐢垫満鎺у埗', breadcrumb: '馃搻 棣栭〉 / 馃煛 姝ヨ繘鐢垫満', type: 'tutorial', file: 'tutorials/proj-stepper-motor.html' },
-  'proj-freertos-station': { title: 'FreeRTOS鐜鐩戞祴绔?, breadcrumb: '馃搻 棣栭〉 / 馃煚 FreeRTOS绔?, type: 'tutorial', file: 'tutorials/proj-freertos-station.html' },
-  'proj-smart-car': { title: '鏅鸿兘灏忚溅', breadcrumb: '馃搻 棣栭〉 / 馃煚 鏅鸿兘灏忚溅', type: 'tutorial', file: 'tutorials/proj-smart-car.html' },
-  'proj-can-bus': { title: 'CAN鎬荤嚎閫氫俊', breadcrumb: '馃搻 棣栭〉 / 馃煚 CAN鎬荤嚎', type: 'tutorial', file: 'tutorials/proj-can-bus.html' },
-  'proj-sd-logger': { title: 'SD鍗℃暟鎹褰曚华', breadcrumb: '馃搻 棣栭〉 / 馃煚 SD鍗¤褰曚华', type: 'tutorial', file: 'tutorials/proj-sd-logger.html' },
-  'proj-esp32-iot': { title: 'ESP32 WiFi鐗╄仈缃?, breadcrumb: '馃搻 棣栭〉 / 馃煚 ESP32鐗╄仈缃?, type: 'tutorial', file: 'tutorials/proj-esp32-iot.html' },
-  'proj-low-power': { title: '浣庡姛鑰楃數姹犺澶?, breadcrumb: '馃搻 棣栭〉 / 馃敶 浣庡姛鑰?, type: 'tutorial', file: 'tutorials/proj-low-power.html' },
-  'proj-bootloader-iap': { title: 'Bootloader IAP鍗囩骇', breadcrumb: '馃搻 棣栭〉 / 馃敶 IAP鍗囩骇', type: 'tutorial', file: 'tutorials/proj-bootloader-iap.html' },
-  'proj-dma-adc': { title: 'DMA鍙岀紦鍐睞DC', breadcrumb: '馃搻 棣栭〉 / 馃敶 DMA+ADC', type: 'tutorial', file: 'tutorials/proj-dma-adc.html' },
-  'proj-usb-hid': { title: 'USB HID閿洏榧犳爣', breadcrumb: '馃搻 棣栭〉 / 馃敶 USB HID', type: 'tutorial', file: 'tutorials/proj-usb-hid.html' },
-  'proj-s32k144-auto': { title: 'S32K144姹借溅鐢靛瓙', breadcrumb: '馃搻 棣栭〉 / 馃敶 姹借溅鐢靛瓙', type: 'tutorial', file: 'tutorials/proj-s32k144-auto.html' },
-  'proj-oscilloscope-debug': { title: '绀烘尝鍣ㄨ皟璇曞疄鎴?, breadcrumb: '馃搻 棣栭〉 / 馃敶 绀烘尝鍣ㄨ皟璇?, type: 'tutorial', file: 'tutorials/proj-oscilloscope-debug.html' }
+  guide: { title: '小白完全指南 - 目录', breadcrumb: '📐 首页 / 📖 小白完全指南', type: 'tutorial', file: 'tutorials/guide/index.html' },
+  'guide-ch00': { title: '第0章：环境搭建', breadcrumb: '📐 首页 / 📖 小白指南 / 第0章', type: 'tutorial', file: 'tutorials/guide/guide-ch00.html' },
+  'guide-ch01': { title: '第1章：ARM GCC', breadcrumb: '📐 首页 / 📖 小白指南 / 第1章', type: 'tutorial', file: 'tutorials/guide/guide-ch01.html' },
+  'guide-ch02': { title: '第2章：CMake', breadcrumb: '📐 首页 / 📖 小白指南 / 第2章', type: 'tutorial', file: 'tutorials/guide/guide-ch02.html' },
+  'guide-ch03': { title: '第3章：Makefile', breadcrumb: '📐 首页 / 📖 小白指南 / 第3章', type: 'tutorial', file: 'tutorials/guide/guide-ch03.html' },
+  'guide-ch04': { title: '第4章：串口通信', breadcrumb: '📐 首页 / 📖 小白指南 / 第4章', type: 'tutorial', file: 'tutorials/guide/guide-ch04.html' },
+  'guide-ch05': { title: '第5章：烧录调试', breadcrumb: '📐 首页 / 📖 小白指南 / 第5章', type: 'tutorial', file: 'tutorials/guide/guide-ch05.html' },
+  'guide-ch06': { title: '第6章：STM32', breadcrumb: '📐 首页 / 📖 小白指南 / 第6章', type: 'tutorial', file: 'tutorials/guide/guide-ch06.html' },
+  'guide-ch07': { title: '第7章：ESP32', breadcrumb: '📐 首页 / 📖 小白指南 / 第7章', type: 'tutorial', file: 'tutorials/guide/guide-ch07.html' },
+  'guide-ch08': { title: '第8章：FreeRTOS', breadcrumb: '📐 首页 / 📖 小白指南 / 第8章', type: 'tutorial', file: 'tutorials/guide/guide-ch08.html' },
+  'guide-ch09': { title: '第9章：通信协议', breadcrumb: '📐 首页 / 📖 小白指南 / 第9章', type: 'tutorial', file: 'tutorials/guide/guide-ch09.html' },
+  'guide-ch10': { title: '第10章：PCB硬件', breadcrumb: '📐 首页 / 📖 小白指南 / 第10章', type: 'tutorial', file: 'tutorials/guide/guide-ch10.html' },
+  'guide-ch11': { title: '第11章：调试技巧', breadcrumb: '📐 首页 / 📖 小白指南 / 第11章', type: 'tutorial', file: 'tutorials/guide/guide-ch11.html' },
+  'guide-ch12': { title: '第12章：项目实战', breadcrumb: '📐 首页 / 📖 小白指南 / 第12章', type: 'tutorial', file: 'tutorials/guide/guide-ch12.html' },
+  'guide-ch13': { title: '第13章：代码速查', breadcrumb: '📐 首页 / 📖 小白指南 / 第13章', type: 'tutorial', file: 'tutorials/guide/guide-ch13.html' },
+  main: { title: '嵌入式小白完全指南', breadcrumb: '📐 首页 / 📖 小白完全指南', type: 'tutorial', file: 'tutorials/main.html' },
+  'arm-gcc': { title: 'ARM GCC 编译工具链', breadcrumb: '📐 首页 / 🔨 ARM GCC', type: 'tutorial', file: 'tutorials/arm-gcc.html' },
+  cmake: { title: 'CMake 构建系统', breadcrumb: '📐 首页 / 📦 CMake', type: 'tutorial', file: 'tutorials/cmake.html' },
+  makefile: { title: 'Makefile 实战', breadcrumb: '📐 首页 / 📜 Makefile', type: 'tutorial', file: 'tutorials/makefile.html' },
+  'flash-debug': { title: '烧录与调试', breadcrumb: '📐 首页 / ⚡ 烧录与调试', type: 'tutorial', file: 'tutorials/flash-debug.html' },
+  serial: { title: '串口通信', breadcrumb: '📐 首页 / 📡 串口通信', type: 'tutorial', file: 'tutorials/serial.html' },
+  stm32: { title: 'STM32 开发', breadcrumb: '📐 首页 / 🔵 STM32', type: 'tutorial', file: 'tutorials/stm32.html' },
+  esp32: { title: 'ESP32 开发', breadcrumb: '📐 首页 / 🟢 ESP32', type: 'tutorial', file: 'tutorials/esp32.html' },
+  freertos: { title: 'FreeRTOS 入门', breadcrumb: '📐 首页 / 🔄 FreeRTOS', type: 'tutorial', file: 'tutorials/freertos.html' },
+  protocols: { title: '通信协议', breadcrumb: '📐 首页 / 🔌 通信协议', type: 'tutorial', file: 'tutorials/protocols.html' },
+  'practice-projects': { title: '练手方向大全', breadcrumb: '📐 首页 / 🔬 练手方向', type: 'tutorial', file: 'tutorials/practice-projects.html' },
+  'bci-2026': { title: '脑机接口2026全球进展', breadcrumb: '📐 首页 / 🧠 脑机接口2026', type: 'tutorial', file: 'tutorials/bci-2026.html' },
+  'proj-led-button': { title: 'LED跑马灯+按键控制', breadcrumb: '📐 首页 / 🟢 LED+按键', type: 'tutorial', file: 'tutorials/proj-led-button.html' },
+  'proj-uart-hello': { title: '串口Hello World', breadcrumb: '📐 首页 / 🟢 串口Hello', type: 'tutorial', file: 'tutorials/proj-uart-hello.html' },
+  'proj-oled-display': { title: 'OLED显示', breadcrumb: '📐 首页 / 🟢 OLED显示', type: 'tutorial', file: 'tutorials/proj-oled-display.html' },
+  'proj-dht11-monitor': { title: '温湿度监测', breadcrumb: '📐 首页 / 🟢 温湿度', type: 'tutorial', file: 'tutorials/proj-dht11-monitor.html' },
+  'proj-pwm-motor': { title: 'PWM电机控制', breadcrumb: '📐 首页 / 🟡 PWM电机', type: 'tutorial', file: 'tutorials/proj-pwm-motor.html' },
+  'proj-servo-control': { title: '舵机控制', breadcrumb: '📐 首页 / 🟡 舵机控制', type: 'tutorial', file: 'tutorials/proj-servo-control.html' },
+  'proj-ir-remote': { title: '红外遥控解码', breadcrumb: '📐 首页 / 🟡 红外遥控', type: 'tutorial', file: 'tutorials/proj-ir-remote.html' },
+  'proj-ultrasonic': { title: '超声波测距', breadcrumb: '📐 首页 / 🟡 超声波测距', type: 'tutorial', file: 'tutorials/proj-ultrasonic.html' },
+  'proj-stepper-motor': { title: '步进电机控制', breadcrumb: '📐 首页 / 🟡 步进电机', type: 'tutorial', file: 'tutorials/proj-stepper-motor.html' },
+  'proj-freertos-station': { title: 'FreeRTOS环境监测站', breadcrumb: '📐 首页 / 🟠 FreeRTOS站', type: 'tutorial', file: 'tutorials/proj-freertos-station.html' },
+  'proj-smart-car': { title: '智能小车', breadcrumb: '📐 首页 / 🟠 智能小车', type: 'tutorial', file: 'tutorials/proj-smart-car.html' },
+  'proj-can-bus': { title: 'CAN总线通信', breadcrumb: '📐 首页 / 🟠 CAN总线', type: 'tutorial', file: 'tutorials/proj-can-bus.html' },
+  'proj-sd-logger': { title: 'SD卡数据记录仪', breadcrumb: '📐 首页 / 🟠 SD卡记录仪', type: 'tutorial', file: 'tutorials/proj-sd-logger.html' },
+  'proj-esp32-iot': { title: 'ESP32 WiFi物联网', breadcrumb: '📐 首页 / 🟠 ESP32物联网', type: 'tutorial', file: 'tutorials/proj-esp32-iot.html' },
+  'proj-low-power': { title: '低功耗电池设备', breadcrumb: '📐 首页 / 🔴 低功耗', type: 'tutorial', file: 'tutorials/proj-low-power.html' },
+  'proj-bootloader-iap': { title: 'Bootloader IAP升级', breadcrumb: '📐 首页 / 🔴 IAP升级', type: 'tutorial', file: 'tutorials/proj-bootloader-iap.html' },
+  'proj-dma-adc': { title: 'DMA双缓冲ADC', breadcrumb: '📐 首页 / 🔴 DMA+ADC', type: 'tutorial', file: 'tutorials/proj-dma-adc.html' },
+  'proj-usb-hid': { title: 'USB HID键盘鼠标', breadcrumb: '📐 首页 / 🔴 USB HID', type: 'tutorial', file: 'tutorials/proj-usb-hid.html' },
+  'proj-s32k144-auto': { title: 'S32K144汽车电子', breadcrumb: '📐 首页 / 🔴 汽车电子', type: 'tutorial', file: 'tutorials/proj-s32k144-auto.html' },
+  'proj-oscilloscope-debug': { title: '示波器调试实战', breadcrumb: '📐 首页 / 🔴 示波器调试', type: 'tutorial', file: 'tutorials/proj-oscilloscope-debug.html' }
 };
 
 let currentPage = 'home';
 let searchMode = false;
 
-// === 鍔犺浇棣栭〉 ===
+// === 加载首页 ===
 function renderHome() {
-// === 鍏ㄥ眬鏁欑▼鍗＄墖鏁版嵁 ===
+// === 全局教程卡片数据 ===
 const cardsData = [
-    { page:'guide', icon:'馃摉', title:'灏忕櫧瀹屽叏鎸囧崡', desc:'14绔犲垎绡囬槄璇伙細鐜鎼缓鈫扐RM GCC鈫扖Make鈫扢akefile鈫掍覆鍙ｂ啋鐑у綍鈫扴TM32鈫扙SP32鈫扚reeRTOS鈫掑崗璁啋纭欢鈫掕皟璇曗啋瀹炴垬鈫掗€熸煡', tags:['蹇呰','14绔?], time:'~2灏忔椂', size:'鍏?00KB', hot:true, diff:1 },
-    { page:'arm-gcc', icon:'馃敡', title:'ARM GCC 宸ュ叿閾?, desc:'gcc/as/ld/objcopy/objdump鍏ㄥ懡浠よ瑙ｏ紝缂栬瘧鍙傛暟閫熸煡锛岄摼鎺ヨ剼鏈師鐞?, tags:['鏍稿績','缂栬瘧'], time:'~20鍒嗛挓', size:'35KB', time:'25鍒嗛挓', diff:1 },
-    { page:'cmake', icon:'馃摝', title:'CMake 鏋勫缓绯荤粺', desc:'CMakeLists.txt鍏ㄨ娉曪紝宸ュ叿閾炬枃浠讹紝CubeMX闆嗘垚锛孷S Code閰嶇疆', tags:['鑷姩鍖?,'鏋勫缓'], time:'~20鍒嗛挓', size:'32KB', time:'20鍒嗛挓', diff:2 },
-    { page:'makefile', icon:'馃摐', title:'Makefile 瀹炴垬', desc:'璇硶瑙勫垯锛屽彉閲忥紝妯″紡瑙勫垯锛屽畬鏁碨TM32椤圭洰Makefile锛屽閲忕紪璇?, tags:['杩涢樁','鏋勫缓'], time:'~25鍒嗛挓', size:'76KB', time:'40鍒嗛挓', diff:2 },
-    { page:'flash-debug', icon:'鈿?, title:'鐑у綍涓庤皟璇?, desc:'ST-Link/J-Link/涓插彛ISP锛孫penOCD锛孏DB锛孷S Code Cortex-Debug', tags:['蹇呭','璋冭瘯'], time:'~30鍒嗛挓', size:'96KB', time:'50鍒嗛挓', diff:2 },
-    { page:'serial', icon:'馃摗', title:'涓插彛閫氫俊', desc:'UART鍗忚锛孋H340椹卞姩锛孭uTTY锛宲yserial缂栫▼锛孲TM32 HAL涓插彛', tags:['蹇呭','閫氫俊'], time:'~20鍒嗛挓', size:'48KB', time:'30鍒嗛挓', diff:1 },
-    { page:'stm32', icon:'馃數', title:'STM32 寮€鍙?, desc:'HAL/LL/瀵勫瓨鍣紝CubeMX锛孏PIO/UART/TIM/ADC/NVIC锛屾椂閽熸爲', tags:['蹇呭','MCU'], time:'~35鍒嗛挓', size:'65KB', time:'35鍒嗛挓', hot:true, diff:2 },
-    { page:'esp32', icon:'馃煝', title:'ESP32 寮€鍙?, desc:'Arduino/ESP-IDF鍙屾鏋讹紝WiFi/BLE锛孫TA锛屾繁搴︾潯鐪狅紝esptool', tags:['杩涢樁','WiFi'], time:'~20鍒嗛挓', size:'31KB', time:'20鍒嗛挓', diff:3 },
-    { page:'freertos', icon:'馃攧', title:'FreeRTOS 鍏ラ棬', desc:'浠诲姟/闃熷垪/淇″彿閲?浜掓枼閲忥紝涓柇瀹夊叏锛屼笌HAL鍏卞瓨锛屽唴瀛樼鐞?, tags:['杩涢樁','RTOS'], time:'~40鍒嗛挓', size:'116KB', time:'55鍒嗛挓', diff:3 },
-    { page:'protocols', icon:'馃攲', title:'閫氫俊鍗忚', desc:'I2C/SPI/UART/CAN鍗忚鍘熺悊锛岀‖浠舵帴绾匡紝HAL浠ｇ爜锛岄€昏緫鍒嗘瀽浠?, tags:['杩涢樁','閫氫俊'], time:'~20鍒嗛挓', size:'29KB', time:'20鍒嗛挓', diff:2 },
-    { page:'practice-projects', icon:'馃敩', title:'缁冩墜鏂瑰悜澶у叏', desc:'20涓垎绾ч」鐩細LED璺戦┈鐏啋FreeRTOS澶氫换鍔♀啋鏅鸿兘灏忚溅鈫払ootloader鈫扷SB寮€鍙?, tags:['瀹炴垬','蹇呯湅'], time:'~10鍒嗛挓', size:'28KB', time:'15鍒嗛挓', hot:true, diff:0 },
-    { page:'bci-2026', icon:'馃', title:'鑴戞満鎺ュ彛2026鍏ㄧ悆杩涘睍', desc:'Neuralink/Synchron/鍗氱澘搴锋渶鏂扮獊鐮达紝涓夋槦4nm鑺墖锛屽ぇ妯″瀷+BCI铻嶅悎鏋舵瀯', tags:['鍓嶆部','鐑偣'], time:'~15鍒嗛挓', size:'46KB', time:'25鍒嗛挓', hot:true, diff:0 },
-    { page:'proj-led-button', icon:'馃挕', title:'LED璺戦┈鐏?鎸夐敭鎺у埗', desc:'GPIO杈撳嚭娴佹按鐏紝鎸夐敭杈撳叆锛屽閮ㄤ腑鏂紝杞欢/纭欢娑堟姈锛岀涓€涓畬鏁撮」鐩?, tags:['鍏ラ棬','GPIO'], time:'~15鍒嗛挓', size:'25KB', diff:1 },
-    { page:'proj-uart-hello', icon:'馃枼锔?, title:'涓插彛Hello World', desc:'UART閰嶇疆锛宲rintf閲嶅畾鍚戯紝涓柇鎺ユ敹锛屽懡浠よВ鏋愭帶鍒禠ED锛孌MA鎺ユ敹', tags:['鍏ラ棬','UART'], time:'~15鍒嗛挓', size:'28KB', diff:1 },
-    { page:'proj-oled-display', icon:'馃摫', title:'OLED鏄剧ず灞忛┍鍔?, desc:'I2C閫氫俊锛孲SD1306椹卞姩锛屽瓧绗?鏁板瓧/鍥惧舰鏄剧ず锛屽瓧搴撳彇妯★紝婊氬姩鏁堟灉', tags:['鍏ラ棬','I2C'], time:'~15鍒嗛挓', size:'30KB', diff:1 },
-    { page:'proj-dht11-monitor', icon:'馃尅锔?, title:'DHT11娓╂箍搴︾洃娴?, desc:'鍗曟€荤嚎鏃跺簭锛孏PIO妯″紡鍒囨崲锛屽井绉掑欢鏃讹紝鏁版嵁鏍￠獙锛孫LED+涓插彛鏄剧ず', tags:['鍏ラ棬','浼犳劅鍣?], time:'~12鍒嗛挓', size:'22KB', diff:1 },
-    { page:'proj-pwm-motor', icon:'鈿欙笍', title:'鐩存祦鐢垫満PWM鎺у埗', desc:'瀹氭椂鍣≒WM鍘熺悊锛孡298N椹卞姩锛屽崰绌烘瘮璋冮€燂紝姝ｅ弽杞紝鎸夐敭/涓插彛鎺ч€?, tags:['杩涢樁','PWM'], time:'~18鍒嗛挓', size:'15KB', diff:2 },
-    { page:'proj-servo-control', icon:'馃', title:'鑸垫満鎺у埗', desc:'50Hz PWM淇″彿锛岃搴﹁绠楀叕寮忥紝澶氳矾鑸垫満锛屾満姊拌噦鍗忓悓鎺у埗', tags:['杩涢樁','PWM'], time:'~18鍒嗛挓', size:'17KB', diff:2 },
-    { page:'proj-ir-remote', icon:'馃摵', title:'绾㈠閬ユ帶瑙ｇ爜', desc:'NEC鍗忚锛屽閮ㄤ腑鏂?瀹氭椂鍣ㄦ祴鑴夊锛岀姸鎬佹満瑙ｇ爜锛岄敭鍊兼槧灏勬帶鍒?, tags:['杩涢樁','涓柇'], time:'~15鍒嗛挓', size:'21KB', diff:2 },
-    { page:'proj-ultrasonic', icon:'馃摗', title:'瓒呭０娉㈡祴璺?, desc:'HC-SR04 Trig/Echo锛岃緭鍏ユ崟鑾锋祴鑴夊锛岃窛绂昏绠楋紝鎶ヨ闃堝€?, tags:['杩涢樁','瀹氭椂鍣?], time:'~15鍒嗛挓', size:'18KB', diff:2 },
-    { page:'proj-stepper-motor', icon:'馃攧', title:'姝ヨ繘鐢垫満鎺у埗', desc:'鍥涚浉鍏媿鐩稿簭锛?8BYJ-48鍑忛€熸瘮璁＄畻锛屾褰㈠姞鍑忛€熸洸绾匡紝绮剧‘浣嶇疆', tags:['杩涢樁','鐢垫満'], time:'~18鍒嗛挓', size:'20KB', diff:2 },
-    { page:'proj-freertos-station', icon:'馃搳', title:'FreeRTOS鐜鐩戞祴绔?, desc:'4浠诲姟鍗忓悓锛岄槦鍒椾紶鏁版嵁锛屼俊鍙烽噺鍚屾锛屼簰鏂ラ噺淇濇姢I2C锛屾姤璀﹀垽鏂?, tags:['瀹炴垬','RTOS'], time:'~20鍒嗛挓', size:'25KB', hot:true, diff:3 },
-    { page:'proj-smart-car', icon:'馃殫', title:'鏅鸿兘灏忚溅', desc:'鐢垫満椹卞姩+瓒呭０娉㈤伩闅?绾㈠閬ユ帶+钃濈墮APP+PID閫熷害闂幆+鐘舵€佹満', tags:['瀹炴垬','缁煎悎'], time:'~25鍒嗛挓', size:'26KB', hot:true, diff:3 },
-    { page:'proj-can-bus', icon:'馃攲', title:'CAN鎬荤嚎閫氫俊', desc:'CAN鍗忚甯ф牸寮忥紝HAL_CAN鏀跺彂锛岃繃婊ゅ櫒閰嶇疆锛屽弻鑺傜偣閫氫俊锛岀粓绔數闃?, tags:['瀹炴垬','CAN'], time:'~20鍒嗛挓', size:'22KB', diff:3 },
-    { page:'proj-sd-logger', icon:'馃捑', title:'SD鍗℃暟鎹褰曚华', desc:'SPI+FatFS锛屾枃浠跺垱寤?鍐欏叆/璇诲彇锛孋SV鏍煎紡锛屼覆鍙ｅ鍑猴紝鏃堕棿鎴?, tags:['瀹炴垬','鏂囦欢绯荤粺'], time:'~20鍒嗛挓', size:'20KB', diff:3 },
-    { page:'proj-esp32-iot', icon:'馃寪', title:'ESP32 WiFi鐗╄仈缃?, desc:'Arduino妗嗘灦锛學iFi杩炴帴锛孒TTP璇锋眰锛孧QTT鍙戝竷璁㈤槄锛孴hingSpeak锛孫TA', tags:['瀹炴垬','IoT'], time:'~20鍒嗛挓', size:'22KB', diff:3 },
-    { page:'proj-low-power', icon:'馃攱', title:'浣庡姛鑰楃數姹犺澶?, desc:'Sleep/Stop/Standby妯″紡锛孯TC瀹氭椂鍞ら啋锛屽閮ㄤ腑鏂敜閱掞紝渭A绾т紭鍖?, tags:['楂樼骇','浣庡姛鑰?], time:'~18鍒嗛挓', size:'22KB', diff:4 },
-    { page:'proj-bootloader-iap', icon:'猬嗭笍', title:'Bootloader IAP鍗囩骇', desc:'Flash鍒嗗尯锛屽悜閲忚〃閲嶅畾浣嶏紝涓插彛鎺ユ敹bin锛孋RC鏍￠獙锛岀増鏈鐞?, tags:['楂樼骇','Bootloader'], time:'~20鍒嗛挓', size:'26KB', diff:4 },
-    { page:'proj-dma-adc', icon:'馃搱', title:'DMA鍙岀紦鍐睞DC閲囬泦', desc:'ADC杩炵画閲囨牱+DMA浼犺緭锛屽弻缂撳啿鍒囨崲锛屼笉涓㈢偣閲囬泦锛屾尝褰㈡樉绀?, tags:['楂樼骇','DMA'], time:'~18鍒嗛挓', size:'22KB', diff:4 },
-    { page:'proj-usb-hid', icon:'鈱笍', title:'USB HID閿洏榧犳爣', desc:'USB鍗忚鏍堬紝HID鎻忚堪绗︼紝鎶ヨ〃鎻忚堪绗︼紝妯℃嫙閿洏/榧犳爣锛屾寜閿Е鍙?, tags:['楂樼骇','USB'], time:'~20鍒嗛挓', size:'20KB', diff:4 },
-    { page:'proj-s32k144-auto', icon:'馃殭', title:'S32K144姹借溅鐢靛瓙', desc:'S32DS鐜锛孎LEXCAN锛孡PIT瀹氭椂鍣紝AUTOSAR姒傚康锛屽姛鑳藉畨鍏ㄦ剰璇?, tags:['楂樼骇','姹借溅'], time:'~20鍒嗛挓', size:'18KB', diff:4 },
-    { page:'proj-oscilloscope-debug', icon:'馃敪', title:'绀烘尝鍣ㄨ皟璇曞疄鎴?, desc:'GPIO缈昏浆娴嬮噺锛孖2C/SPI/UART鏃跺簭鍒嗘瀽锛孭WM娴嬮噺锛屼腑鏂欢杩燂紝鍋跺彂BUG鎹曟崏', tags:['楂樼骇','璋冭瘯'], time:'~15鍒嗛挓', size:'20KB', diff:4 }
+    { page:'guide', icon:'📖', title:'小白完全指南', desc:'14章分篇阅读：环境搭建→ARM GCC→CMake→Makefile→串口→烧录→STM32→ESP32→FreeRTOS→协议→硬件→调试→实战→速查', tags:['必读','14章'], time:'~2小时', size:'共200KB', hot:true, diff:1 },
+    { page:'arm-gcc', icon:'🔧', title:'ARM GCC 工具链', desc:'gcc/as/ld/objcopy/objdump全命令详解，编译参数速查，链接脚本原理', tags:['核心','编译'], time:'~20分钟', size:'35KB', time:'25分钟', diff:1 },
+    { page:'cmake', icon:'📦', title:'CMake 构建系统', desc:'CMakeLists.txt全语法，工具链文件，CubeMX集成，VS Code配置', tags:['自动化','构建'], time:'~20分钟', size:'32KB', time:'20分钟', diff:2 },
+    { page:'makefile', icon:'📜', title:'Makefile 实战', desc:'语法规则，变量，模式规则，完整STM32项目Makefile，增量编译', tags:['进阶','构建'], time:'~25分钟', size:'76KB', time:'40分钟', diff:2 },
+    { page:'flash-debug', icon:'⚡', title:'烧录与调试', desc:'ST-Link/J-Link/串口ISP，OpenOCD，GDB，VS Code Cortex-Debug', tags:['必学','调试'], time:'~30分钟', size:'96KB', time:'50分钟', diff:2 },
+    { page:'serial', icon:'📡', title:'串口通信', desc:'UART协议，CH340驱动，PuTTY，pyserial编程，STM32 HAL串口', tags:['必学','通信'], time:'~20分钟', size:'48KB', time:'30分钟', diff:1 },
+    { page:'stm32', icon:'🔵', title:'STM32 开发', desc:'HAL/LL/寄存器，CubeMX，GPIO/UART/TIM/ADC/NVIC，时钟树', tags:['必学','MCU'], time:'~35分钟', size:'65KB', time:'35分钟', hot:true, diff:2 },
+    { page:'esp32', icon:'🟢', title:'ESP32 开发', desc:'Arduino/ESP-IDF双框架，WiFi/BLE，OTA，深度睡眠，esptool', tags:['进阶','WiFi'], time:'~20分钟', size:'31KB', time:'20分钟', diff:3 },
+    { page:'freertos', icon:'🔄', title:'FreeRTOS 入门', desc:'任务/队列/信号量/互斥量，中断安全，与HAL共存，内存管理', tags:['进阶','RTOS'], time:'~40分钟', size:'116KB', time:'55分钟', diff:3 },
+    { page:'protocols', icon:'🔌', title:'通信协议', desc:'I2C/SPI/UART/CAN协议原理，硬件接线，HAL代码，逻辑分析仪', tags:['进阶','通信'], time:'~20分钟', size:'29KB', time:'20分钟', diff:2 },
+    { page:'practice-projects', icon:'🔬', title:'练手方向大全', desc:'20个分级项目：LED跑马灯→FreeRTOS多任务→智能小车→Bootloader→USB开发', tags:['实战','必看'], time:'~10分钟', size:'28KB', time:'15分钟', hot:true, diff:0 },
+    { page:'bci-2026', icon:'🧠', title:'脑机接口2026全球进展', desc:'Neuralink/Synchron/博睿康最新突破，三星4nm芯片，大模型+BCI融合架构', tags:['前沿','热点'], time:'~15分钟', size:'46KB', time:'25分钟', hot:true, diff:0 },
+    { page:'proj-led-button', icon:'💡', title:'LED跑马灯+按键控制', desc:'GPIO输出流水灯，按键输入，外部中断，软件/硬件消抖，第一个完整项目', tags:['入门','GPIO'], time:'~15分钟', size:'25KB', diff:1 },
+    { page:'proj-uart-hello', icon:'🖥️', title:'串口Hello World', desc:'UART配置，printf重定向，中断接收，命令解析控制LED，DMA接收', tags:['入门','UART'], time:'~15分钟', size:'28KB', diff:1 },
+    { page:'proj-oled-display', icon:'📱', title:'OLED显示屏驱动', desc:'I2C通信，SSD1306驱动，字符/数字/图形显示，字库取模，滚动效果', tags:['入门','I2C'], time:'~15分钟', size:'30KB', diff:1 },
+    { page:'proj-dht11-monitor', icon:'🌡️', title:'DHT11温湿度监测', desc:'单总线时序，GPIO模式切换，微秒延时，数据校验，OLED+串口显示', tags:['入门','传感器'], time:'~12分钟', size:'22KB', diff:1 },
+    { page:'proj-pwm-motor', icon:'⚙️', title:'直流电机PWM控制', desc:'定时器PWM原理，L298N驱动，占空比调速，正反转，按键/串口控速', tags:['进阶','PWM'], time:'~18分钟', size:'15KB', diff:2 },
+    { page:'proj-servo-control', icon:'🦾', title:'舵机控制', desc:'50Hz PWM信号，角度计算公式，多路舵机，机械臂协同控制', tags:['进阶','PWM'], time:'~18分钟', size:'17KB', diff:2 },
+    { page:'proj-ir-remote', icon:'📺', title:'红外遥控解码', desc:'NEC协议，外部中断+定时器测脉宽，状态机解码，键值映射控制', tags:['进阶','中断'], time:'~15分钟', size:'21KB', diff:2 },
+    { page:'proj-ultrasonic', icon:'📡', title:'超声波测距', desc:'HC-SR04 Trig/Echo，输入捕获测脉宽，距离计算，报警阈值', tags:['进阶','定时器'], time:'~15分钟', size:'18KB', diff:2 },
+    { page:'proj-stepper-motor', icon:'🔄', title:'步进电机控制', desc:'四相八拍相序，28BYJ-48减速比计算，梯形加减速曲线，精确位置', tags:['进阶','电机'], time:'~18分钟', size:'20KB', diff:2 },
+    { page:'proj-freertos-station', icon:'📊', title:'FreeRTOS环境监测站', desc:'4任务协同，队列传数据，信号量同步，互斥量保护I2C，报警判断', tags:['实战','RTOS'], time:'~20分钟', size:'25KB', hot:true, diff:3 },
+    { page:'proj-smart-car', icon:'🚗', title:'智能小车', desc:'电机驱动+超声波避障+红外遥控+蓝牙APP+PID速度闭环+状态机', tags:['实战','综合'], time:'~25分钟', size:'26KB', hot:true, diff:3 },
+    { page:'proj-can-bus', icon:'🔌', title:'CAN总线通信', desc:'CAN协议帧格式，HAL_CAN收发，过滤器配置，双节点通信，终端电阻', tags:['实战','CAN'], time:'~20分钟', size:'22KB', diff:3 },
+    { page:'proj-sd-logger', icon:'💾', title:'SD卡数据记录仪', desc:'SPI+FatFS，文件创建/写入/读取，CSV格式，串口导出，时间戳', tags:['实战','文件系统'], time:'~20分钟', size:'20KB', diff:3 },
+    { page:'proj-esp32-iot', icon:'🌐', title:'ESP32 WiFi物联网', desc:'Arduino框架，WiFi连接，HTTP请求，MQTT发布订阅，ThingSpeak，OTA', tags:['实战','IoT'], time:'~20分钟', size:'22KB', diff:3 },
+    { page:'proj-low-power', icon:'🔋', title:'低功耗电池设备', desc:'Sleep/Stop/Standby模式，RTC定时唤醒，外部中断唤醒，μA级优化', tags:['高级','低功耗'], time:'~18分钟', size:'22KB', diff:4 },
+    { page:'proj-bootloader-iap', icon:'⬆️', title:'Bootloader IAP升级', desc:'Flash分区，向量表重定位，串口接收bin，CRC校验，版本管理', tags:['高级','Bootloader'], time:'~20分钟', size:'26KB', diff:4 },
+    { page:'proj-dma-adc', icon:'📈', title:'DMA双缓冲ADC采集', desc:'ADC连续采样+DMA传输，双缓冲切换，不丢点采集，波形显示', tags:['高级','DMA'], time:'~18分钟', size:'22KB', diff:4 },
+    { page:'proj-usb-hid', icon:'⌨️', title:'USB HID键盘鼠标', desc:'USB协议栈，HID描述符，报表描述符，模拟键盘/鼠标，按键触发', tags:['高级','USB'], time:'~20分钟', size:'20KB', diff:4 },
+    { page:'proj-s32k144-auto', icon:'🚙', title:'S32K144汽车电子', desc:'S32DS环境，FLEXCAN，LPIT定时器，AUTOSAR概念，功能安全意识', tags:['高级','汽车'], time:'~20分钟', size:'18KB', diff:4 },
+    { page:'proj-oscilloscope-debug', icon:'🔭', title:'示波器调试实战', desc:'GPIO翻转测量，I2C/SPI/UART时序分析，PWM测量，中断延迟，偶发BUG捕捉', tags:['高级','调试'], time:'~15分钟', size:'20KB', diff:4 }
   ];
   let html = `<div class="home-hero">
-    <h1>馃搻 宓屽叆寮忓紑鍙戞暀绋?/h1>
-    <p>浠庨浂鍒板疄鎴樼殑瀹屾暣瀛︿範璺嚎锛?3绡囨繁搴︽暀绋嬭鐩栫紪璇戙€佽皟璇曘€丮CU銆丷TOS銆侀€氫俊鍗忚銆?0涓粌鎵嬮」鐩€佸墠娌挎妧鏈?/p>
-    <div class="quick-start" onclick="loadPage('guide')" style="margin-top:18px;padding:14px 28px;background:linear-gradient(135deg,#238636,#1f6feb);border-radius:12px;cursor:pointer;text-align:center;font-size:1.05em;font-weight:700;color:#fff;display:inline-block">馃殌 鎴戞槸鏂版墜锛屼粠鍝噷寮€濮嬶紵鈫?灏忕櫧瀹屽叏鎸囧崡锛?4绔犲垎绡囬槄璇伙級</div>
+    <h1>📐 嵌入式开发教程</h1>
+    <p>从零到实战的完整学习路线，33篇深度教程覆盖编译、调试、MCU、RTOS、通信协议、20个练手项目、前沿技术</p>
+    <div class="quick-start" onclick="loadPage('guide')" style="margin-top:18px;padding:14px 28px;background:linear-gradient(135deg,#238636,#1f6feb);border-radius:12px;cursor:pointer;text-align:center;font-size:1.05em;font-weight:700;color:#fff;display:inline-block">🚀 我是新手，从哪里开始？→ 小白完全指南（14章分篇阅读）</div>
   </div>
 
-  <!-- 瀛︿範璺嚎鍥?-->
+  <!-- 学习路线图 -->
   <div class="roadmap">
-    <h3>馃椇锔?鎺ㄨ崘瀛︿範璺嚎</h3>
+    <h3>🗺️ 推荐学习路线</h3>
     <div class="roadmap-steps">
-      <a class="roadmap-step s1" onclick="loadPage('main')"><span class="step-num">1</span>灏忕櫧鎸囧崡</a><span class="roadmap-arrow">鈫?/span>
-      <a class="roadmap-step s1" onclick="loadPage('arm-gcc')"><span class="step-num">2</span>ARM GCC</a><span class="roadmap-arrow">鈫?/span>
-      <a class="roadmap-step s2" onclick="loadPage('stm32')"><span class="step-num">3</span>STM32</a><span class="roadmap-arrow">鈫?/span>
-      <a class="roadmap-step s2" onclick="loadPage('serial')"><span class="step-num">4</span>涓插彛</a><span class="roadmap-arrow">鈫?/span>
-      <a class="roadmap-step s3" onclick="loadPage('proj-led-button')"><span class="step-num">5</span>绗?涓」鐩?/a><span class="roadmap-arrow">鈫?/span>
-      <a class="roadmap-step s3" onclick="loadPage('freertos')"><span class="step-num">6</span>FreeRTOS</a><span class="roadmap-arrow">鈫?/span>
-      <a class="roadmap-step s4" onclick="loadPage('proj-smart-car')"><span class="step-num">7</span>瀹炴垬椤圭洰</a>
+      <a class="roadmap-step s1" onclick="loadPage('main')"><span class="step-num">1</span>小白指南</a><span class="roadmap-arrow">→</span>
+      <a class="roadmap-step s1" onclick="loadPage('arm-gcc')"><span class="step-num">2</span>ARM GCC</a><span class="roadmap-arrow">→</span>
+      <a class="roadmap-step s2" onclick="loadPage('stm32')"><span class="step-num">3</span>STM32</a><span class="roadmap-arrow">→</span>
+      <a class="roadmap-step s2" onclick="loadPage('serial')"><span class="step-num">4</span>串口</a><span class="roadmap-arrow">→</span>
+      <a class="roadmap-step s3" onclick="loadPage('proj-led-button')"><span class="step-num">5</span>第1个项目</a><span class="roadmap-arrow">→</span>
+      <a class="roadmap-step s3" onclick="loadPage('freertos')"><span class="step-num">6</span>FreeRTOS</a><span class="roadmap-arrow">→</span>
+      <a class="roadmap-step s4" onclick="loadPage('proj-smart-car')"><span class="step-num">7</span>实战项目</a>
     </div>
   </div>
 
   <div class="home-stats">
-    <div class="home-stat"><div class="num">47</div><div class="label">绡囨暀绋?/div></div>
-    <div class="home-stat"><div class="num">1.2MB</div><div class="label">鎬诲唴瀹?/div></div>
-    <div class="home-stat"><div class="num">400+</div><div class="label">浠ｇ爜绀轰緥</div></div>
-    <div class="home-stat"><div class="num">100+</div><div class="label">甯歌闂</div></div>
+    <div class="home-stat"><div class="num">47</div><div class="label">篇教程</div></div>
+    <div class="home-stat"><div class="num">1.2MB</div><div class="label">总内容</div></div>
+    <div class="home-stat"><div class="num">400+</div><div class="label">代码示例</div></div>
+    <div class="home-stat"><div class="num">100+</div><div class="label">常见问题</div></div>
   </div>`;
 
-  // 鍒嗙粍锛氬熀纭€鏁欑▼ + 椤圭洰鏁欑▼
+  // 分组：基础教程 + 项目教程
   const baseCards = cardsData.filter(c => !c.page.startsWith('proj-'));
   const projCards = cardsData.filter(c => c.page.startsWith('proj-'));
   const projGroups = [
-    {title:'馃煝 鍏ラ棬椤圭洰锛?~3涓湀锛岀‖浠堵?5璧凤級', filter:c => c.tags.includes('鍏ラ棬')},
-    {title:'馃煛 杩涢樁椤圭洰锛?~6涓湀锛?, filter:c => c.tags.includes('杩涢樁') && c.page.startsWith('proj-')},
-    {title:'馃煚 瀹炴垬椤圭洰锛?~12涓湀锛?, filter:c => c.tags.includes('瀹炴垬')},
-    {title:'馃敶 楂樼骇椤圭洰锛?骞?锛?, filter:c => c.tags.includes('楂樼骇')}
+    {title:'🟢 入门项目（0~3个月，硬件¥25起）', filter:c => c.tags.includes('入门')},
+    {title:'🟡 进阶项目（3~6个月）', filter:c => c.tags.includes('进阶') && c.page.startsWith('proj-')},
+    {title:'🟠 实战项目（6~12个月）', filter:c => c.tags.includes('实战')},
+    {title:'🔴 高级项目（1年+）', filter:c => c.tags.includes('高级')}
   ];
 
   let sortMode = 'default';
 function renderSortBar() {
-  return `<div class="sort-bar"><span class="label">鎺掑簭锛?/span>
-    <button class="sort-btn active" onclick="sortCards('default',this)">榛樿</button>
-    <button class="sort-btn" onclick="sortCards('time-asc',this)">鈴?鐭啋闀?/button>
-    <button class="sort-btn" onclick="sortCards('time-desc',this)">鈴?闀库啋鐭?/button>
-    <button class="sort-btn" onclick="sortCards('diff-asc',this)">馃搳 绠€鍗曗啋闅?/button>
-    <button class="sort-btn" onclick="sortCards('name',this)">馃敜 鍚嶇О</button>
+  return `<div class="sort-bar"><span class="label">排序：</span>
+    <button class="sort-btn active" onclick="sortCards('default',this)">默认</button>
+    <button class="sort-btn" onclick="sortCards('time-asc',this)">⏱ 短→长</button>
+    <button class="sort-btn" onclick="sortCards('time-desc',this)">⏱ 长→短</button>
+    <button class="sort-btn" onclick="sortCards('diff-asc',this)">📊 简单→难</button>
+    <button class="sort-btn" onclick="sortCards('name',this)">🔤 名称</button>
   </div>`;
 }
 function sortCards(mode, btn) {
@@ -586,21 +625,21 @@ function renderCardGroup(title, items) {
     let h = `<div class="home-section-title">${title}</div><div class="home-grid">`;
     items.forEach(c => {
       const tagHtml = c.tags.map((t,i) => `<span class="tag ${i===0?'g':'b'}">${t}</span>`).join('');
-      const diffHtml = c.diff ? `<div class="difficulty d${c.diff}">${'<span class="dot on"></span>'.repeat(c.diff)+'<span class="dot"></span>'.repeat(4-c.diff)}<span style="font-size:.7em;margin-left:4px;color:var(--t2)">${['','鍏ラ棬','鍩虹','杩涢樁','楂樼骇'][c.diff]}</span></div>` : '';
+      const diffHtml = c.diff ? `<div class="difficulty d${c.diff}">${'<span class="dot on"></span>'.repeat(c.diff)+'<span class="dot"></span>'.repeat(4-c.diff)}<span style="font-size:.7em;margin-left:4px;color:var(--t2)">${['','入门','基础','进阶','高级'][c.diff]}</span></div>` : '';
       h += `<a class="home-card" onclick="loadPage('${c.page}')">
         <div class="icon">${c.icon}</div>
-        <div class="title">${c.title}${c.hot?' 馃敟':''}</div>
+        <div class="title">${c.title}${c.hot?' 🔥':''}</div>
         <div class="desc">${c.desc}</div>
         ${diffHtml}
         <div class="tags">${tagHtml}</div>
-        <div class="size">${c.size} <span class="read-time">鈴?${c.time||''}</span></div>
+        <div class="size">${c.size} <span class="read-time">⏱ ${c.time||''}</span></div>
       </a>`;
     });
     h += '</div>';
     return h;
   }
 
-  html += renderCardGroup('馃摎 鍩虹鏁欑▼', baseCards);
+  html += renderCardGroup('📚 基础教程', baseCards);
   projGroups.forEach(g => {
     const filtered = projCards.filter(g.filter);
     if (filtered.length > 0) html += renderCardGroup(g.title, filtered);
@@ -609,7 +648,7 @@ function renderCardGroup(title, items) {
   return html;
 }
 
-// === 楠ㄦ灦灞?===
+// === 骨架屏 ===
 function skeletonContent() {
   return `<div class="skeleton-wrap">
     <div class="skeleton-line title"></div>
@@ -628,11 +667,11 @@ function skeletonContent() {
   </div>`;
 }
 
-// === 浜殫妯″紡鍒囨崲 ===
+// === 亮暗模式切换 ===
 function updateThemeIcon() {
   const btn = document.getElementById('themeToggle');
   const isLight = document.body.classList.contains('light-mode');
-  if (btn) btn.textContent = isLight ? '鈽€锔? : '馃寵';
+  if (btn) btn.textContent = isLight ? '☀️' : '🌙';
 }
 function toggleTheme() {
   document.body.classList.toggle('light-mode');
@@ -646,36 +685,37 @@ function toggleTheme() {
   updateThemeIcon();
 })();
 
-// === 鍔犺浇鏁欑▼鍐呭 ===
+// === 加载教程内容 ===
 async function loadPage(pageId) {
   currentPage = pageId;
   searchMode = false;
   document.getElementById('searchInput').value = '';
 
-  // 鏇存柊瀵艰埅楂樹寒
+  // 更新导航高亮
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   const navItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
   if (navItem) {
     navItem.classList.add('active');
-    // 濡傛灉鏄」鐩暀绋嬶紝鑷姩灞曞紑瀵瑰簲鐨勫鑸粍
+    // 如果是项目教程，自动展开对应的导航组
     const navGroup = navItem.closest('.nav-group.collapsible');
     if (navGroup && !navGroup.classList.contains('open')) navGroup.classList.add('open');
   }
 
-  // 鏇存柊闈㈠寘灞?  const pageConfig = PAGES[pageId];
+  // 更新面包屑
+  const pageConfig = PAGES[pageId];
   document.getElementById('breadcrumb').innerHTML = pageConfig.breadcrumb;
 
-  // 鍏抽棴绉诲姩绔晶杈规爮
+  // 关闭移动端侧边栏
   document.getElementById('sidebar').classList.remove('open');
 
-  // 鏇存柊鏀惰棌鎸夐挳
+  // 更新收藏按钮
   const bmToggle = document.getElementById('bmToggle');
   if (bmToggle) {
     if (pageId === 'home') { bmToggle.style.display = 'none'; }
     else { bmToggle.style.display = ''; updateBookmarkUI(); }
   }
 
-  // 鏍囪宸茶
+  // 标记已读
   if (pageId !== 'home') markViewed(pageId);
 
   const content = document.getElementById('contentArea');
@@ -683,40 +723,43 @@ async function loadPage(pageId) {
 
   if (pageId === 'home') {
     content.innerHTML = renderHome();
-    document.title = '宓屽叆寮忓紑鍙戞暀绋?;
+    document.title = '嵌入式开发教程';
     history.pushState({page:pageId}, '', `#/${pageId}`);
     updateHomeStats();
     setTimeout(() => updateHomeStats(), 200);
     return;
   }
 
-  // 鍔犺浇鏁欑▼HTML - 楠ㄦ灦灞?  content.innerHTML = skeletonContent();
+  // 加载教程HTML - 骨架屏
+  content.innerHTML = skeletonContent();
   try {
     const resp = await fetch(pageConfig.file);
-    if (!resp.ok) throw new Error('鍔犺浇澶辫触');
+    if (!resp.ok) throw new Error('加载失败');
     const html = await resp.text();
-    // 鎻愬彇body鍐呭
+    // 提取body内容
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    // 绉婚櫎鍘熸湁鐨刵av-top鍜宐readcrumb
+    // 移除原有的nav-top和breadcrumb
     doc.querySelectorAll('.nav-top, .breadcrumb, .nav-top + style').forEach(el => el.remove());
     const bodyContent = doc.body.innerHTML;
     content.innerHTML = bodyContent;
+    content.querySelectorAll('img').forEach(function(img){img.style.cursor='zoom-in';img.addEventListener('click',function(){openLightbox(this.src);});});
 
-    // 闃呰鏃堕棿浼扮畻
+    // 阅读时间估算
     const textOnly = bodyContent.replace(/<[^>]+>/g, '').replace(/\s+/g, '');
     const readMin = Math.max(1, Math.round(textOnly.length / 400));
     const h1El = content.querySelector('h1');
     if (h1El && readMin > 0) {
       const rtBadge = document.createElement('span');
       rtBadge.className = 'read-time';
-      rtBadge.textContent = '鈴?' + readMin + ' 鍒嗛挓';
-      rtBadge.title = '绾?' + textOnly.length.toLocaleString() + ' 瀛?;
+      rtBadge.textContent = '⏱ ' + readMin + ' 分钟';
+      rtBadge.title = '约 ' + textOnly.length.toLocaleString() + ' 字';
       h1El.appendChild(document.createTextNode(' '));
       h1El.appendChild(rtBadge);
     }
 
-    // 绔犺妭杩涘害鎸囩ず鍣紙鎸囧崡绔犺妭椤甸潰锛?    if (pageId.startsWith('guide-ch')) {
+    // 章节进度指示器（指南章节页面）
+    if (pageId.startsWith('guide-ch')) {
       const progressBar = renderGuideProgress(pageId);
       if (progressBar) {
         const h1 = content.querySelector('h1');
@@ -728,32 +771,33 @@ async function loadPage(pageId) {
       }
     }
 
-    // 缁欐墍鏈塸re鍔犲鍒舵寜閽?    content.querySelectorAll('pre').forEach(pre => {
+    // 给所有pre加复制按钮
+    content.querySelectorAll('pre').forEach(pre => {
       const btn = document.createElement('button');
       btn.className = 'copy-btn';
-      btn.textContent = '澶嶅埗';
+      btn.textContent = '复制';
       btn.onclick = () => {
         navigator.clipboard.writeText(pre.textContent).then(() => {
-          btn.textContent = '宸插鍒?鉁?;
+          btn.textContent = '已复制 ✓';
           btn.classList.add('copied');
-          setTimeout(() => { btn.textContent = '澶嶅埗'; btn.classList.remove('copied'); }, 1500);
+          setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 1500);
         });
       };
       pre.style.position = 'relative';
       pre.appendChild(btn);
     });
 
-    document.title = pageConfig.title + ' - 宓屽叆寮忓紑鍙戞暀绋?;
+    document.title = pageConfig.title + ' - 嵌入式开发教程';
     history.pushState({page:pageId}, '', `#/${pageId}`);
 
-    // 娣诲姞鏁欑▼鍐呯洰褰?TOC)
+    // 添加教程内目录(TOC)
     setTimeout(() => {
       const headings = content.querySelectorAll('h2');
       if (headings.length >= 3) {
         const tocDiv = document.createElement('details');
         tocDiv.className = 'toc-inline';
         tocDiv.open = false;
-        let tocHtml = '<summary>馃搼 鏈暀绋嬬洰褰曪紙' + headings.length + ' 涓珷鑺傦級</summary><ol>';
+        let tocHtml = '<summary>📑 本教程目录（' + headings.length + ' 个章节）</summary><ol>';
         headings.forEach((h, i) => {
           if (!h.id) h.id = 'toc-h2-' + i;
           tocHtml += `<li><a onclick="document.getElementById('${h.id}').scrollIntoView({behavior:'smooth',block:'start'})">${h.textContent}</a></li>`;
@@ -765,7 +809,8 @@ async function loadPage(pageId) {
       }
     }, 100);
 
-    // 娣诲姞涓?涓嬬瘒瀵艰埅锛堟寜瀛︿範璺嚎鎺掑簭锛?    const pageOrder = ['overview','guide','guide-ch00','guide-ch01','guide-ch02','guide-ch03','guide-ch04','guide-ch05','guide-ch06','guide-ch07','guide-ch08','guide-ch09','guide-ch10','guide-ch11','guide-ch12','guide-ch13','arm-gcc','cmake','makefile','serial','flash-debug','stm32','esp32','freertos','protocols','practice-projects','proj-led-button','proj-uart-hello','proj-oled-display','proj-dht11-monitor','proj-pwm-motor','proj-servo-control','proj-ir-remote','proj-ultrasonic','proj-stepper-motor','proj-freertos-station','proj-smart-car','proj-can-bus','proj-sd-logger','proj-esp32-iot','proj-low-power','proj-bootloader-iap','proj-dma-adc','proj-usb-hid','proj-s32k144-auto','proj-oscilloscope-debug','bci-2026'];
+    // 添加上/下篇导航（按学习路线排序）
+    const pageOrder = ['overview','guide','guide-ch00','guide-ch01','guide-ch02','guide-ch03','guide-ch04','guide-ch05','guide-ch06','guide-ch07','guide-ch08','guide-ch09','guide-ch10','guide-ch11','guide-ch12','guide-ch13','arm-gcc','cmake','makefile','serial','flash-debug','stm32','esp32','freertos','protocols','practice-projects','proj-led-button','proj-uart-hello','proj-oled-display','proj-dht11-monitor','proj-pwm-motor','proj-servo-control','proj-ir-remote','proj-ultrasonic','proj-stepper-motor','proj-freertos-station','proj-smart-car','proj-can-bus','proj-sd-logger','proj-esp32-iot','proj-low-power','proj-bootloader-iap','proj-dma-adc','proj-usb-hid','proj-s32k144-auto','proj-oscilloscope-debug','bci-2026'];
     const idx = pageOrder.indexOf(pageId);
     if (idx >= 0) {
       const navHtml = document.createElement('div');
@@ -773,29 +818,29 @@ async function loadPage(pageId) {
       let links = '';
       if (idx > 0) {
         const prev = PAGES[pageOrder[idx-1]];
-        links += `<a class="page-nav-prev" onclick="loadPage('${pageOrder[idx-1]}')">鈫?${prev.title}</a>`;
+        links += `<a class="page-nav-prev" onclick="loadPage('${pageOrder[idx-1]}')">← ${prev.title}</a>`;
       }
       if (idx < pageOrder.length - 1) {
         const next = PAGES[pageOrder[idx+1]];
-        links += `<a class="page-nav-next" onclick="loadPage('${pageOrder[idx+1]}')">${next.title} 鈫?/a>`;
+        links += `<a class="page-nav-next" onclick="loadPage('${pageOrder[idx+1]}')">${next.title} →</a>`;
       }
       navHtml.innerHTML = links;
       content.appendChild(navHtml);
-    // 鏄剧ず鏀惰棌鎸夐挳
+    // 显示收藏按钮
     const bmBtn = document.getElementById('bmToggle');
     if (bmBtn) { bmBtn.style.display = ''; updateBookmarkUI(); }
     }
 
-    // 鐩稿叧鎺ㄨ崘锛堥潪棣栭〉銆侀潪绔犺妭椤碉級
+    // 相关推荐（非首页、非章节页）
     if (pageId !== 'home' && !pageId.startsWith('guide-ch') && pageId !== 'guide') {
       const related = getRelated(pageId);
       if (related.length > 0) {
         const relDiv = document.createElement('div');
         relDiv.className = 'related-links';
-        var relHtml = '<h3>馃敆 鐩稿叧鎺ㄨ崘</h3><div class="related-grid">';
+        var relHtml = '<h3>🔗 相关推荐</h3><div class="related-grid">';
         related.forEach(function(r) {
           relHtml += '<a class="related-card" onclick="loadPage(\'' + r.id + '\')" title="' + r.title + '">' +
-            '<span class="related-icon">' + (r.icon || '馃搫') + '</span>' +
+            '<span class="related-icon">' + (r.icon || '📄') + '</span>' +
             '<span class="related-title">' + r.title + '</span>' +
             '<span class="related-desc">' + (r.desc || '') + '</span></a>';
         });
@@ -805,12 +850,63 @@ async function loadPage(pageId) {
       }
     }
   } catch(e) {
-    content.innerHTML = `<div class="warn">鈿狅笍 鍔犺浇澶辫触: ${e.message}锛岃鍒锋柊閲嶈瘯銆?/div>`;
+    content.innerHTML = `<div class="warn">⚠️ 加载失败: ${e.message}，请刷新重试。</div>`;
   }
 }
 
-// === 鍏ㄦ枃鎼滅储缂撳瓨 ===
+// === 全文搜索缓存 ===
 let searchCache = {};
+
+// ══ v1.7.0: 语法高亮 ══
+const C_KEYWORDS = new Set(['auto','break','case','char','const','continue','default','do','double','else','enum','extern','float','for','goto','if','inline','int','long','register','return','short','signed','sizeof','static','struct','switch','typedef','union','unsigned','void','volatile','while']);
+const C_TYPES = new Set(['uint8_t','uint16_t','uint32_t','uint64_t','int8_t','int16_t','int32_t','int64_t','size_t','ssize_t','bool','true','false','NULL','HAL_StatusTypeDef','esp_err_t','QueueHandle_t','SemaphoreHandle_t','TimerHandle_t','TaskHandle_t','GPIO_TypeDef','ADC_HandleTypeDef','UART_HandleTypeDef','I2C_HandleTypeDef','SPI_HandleTypeDef','TIM_HandleTypeDef','DMA_HandleTypeDef','RTC_HandleTypeDef','uintptr_t','float32_t']);
+const C_PP = new Set(['#include','#define','#ifdef','#ifndef','#if','#else','#elif','#endif','#pragma','#error','#warning','#undef']);
+const MAKEFILE_KW = new Set(['all','clean','flash','debug','release','.PHONY','ifeq','ifneq','ifdef','ifndef','else','endif','include','export','override','define','endef','eval','call','foreach','wildcard','patsubst','notdir','dir','addprefix','addsuffix','shell','subst','filter','strip','sort','word','words','firstword','lastword','error','warning','info']);
+
+function highlightCodeBlocks(container) {
+  container.querySelectorAll('pre code').forEach(el => {
+    if (el.classList.contains('hl-done')) return;
+    el.classList.add('hl-done');
+    let text = el.innerHTML;
+    if (text.includes('<span class="syn-')) return; // already highlighted
+    
+    const firstLine = text.split('
+')[0] || '';
+    const isMakefile = firstLine.includes('# ') && (text.includes(' = ') || text.includes(':	') || text.includes('$(')) && !text.includes('{');
+    const isCPP = !isMakefile && (text.includes('#include') || text.includes('HAL_') || text.includes('void ') || text.includes('uint8_t') || text.includes('typedef') || text.includes('int main'));
+    
+    if (isMakefile) {
+      text = text.replace(/(^|
+)(\s*)([.\/\\w-]+)\s*:/gm, '$1$2<span class="syn-fn">$3</span>:');
+      text = text.replace(/\$\((\w+)\)/g, '<span class="syn-kw">$$($1)</span>');
+      text = text.replace(/\$[@<^+?*]/g, '<span class="syn-num">$&</span>');
+      text = text.replace(/(^|
+)(\s*)(\w+)	/g, '$1$2$3	');
+      text = text.replace(/^(\s*)(#.*)$/gm, '$1<span class="syn-com">$2</span>');
+    } else if (isCPP) {
+      // Strings
+      text = text.replace(/(["'])(?:(?=(\?)).)*?/g, '<span class="syn-str">$&</span>');
+      // Comments
+      text = text.replace(/(\/\/.*$)/gm, '<span class="syn-com">$1</span>');
+      text = text.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="syn-com">$1</span>');
+      // Preprocessor
+      text = text.replace(/^(\s*#\s*\w+)/gm, '<span class="syn-pp">$1</span>');
+      // Numbers
+      text = text.replace(/(0x[0-9a-fA-F]+|\d+\.?\d*(?:[eE][+-]?\d+)?[uUlLfF]*)/g, '<span class="syn-num">$1</span>');
+      // Types
+      C_TYPES.forEach(t => { const r = new RegExp('\b'+t+'\b','g'); text = text.replace(r, '<span class="syn-type">'+t+'</span>'); });
+      // Keywords
+      C_KEYWORDS.forEach(k => { const r = new RegExp('\b'+k+'\b','g'); text = text.replace(r, '<span class="syn-kw">'+k+'</span>'); });
+      // Functions (identifier followed by opening paren)
+      text = text.replace(/([a-zA-Z_]\w+)\s*\(/g, (m, name) => {
+        if (['if','for','while','switch','return','sizeof','typeof'].includes(name)) return m;
+        return `<span class="syn-fn">${name}</span>(`;
+      });
+    }
+    el.innerHTML = text;
+  });
+}
+
 let searchIndexReady = false;
 
 async function buildSearchIndex() {
@@ -830,8 +926,65 @@ async function buildSearchIndex() {
 }
 
 setTimeout(buildSearchIndex, 2500);
+setTimeout(buildBreadcrumbMap, 3500);
+// ══ v1.7.0: 面包屑 ══
+const BREADCRUMB_MAP = {};
+function buildBreadcrumbMap() {
+  for (let i=0; i<=13; i++) {
+    const id = `guide-ch${String(i).padStart(2,'0')}`;
+    BREADCRUMB_MAP[id] = { section: '小白完全指南', title: `第${i}章` };
+  }
+  // Also add from cardsData
+  if (typeof cardsData !== 'undefined') cardsData.forEach(c => {
+    if (!BREADCRUMB_MAP[c.id]) BREADCRUMB_MAP[c.id] = { section: c.section || '教程', title: c.title };
+  });
+}
 
-// === 鎼滅储 ===
+// ══ v1.7.0: 相关教程推荐 ══
+const RELATED_TAGS = {
+  'guide-ch00': ['arm-gcc','cmake','makefile'],
+  'guide-ch01': ['guide-ch02','guide-ch03','cmake','makefile'],
+  'guide-ch02': ['guide-ch01','guide-ch03','makefile'],
+  'guide-ch03': ['guide-ch02','cmake'],
+  'guide-ch04': ['proj-uart-hello','protocols','serial'],
+  'guide-ch05': ['flash-debug','proj-bootloader-iap'],
+  'guide-ch06': ['guide-ch04','guide-ch05','guide-ch08','proj-led-button'],
+  'guide-ch07': ['guide-ch06','proj-esp32-iot','bci-2026'],
+  'guide-ch08': ['guide-ch06','proj-freertos-station','freertos'],
+  'guide-ch09': ['protocols','proj-can-bus','proj-i2c'],
+  'guide-ch10': ['guide-ch11','proj-low-power'],
+  'guide-ch11': ['guide-ch10','proj-low-power'],
+  'guide-ch12': ['proj-dht11-monitor','guide-ch09'],
+  'guide-ch13': ['proj-smart-car','proj-freertos-station','practice-projects'],
+  'proj-led-button': ['guide-ch06','proj-uart-hello'],
+  'proj-uart-hello': ['guide-ch04','proj-led-button'],
+  'proj-freertos-station': ['guide-ch08','freertos'],
+  'proj-smart-car': ['guide-ch13','proj-pwm-motor'],
+  'proj-esp32-iot': ['guide-ch07','bci-2026'],
+  'bci-2026': ['guide-ch07','practice-projects'],
+};
+function renderRelated(pageId) {
+  const ids = RELATED_TAGS[pageId];
+  if (!ids) return '';
+  const cards = ids.map(id => {
+    const c = (typeof cardsData !== 'undefined' && cardsData.find(x => x.id === id))
+           || (typeof cfgMap !== 'undefined' && cfgMap[id]);
+    const title = c ? (c.title || c.label || id) : id;
+    const tag = (id.startsWith('guide-') ? '指南' : id.startsWith('proj-') ? '实战' : '专题');
+    return `<div class="related-card" onclick="loadPage('${id}')"><span class="rt-tag">${tag}</span>${title}</div>`;
+  }).join('');
+  return `<div class="related-tutorials"><h3>📎 相关教程</h3><div class="related-grid">${cards}</div></div>`;
+}
+
+function renderBreadcrumb(pageId) {
+  if (!BREADCRUMB_MAP[pageId]) return '';
+  const b = BREADCRUMB_MAP[pageId];
+  return `<div class="breadcrumb"><a href="#" onclick="loadPage('home')">🏠 首页</a><span class="sep">›</span><span>${b.section}</span><span class="sep">›</span><span>${b.title}</span></div>`;
+}
+setTimeout(buildBreadcrumbMap, 3000);
+
+
+// === 搜索 ===
 async function handleSearch(query) {
   if (!query.trim()) {
     if (searchMode) loadPage(currentPage);
@@ -860,21 +1013,21 @@ async function handleSearch(query) {
         const idx = fullText.indexOf(q);
         const start = Math.max(0, idx - 30);
         const end = Math.min(fullText.length, idx + q.length + 60);
-        snippet = (start > 0 ? '鈥? : '') + fullText.slice(start, end).trim() + (end < fullText.length ? '鈥? : '');
+        snippet = (start > 0 ? '…' : '') + fullText.slice(start, end).trim() + (end < fullText.length ? '…' : '');
       }
       results.push({ id, title: cfg.title, desc: card ? card.desc : '', card, matchLevel, snippet });
     }
   });
   results.sort((a,b) => b.matchLevel - a.matchLevel);
 
-  let html = `<h2>馃攳 鎼滅储缁撴灉: "${query}"</h2><div class="search-results-count">鎵惧埌 ${results.length} 涓尮閰嶆暀绋嬶紙鍏ㄦ枃鎼滅储锛?/div>`;
+  let html = `<h2>🔍 搜索结果: "${query}"</h2><div class="search-results-count">找到 ${results.length} 个匹配教程（全文搜索）</div>`;
   if (results.length === 0) {
-    html += '<p style="color:var(--t2)">鏈壘鍒板尮閰嶇殑鏁欑▼锛岃瘯璇曞叾浠栧叧閿瘝銆?/p><p style="color:var(--t2);font-size:.85em">鎻愮ず锛氬彲鎼滄暀绋嬫爣棰樸€佹弿杩版垨鍏ㄦ枃鍐呭锛屽"PWM""HAL_Delay""瀹氭椂鍣?</p>';
+    html += '<p style="color:var(--t2)">未找到匹配的教程，试试其他关键词。</p><p style="color:var(--t2);font-size:.85em">提示：可搜教程标题、描述或全文内容，如"PWM""HAL_Delay""定时器"</p>';
   } else {
     results.forEach(r => {
       const diffHtml = r.card && r.card.diff ? `<div class="difficulty d${r.card.diff}">${'<span class="dot on"></span>'.repeat(r.card.diff)+'<span class="dot"></span>'.repeat(4-r.card.diff)}</div>` : '';
       const tags = r.card ? r.card.tags.map((t,i) => `<span class="tag ${i===0?'g':'b'}">${t}</span>`).join('') : '';
-      const matchBadge = r.matchLevel === 2 ? '<span class="tag g" style="margin-left:4px">鍏ㄦ枃鍖归厤</span>' : '<span class="tag b" style="margin-left:4px">鏍囬鍖归厤</span>';
+      const matchBadge = r.matchLevel === 2 ? '<span class="tag g" style="margin-left:4px">全文匹配</span>' : '<span class="tag b" style="margin-left:4px">标题匹配</span>';
       const snippetHtml = r.snippet ? `<div style="font-size:.78em;color:var(--t2);margin-top:4px;padding:6px 10px;background:var(--bg3);border-radius:6px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.snippet.replace(q, '<b style="background:rgba(88,166,255,.25);padding:1px 3px;border-radius:3px">'+q+'</b>')}</div>` : '';
       html += `<div class="card" style="cursor:pointer" onclick="loadPage('${r.id}')"><div class="b"><strong style="color:var(--a)">${r.title}</strong>${matchBadge}${r.desc ? '<br><span style="color:var(--t2);font-size:.85em">'+r.desc+'</span>' : ''}${diffHtml}${snippetHtml}<div style="margin-top:6px">${tags}</div></div></div>`;
     });
@@ -882,24 +1035,24 @@ async function handleSearch(query) {
   content.innerHTML = html;
 }
 
-// === 渚ц竟鏍忓垏鎹?===
+// === 侧边栏切换 ===
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
 }
 
-// === 瀵艰埅缁勬姌鍙?===
+// === 导航组折叠 ===
 function toggleNavGroup(el) {
   el.parentElement.classList.toggle('open');
 }
 
-// === 闃呰杩涘害鏉?===
+// === 阅读进度条 ===
 window.addEventListener('scroll', () => {
   const scrollTop = document.documentElement.scrollTop;
   const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
   const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
   document.getElementById('progressBar').style.width = progress + '%';
 
-  // 鍥炲埌椤堕儴鎸夐挳
+  // 回到顶部按钮
   const backTop = document.getElementById('backTop');
   if (scrollTop > 400) backTop.classList.add('show');
   else backTop.classList.remove('show');
@@ -909,7 +1062,7 @@ window.addEventListener('scroll', () => {
   else homeFab.classList.remove('show');
 });
 
-// === 璺敱 ===
+// === 路由 ===
 window.addEventListener('popstate', (e) => {
   if (e.state && e.state.page) loadPage(e.state.page);
   else loadPage('home');
@@ -917,25 +1070,28 @@ window.addEventListener('popstate', (e) => {
   updateHomeStats();
 });
 
-// === 閿洏蹇嵎閿?===
+// === 键盘快捷键 ===
 document.addEventListener('keydown', (e) => {
-  // / 閿仛鐒︽悳绱?  if (e.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+  // / 键聚焦搜索
+  if (e.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
     e.preventDefault();
     document.getElementById('searchInput').focus();
   }
-  // Ctrl+F / Alt+F 涓撴敞妯″紡
+  // Ctrl+F / Alt+F 专注模式
   if ((e.ctrlKey || e.altKey) && e.key === 'f' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
     e.preventDefault();
     toggleFocus();
     return;
   }
-  // Escape 娓呴櫎鎼滅储
+  // Escape 清除搜索 / 关闭灯箱
   if (e.key === 'Escape') {
+    const lb = document.getElementById('lightboxOverlay');
+    if (lb && !lb.classList.contains('hidden')) { closeLightbox(); return; }
     document.getElementById('searchInput').blur();
     document.getElementById('searchInput').value = '';
     if (searchMode) loadPage(currentPage);
   }
-  // 宸﹀彸绠ご缈婚〉锛堥潪杈撳叆鐘舵€侊級
+  // 左右箭头翻页（非输入状态）
   if (!['INPUT','TEXTAREA'].includes(document.activeElement.tagName) && currentPage !== 'home') {
     const pageOrder = ['overview','guide','guide-ch00','guide-ch01','guide-ch02','guide-ch03','guide-ch04','guide-ch05','guide-ch06','guide-ch07','guide-ch08','guide-ch09','guide-ch10','guide-ch11','guide-ch12','guide-ch13','arm-gcc','cmake','makefile','serial','flash-debug','stm32','esp32','freertos','protocols','practice-projects','proj-led-button','proj-uart-hello','proj-oled-display','proj-dht11-monitor','proj-pwm-motor','proj-servo-control','proj-ir-remote','proj-ultrasonic','proj-stepper-motor','proj-freertos-station','proj-smart-car','proj-can-bus','proj-sd-logger','proj-esp32-iot','proj-low-power','proj-bootloader-iap','proj-dma-adc','proj-usb-hid','proj-s32k144-auto','proj-oscilloscope-debug','bci-2026'];
     const idx = pageOrder.indexOf(currentPage);
@@ -945,14 +1101,14 @@ document.addEventListener('keydown', (e) => {
 });
 
 
-// === 涓撴敞闃呰妯″紡 ===
+// === 专注阅读模式 ===
 let focusMode = false;
 function toggleFocus() {
   focusMode = !focusMode;
   document.body.classList.toggle('focus-mode');
   const btn = document.getElementById('focusBtn');
-  if (focusMode) { btn.classList.add('active'); btn.textContent = '馃摉 涓撴敞涓?; }
-  else { btn.classList.remove('active'); btn.textContent = '馃摉 涓撴敞'; }
+  if (focusMode) { btn.classList.add('active'); btn.textContent = '📖 专注中'; }
+  else { btn.classList.remove('active'); btn.textContent = '📖 专注'; }
   try { localStorage.setItem('focusMode', focusMode ? '1' : '0'); } catch(e) {}
 }
 // Restore focus mode
@@ -961,11 +1117,11 @@ function toggleFocus() {
     focusMode = true;
     document.body.classList.add('focus-mode');
     const btn = document.getElementById('focusBtn');
-    if (btn) { btn.classList.add('active'); btn.textContent = '馃摉 涓撴敞涓?; }
+    if (btn) { btn.classList.add('active'); btn.textContent = '📖 专注中'; }
   }
 })();
 
-// === 绔犺妭杩涘害鎸囩ず鍣?===
+// === 章节进度指示器 ===
 function renderGuideProgress(currentChapter) {
   const chapters = ['guide-ch00','guide-ch01','guide-ch02','guide-ch03','guide-ch04','guide-ch05','guide-ch06','guide-ch07','guide-ch08','guide-ch09','guide-ch10','guide-ch11','guide-ch12','guide-ch13'];
   const labels = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13'];
@@ -979,52 +1135,52 @@ function renderGuideProgress(currentChapter) {
     let cls = 'gdot';
     if (isCurrent) cls += ' current';
     else if (isDone) cls += ' done';
-    dots += `<span class="${cls}" title="绗?{labels[i]}绔?{isDone?' (宸茶)':' (鏈)'}" onclick="loadPage('${ch}')"></span>`;
+    dots += `<span class="${cls}" title="第${labels[i]}章${isDone?' (已读)':' (未读)'}" onclick="loadPage('${ch}')"></span>`;
   });
   return `<div class="guide-progress"><span class="glabel">0</span>${dots}<span class="glabel">13</span></div>`;
 }
 
-// === 鏀惰棌澶?===
+// === 收藏夹 ===
 function getBookmarks() {
   try { return JSON.parse(localStorage.getItem('tutorial_bookmarks')||'[]'); }
   catch(e) { return []; }
 }
 function saveBookmarks(list) { localStorage.setItem('tutorial_bookmarks', JSON.stringify(list)); }
 
-// === 鐩稿叧鎺ㄨ崘鏄犲皠 ===
+// === 相关推荐映射 ===
 function getRelated(pageId) {
   const map = {
-    'arm-gcc': [{id:'cmake',icon:'馃摝',title:'CMake',desc:'缂栬瘧鏋勫缓鎼。'},{id:'makefile',icon:'馃摐',title:'Makefile',desc:'浼犵粺鏋勫缓宸ュ叿'},{id:'flash-debug',icon:'馃攲',title:'鐑у綍璋冭瘯',desc:'缂栬瘧浜х墿鐑ц繘鍘?}],
-    'cmake': [{id:'arm-gcc',icon:'馃敡',title:'ARM GCC',desc:'缂栬瘧鍣?},{id:'makefile',icon:'馃摐',title:'Makefile',desc:'搴曞眰寮曟搸'},{id:'stm32',icon:'馃數',title:'STM32',desc:'瀹炴垬椤圭洰'}],
-    'makefile': [{id:'arm-gcc',icon:'馃敡',title:'ARM GCC',desc:'鏋勫缓鐩爣'},{id:'cmake',icon:'馃摝',title:'CMake',desc:'鐜颁唬鏂规'}],
-    'serial': [{id:'flash-debug',icon:'馃攲',title:'鐑у綍璋冭瘯',desc:'涓插彛璋冭瘯鍣?},{id:'stm32',icon:'馃數',title:'STM32',desc:'涓插彛瀹炴垬'}],
-    'flash-debug': [{id:'serial',icon:'馃摗',title:'涓插彛閫氫俊',desc:'璋冭瘯鍩虹'},{id:'arm-gcc',icon:'馃敡',title:'ARM GCC',desc:'缂栬瘧宸ュ叿閾?},{id:'stm32',icon:'馃數',title:'STM32',desc:'鐑у綍瀹炴垬'}],
-    'stm32': [{id:'flash-debug',icon:'馃攲',title:'鐑у綍璋冭瘯',desc:'蹇呰'},{id:'freertos',icon:'馃攧',title:'FreeRTOS',desc:'杩涢樁'},{id:'esp32',icon:'馃煝',title:'ESP32',desc:'鍙︿竴骞冲彴'}],
-    'esp32': [{id:'flash-debug',icon:'馃攲',title:'鐑у綍璋冭瘯',desc:'蹇呰'},{id:'freertos',icon:'馃攧',title:'FreeRTOS',desc:'IDF鍩虹煶'},{id:'stm32',icon:'馃數',title:'STM32',desc:'瀵规瘮瀛︿範'}],
-    'freertos': [{id:'stm32',icon:'馃數',title:'STM32',desc:'杩愯骞冲彴'},{id:'esp32',icon:'馃煝',title:'ESP32',desc:'IDF涓璕TOS'}],
-    'protocols': [{id:'serial',icon:'馃摗',title:'涓插彛閫氫俊',desc:'UART璇﹁В'},{id:'stm32',icon:'馃數',title:'STM32',desc:'鍗忚瀹炴垬'}],
-    'practice-projects': [{id:'proj-led-button',icon:'馃挕',title:'LED+鎸夐敭',desc:'绗竴涓」鐩?},{id:'proj-uart-hello',icon:'馃摕',title:'涓插彛Hello',desc:'鍏ラ棬缁忓吀'}],
-    'proj-led-button': [{id:'proj-uart-hello',icon:'馃摕',title:'涓插彛Hello',desc:'涓嬩竴姝?},{id:'proj-pwm-motor',icon:'鈿欙笍',title:'PWM鐢垫満',desc:'鏇撮珮闃?}],
-    'proj-uart-hello': [{id:'proj-led-button',icon:'馃挕',title:'LED+鎸夐敭',desc:'涓婁竴姝?},{id:'proj-oled-display',icon:'馃枼锔?,title:'OLED鏄剧ず',desc:'鍙杈撳嚭'}],
-    'proj-oled-display': [{id:'proj-uart-hello',icon:'馃摕',title:'涓插彛Hello',desc:'I2C鍩虹'},{id:'proj-dht11-monitor',icon:'馃尅锔?,title:'娓╂箍搴?,desc:'浼犳劅鍣?}],
-    'proj-dht11-monitor': [{id:'proj-oled-display',icon:'馃枼锔?,title:'OLED鏄剧ず',desc:'鏁版嵁鏄剧ず'},{id:'proj-sd-logger',icon:'馃捑',title:'SD鏃ュ織',desc:'鎸佷箙鍖?}],
-    'proj-pwm-motor': [{id:'proj-servo-control',icon:'馃幆',title:'鑸垫満鎺у埗',desc:'PWM瀹舵棌'},{id:'proj-smart-car',icon:'馃殫',title:'鏅鸿兘灏忚溅',desc:'PWM椹卞姩'}],
-    'proj-servo-control': [{id:'proj-pwm-motor',icon:'鈿欙笍',title:'PWM鐢垫満',desc:'鍚屼负PWM'},{id:'proj-smart-car',icon:'馃殫',title:'鏅鸿兘灏忚溅',desc:'澶氳埖鏈?}],
-    'proj-ir-remote': [{id:'proj-led-button',icon:'馃挕',title:'LED+鎸夐敭',desc:'涓柇'},{id:'proj-smart-car',icon:'馃殫',title:'鏅鸿兘灏忚溅',desc:'閬ユ帶'}],
-    'proj-ultrasonic': [{id:'proj-smart-car',icon:'馃殫',title:'鏅鸿兘灏忚溅',desc:'閬块殰'},{id:'proj-oled-display',icon:'馃枼锔?,title:'OLED鏄剧ず',desc:'璺濈'}],
-    'proj-stepper-motor': [{id:'proj-pwm-motor',icon:'鈿欙笍',title:'PWM鐢垫満',desc:'鍙︿竴绉?},{id:'proj-servo-control',icon:'馃幆',title:'鑸垫満鎺у埗',desc:'绮剧‘'}],
-    'proj-freertos-station': [{id:'freertos',icon:'馃攧',title:'FreeRTOS',desc:'鏁欑▼'}],
-    'proj-smart-car': [{id:'proj-pwm-motor',icon:'鈿欙笍',title:'PWM鐢垫満',desc:'椹卞姩'},{id:'proj-ultrasonic',icon:'馃搹',title:'瓒呭０娉?,desc:'閬块殰'},{id:'proj-ir-remote',icon:'馃摵',title:'绾㈠閬ユ帶',desc:'閬ユ帶'}],
-    'proj-can-bus': [{id:'protocols',icon:'馃攲',title:'閫氫俊鍗忚',desc:'CAN'},{id:'stm32',icon:'馃數',title:'STM32',desc:'CAN澶栬'}],
-    'proj-sd-logger': [{id:'proj-dht11-monitor',icon:'馃尅锔?,title:'娓╂箍搴?,desc:'鏉ユ簮'},{id:'protocols',icon:'馃攲',title:'閫氫俊鍗忚',desc:'SPI'}],
-    'proj-esp32-iot': [{id:'esp32',icon:'馃煝',title:'ESP32',desc:'骞冲彴'},{id:'freertos',icon:'馃攧',title:'FreeRTOS',desc:'浠诲姟'}],
-    'proj-low-power': [{id:'stm32',icon:'馃數',title:'STM32',desc:'浣庡姛鑰?}],
-    'proj-bootloader-iap': [{id:'flash-debug',icon:'馃攲',title:'鐑у綍璋冭瘯',desc:'鍗囩骇鐗?},{id:'stm32',icon:'馃數',title:'STM32',desc:'IAP'}],
-    'proj-dma-adc': [{id:'stm32',icon:'馃數',title:'STM32',desc:'DMA澶栬'},{id:'freertos',icon:'馃攧',title:'FreeRTOS',desc:'DMA+RTOS'}],
-    'proj-usb-hid': [{id:'protocols',icon:'馃攲',title:'閫氫俊鍗忚',desc:'USB'},{id:'stm32',icon:'馃數',title:'STM32',desc:'USB澶栬'}],
-    'proj-s32k144-auto': [{id:'stm32',icon:'馃數',title:'STM32',desc:'姹借溅绾?},{id:'proj-can-bus',icon:'馃殞',title:'CAN鎬荤嚎',desc:'杞﹁浇'}],
-    'proj-oscilloscope-debug': [{id:'flash-debug',icon:'馃攲',title:'鐑у綍璋冭瘯',desc:'宸ュ叿'},{id:'serial',icon:'馃摗',title:'涓插彛閫氫俊',desc:'杈撳嚭'}],
-    'bci-2026': [{id:'stm32',icon:'馃數',title:'STM32',desc:'骞冲彴'},{id:'freertos',icon:'馃攧',title:'FreeRTOS',desc:'瀹炴椂绯荤粺'},{id:'protocols',icon:'馃攲',title:'閫氫俊鍗忚',desc:'浼犺緭'}]
+    'arm-gcc': [{id:'cmake',icon:'📦',title:'CMake',desc:'编译构建搭档'},{id:'makefile',icon:'📜',title:'Makefile',desc:'传统构建工具'},{id:'flash-debug',icon:'🔌',title:'烧录调试',desc:'编译产物烧进去'}],
+    'cmake': [{id:'arm-gcc',icon:'🔧',title:'ARM GCC',desc:'编译器'},{id:'makefile',icon:'📜',title:'Makefile',desc:'底层引擎'},{id:'stm32',icon:'🔵',title:'STM32',desc:'实战项目'}],
+    'makefile': [{id:'arm-gcc',icon:'🔧',title:'ARM GCC',desc:'构建目标'},{id:'cmake',icon:'📦',title:'CMake',desc:'现代方案'}],
+    'serial': [{id:'flash-debug',icon:'🔌',title:'烧录调试',desc:'串口调试器'},{id:'stm32',icon:'🔵',title:'STM32',desc:'串口实战'}],
+    'flash-debug': [{id:'serial',icon:'📡',title:'串口通信',desc:'调试基础'},{id:'arm-gcc',icon:'🔧',title:'ARM GCC',desc:'编译工具链'},{id:'stm32',icon:'🔵',title:'STM32',desc:'烧录实战'}],
+    'stm32': [{id:'flash-debug',icon:'🔌',title:'烧录调试',desc:'必读'},{id:'freertos',icon:'🔄',title:'FreeRTOS',desc:'进阶'},{id:'esp32',icon:'🟢',title:'ESP32',desc:'另一平台'}],
+    'esp32': [{id:'flash-debug',icon:'🔌',title:'烧录调试',desc:'必读'},{id:'freertos',icon:'🔄',title:'FreeRTOS',desc:'IDF基石'},{id:'stm32',icon:'🔵',title:'STM32',desc:'对比学习'}],
+    'freertos': [{id:'stm32',icon:'🔵',title:'STM32',desc:'运行平台'},{id:'esp32',icon:'🟢',title:'ESP32',desc:'IDF中RTOS'}],
+    'protocols': [{id:'serial',icon:'📡',title:'串口通信',desc:'UART详解'},{id:'stm32',icon:'🔵',title:'STM32',desc:'协议实战'}],
+    'practice-projects': [{id:'proj-led-button',icon:'💡',title:'LED+按键',desc:'第一个项目'},{id:'proj-uart-hello',icon:'📟',title:'串口Hello',desc:'入门经典'}],
+    'proj-led-button': [{id:'proj-uart-hello',icon:'📟',title:'串口Hello',desc:'下一步'},{id:'proj-pwm-motor',icon:'⚙️',title:'PWM电机',desc:'更高阶'}],
+    'proj-uart-hello': [{id:'proj-led-button',icon:'💡',title:'LED+按键',desc:'上一步'},{id:'proj-oled-display',icon:'🖥️',title:'OLED显示',desc:'可视输出'}],
+    'proj-oled-display': [{id:'proj-uart-hello',icon:'📟',title:'串口Hello',desc:'I2C基础'},{id:'proj-dht11-monitor',icon:'🌡️',title:'温湿度',desc:'传感器'}],
+    'proj-dht11-monitor': [{id:'proj-oled-display',icon:'🖥️',title:'OLED显示',desc:'数据显示'},{id:'proj-sd-logger',icon:'💾',title:'SD日志',desc:'持久化'}],
+    'proj-pwm-motor': [{id:'proj-servo-control',icon:'🎯',title:'舵机控制',desc:'PWM家族'},{id:'proj-smart-car',icon:'🚗',title:'智能小车',desc:'PWM驱动'}],
+    'proj-servo-control': [{id:'proj-pwm-motor',icon:'⚙️',title:'PWM电机',desc:'同为PWM'},{id:'proj-smart-car',icon:'🚗',title:'智能小车',desc:'多舵机'}],
+    'proj-ir-remote': [{id:'proj-led-button',icon:'💡',title:'LED+按键',desc:'中断'},{id:'proj-smart-car',icon:'🚗',title:'智能小车',desc:'遥控'}],
+    'proj-ultrasonic': [{id:'proj-smart-car',icon:'🚗',title:'智能小车',desc:'避障'},{id:'proj-oled-display',icon:'🖥️',title:'OLED显示',desc:'距离'}],
+    'proj-stepper-motor': [{id:'proj-pwm-motor',icon:'⚙️',title:'PWM电机',desc:'另一种'},{id:'proj-servo-control',icon:'🎯',title:'舵机控制',desc:'精确'}],
+    'proj-freertos-station': [{id:'freertos',icon:'🔄',title:'FreeRTOS',desc:'教程'}],
+    'proj-smart-car': [{id:'proj-pwm-motor',icon:'⚙️',title:'PWM电机',desc:'驱动'},{id:'proj-ultrasonic',icon:'📏',title:'超声波',desc:'避障'},{id:'proj-ir-remote',icon:'📺',title:'红外遥控',desc:'遥控'}],
+    'proj-can-bus': [{id:'protocols',icon:'🔌',title:'通信协议',desc:'CAN'},{id:'stm32',icon:'🔵',title:'STM32',desc:'CAN外设'}],
+    'proj-sd-logger': [{id:'proj-dht11-monitor',icon:'🌡️',title:'温湿度',desc:'来源'},{id:'protocols',icon:'🔌',title:'通信协议',desc:'SPI'}],
+    'proj-esp32-iot': [{id:'esp32',icon:'🟢',title:'ESP32',desc:'平台'},{id:'freertos',icon:'🔄',title:'FreeRTOS',desc:'任务'}],
+    'proj-low-power': [{id:'stm32',icon:'🔵',title:'STM32',desc:'低功耗'}],
+    'proj-bootloader-iap': [{id:'flash-debug',icon:'🔌',title:'烧录调试',desc:'升级版'},{id:'stm32',icon:'🔵',title:'STM32',desc:'IAP'}],
+    'proj-dma-adc': [{id:'stm32',icon:'🔵',title:'STM32',desc:'DMA外设'},{id:'freertos',icon:'🔄',title:'FreeRTOS',desc:'DMA+RTOS'}],
+    'proj-usb-hid': [{id:'protocols',icon:'🔌',title:'通信协议',desc:'USB'},{id:'stm32',icon:'🔵',title:'STM32',desc:'USB外设'}],
+    'proj-s32k144-auto': [{id:'stm32',icon:'🔵',title:'STM32',desc:'汽车级'},{id:'proj-can-bus',icon:'🚌',title:'CAN总线',desc:'车载'}],
+    'proj-oscilloscope-debug': [{id:'flash-debug',icon:'🔌',title:'烧录调试',desc:'工具'},{id:'serial',icon:'📡',title:'串口通信',desc:'输出'}],
+    'bci-2026': [{id:'stm32',icon:'🔵',title:'STM32',desc:'平台'},{id:'freertos',icon:'🔄',title:'FreeRTOS',desc:'实时系统'},{id:'protocols',icon:'🔌',title:'通信协议',desc:'传输'}]
   };
   return map[pageId] || [];
 }
@@ -1042,8 +1198,8 @@ function isBookmarked(pageId) { return getBookmarks().includes(pageId); }
 function updateBookmarkUI() {
   const btn = document.getElementById('bmToggle');
   if (!btn) return;
-  if (isBookmarked(currentPage)) { btn.classList.add('active'); btn.textContent = '猸?; }
-  else { btn.classList.remove('active'); btn.textContent = '鈽?; }
+  if (isBookmarked(currentPage)) { btn.classList.add('active'); btn.textContent = '⭐'; }
+  else { btn.classList.remove('active'); btn.textContent = '☆'; }
 }
 function renderBookmarksList() {
   const bm = getBookmarks();
@@ -1056,7 +1212,7 @@ function renderBookmarksList() {
   let html = '';
   bm.forEach(id => {
     const cfg = PAGES[id];
-    if (cfg) html += `<div class="bm-item" onclick="loadPage('${id}')">${cfg.title}<span class="bm-remove" onclick="event.stopPropagation();removeBookmark('${id}')">鉁?/span></div>`;
+    if (cfg) html += `<div class="bm-item" onclick="loadPage('${id}')">${cfg.title}<span class="bm-remove" onclick="event.stopPropagation();removeBookmark('${id}')">✕</span></div>`;
   });
   list.innerHTML = html;
 }
@@ -1067,7 +1223,11 @@ function removeBookmark(pageId) {
   updateBookmarkUI();
 }
 
-// === 瀛︿範杩涘害 ===
+// === 图片灯箱 ===
+function openLightbox(src) { let ol=document.getElementById('lightboxOverlay'), img=ol.querySelector('.lightbox-img'); img.src=src; ol.classList.remove('hidden'); }
+function closeLightbox() { document.getElementById('lightboxOverlay').classList.add('hidden'); }
+
+// === 学习进度 ===
 function markViewed(pageId) {
   if (pageId === 'home') return;
   try {
@@ -1086,7 +1246,7 @@ function getProgressPercent() {
 }
 function progressIndicator() {
   const pct = getProgressPercent();
-  return pct > 0 ? `<div class="progress-indicator" title="宸茶 ${pct}%"><div class="pi-bar"><div class="pi-fill" style="width:${pct}%"></div></div>${pct}%</div>` : '';
+  return pct > 0 ? `<div class="progress-indicator" title="已读 ${pct}%"><div class="pi-bar"><div class="pi-fill" style="width:${pct}%"></div></div>${pct}%</div>` : '';
 }
 function updateHomeStats() {
   const viewed = getViewedCount();
@@ -1098,7 +1258,7 @@ function updateHomeStats() {
     if (!existing && viewed > 0) {
       const statEl = document.createElement('div');
       statEl.className = 'home-stat progress-stat';
-      statEl.innerHTML = `<div class="num">${viewed}</div><div class="label">宸插涔?/div><div class="progress-indicator" style="margin-top:4px"><div class="pi-bar"><div class="pi-fill" style="width:${getProgressPercent()}%"></div></div>${getProgressPercent()}%</div>`;
+      statEl.innerHTML = `<div class="num">${viewed}</div><div class="label">已学习</div><div class="progress-indicator" style="margin-top:4px"><div class="pi-bar"><div class="pi-fill" style="width:${getProgressPercent()}%"></div></div>${getProgressPercent()}%</div>`;
       statsDiv.appendChild(statEl);
     } else if (existing && viewed > 0) {
       existing.querySelector('.num').textContent = viewed;
@@ -1109,7 +1269,7 @@ function updateHomeStats() {
 }
 
 
-// === 鍒濆鍖?===
+// === 初始化 ===
 (function init() {
   const hash = window.location.hash;
   if (hash && hash.startsWith('#/')) {
@@ -1122,18 +1282,19 @@ function updateHomeStats() {
 })();
 </script>
 
-<div class="shortcut-hint" id="shortcutHint">鎸?<span class="kbd-key">?</span> 鏌ョ湅蹇嵎閿?/div>
+<div class="copy-toast" id="copyToast">✅ 代码已复制!</div>
+<div class="shortcut-hint" id="shortcutHint">按 <span class="kbd-key">?</span> 查看快捷键</div>
 <div class="shortcuts-overlay" id="shortcutsOverlay" onclick="this.classList.remove('show')">
   <div class="shortcuts-panel" onclick="event.stopPropagation()">
-    <h3>鈱笍 蹇嵎閿€熸煡 <button class="close-btn" onclick="document.getElementById('shortcutsOverlay').classList.remove('show')">鉁?/button></h3>
-    <div class="kbd-row"><span><span class="kbd-key">/</span></span><span class="kbd-desc">鑱氱劍鎼滅储妗?/span></div>
-    <div class="kbd-row"><span><span class="kbd-key">Esc</span></span><span class="kbd-desc">娓呴櫎鎼滅储 / 閫€鍑轰笓娉ㄦā寮?/span></div>
-    <div class="kbd-row"><span><span class="kbd-key">?</span></span><span class="kbd-desc">鏄剧ず/闅愯棌姝ら潰鏉?/span></div>
-    <div class="kbd-row"><span><span class="kbd-key">鈫?/span> <span class="kbd-key">鈫?/span></span><span class="kbd-desc">涓婁笅绡囩炕椤碉紙鎸囧崡/鏁欑▼锛?/span></div>
-    <div class="kbd-row"><span><span class="kbd-key">Ctrl</span>+<span class="kbd-key">S</span></span><span class="kbd-desc">鏀惰棌/鍙栨秷褰撳墠鏁欑▼</span></div>
-    <div class="kbd-row"><span><span class="kbd-key">Ctrl</span>+<span class="kbd-key">F</span></span><span class="kbd-desc">涓撴敞闃呰妯″紡</span></div>
-    <div class="kbd-row"><span><span class="kbd-key">t</span></span><span class="kbd-desc">鍒囨崲浜壊/鏆楄壊涓婚</span></div>
-    <div class="kbd-row"><span><span class="kbd-key">h</span></span><span class="kbd-desc">杩斿洖棣栭〉</span></div>
+    <h3>⌨️ 快捷键速查 <button class="close-btn" onclick="document.getElementById('shortcutsOverlay').classList.remove('show')">✕</button></h3>
+    <div class="kbd-row"><span><span class="kbd-key">/</span></span><span class="kbd-desc">聚焦搜索框</span></div>
+    <div class="kbd-row"><span><span class="kbd-key">Esc</span></span><span class="kbd-desc">清除搜索 / 退出专注模式</span></div>
+    <div class="kbd-row"><span><span class="kbd-key">?</span></span><span class="kbd-desc">显示/隐藏此面板</span></div>
+    <div class="kbd-row"><span><span class="kbd-key">←</span> <span class="kbd-key">→</span></span><span class="kbd-desc">上下篇翻页（指南/教程）</span></div>
+    <div class="kbd-row"><span><span class="kbd-key">Ctrl</span>+<span class="kbd-key">S</span></span><span class="kbd-desc">收藏/取消当前教程</span></div>
+    <div class="kbd-row"><span><span class="kbd-key">Ctrl</span>+<span class="kbd-key">F</span></span><span class="kbd-desc">专注阅读模式</span></div>
+    <div class="kbd-row"><span><span class="kbd-key">t</span></span><span class="kbd-desc">切换亮色/暗色主题</span></div>
+    <div class="kbd-row"><span><span class="kbd-key">h</span></span><span class="kbd-desc">返回首页</span></div>
   </div>
 </div>
 
