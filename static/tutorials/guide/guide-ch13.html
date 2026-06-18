@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第13章：常用代码速查 - 嵌入式小白完全指南</title>
+<title>绗?3绔狅細甯哥敤浠ｇ爜閫熸煡 - 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,36 +57,33 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第13章：常用代码速查</h1>
-<div class="summary"><b>📖 小白完全指南 · 13/14</b> | 阅读时间约3分钟</div>
+<h1>绗?3绔狅細甯哥敤浠ｇ爜閫熸煡</h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 13/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
 
-<h3>启动文件(startup)说明</h3>
+<h3>鍚姩鏂囦欢(startup)璇存槑</h3>
 
-<p>启动文件用汇编编写，做三件事：①初始化堆栈指针 ②初始化中断向量表 ③调用SystemInit()和main()</p>
+<p>鍚姩鏂囦欢鐢ㄦ眹缂栫紪鍐欙紝鍋氫笁浠朵簨锛氣憼鍒濆鍖栧爢鏍堟寚閽?鈶″垵濮嬪寲涓柇鍚戦噺琛?鈶㈣皟鐢⊿ystemInit()鍜宮ain()</p>
 
-<pre><code>// startup_stm32f103xx.s 关键部分
+<pre><code>// startup_stm32f103xx.s 鍏抽敭閮ㄥ垎
   .section .isr_vector,"a",%progbits
-  .word _estack              // 初始栈指针（RAM末尾）
-  .word Reset_Handler         // 复位向量
+  .word _estack              // 鍒濆鏍堟寚閽堬紙RAM鏈熬锛?  .word Reset_Handler         // 澶嶄綅鍚戦噺
   .word NMI_Handler
   .word HardFault_Handler
   .word MemManage_Handler
   .word BusFault_Handler
-  // ... 更多中断向量 ...
+  // ... 鏇村涓柇鍚戦噺 ...
 
 Reset_Handler:
-  ldr sp, =_estack           // 设置栈指针
-  bl SystemInit              // 初始化时钟
-  bl __libc_init_array       // C库初始化
-  bl main                    // 跳转到main()
-  bx lr                      // main不应返回</code></pre>
+  ldr sp, =_estack           // 璁剧疆鏍堟寚閽?  bl SystemInit              // 鍒濆鍖栨椂閽?  bl __libc_init_array       // C搴撳垵濮嬪寲
+  bl main                    // 璺宠浆鍒癿ain()
+  bx lr                      // main涓嶅簲杩斿洖</code></pre>
 
 <h3>Linker Script (STM32F103C8T6)</h3>
 
-<pre><code>/* STM32F103C8Tx.ld - 完整版 */
+<pre><code>/* STM32F103C8Tx.ld - 瀹屾暣鐗?*/
 ENTRY(Reset_Handler)
 
-_estack = ORIGIN(RAM) + LENGTH(RAM);  /* 栈顶 = RAM末尾 */
+_estack = ORIGIN(RAM) + LENGTH(RAM);  /* 鏍堥《 = RAM鏈熬 */
 
 MEMORY {
   FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 64K
@@ -151,154 +148,146 @@ SECTIONS {
   /DISCARD/ : { *(.ARM.attributes) }
 }</code></pre>
 
-<h3>GDB常用命令速查表</h3>
+<h3>GDB甯哥敤鍛戒护閫熸煡琛?/h3>
 
 <table>
-<tr><th>命令</th><th>缩写</th><th>说明</th></tr>
-<tr><td>break main</td><td>b main</td><td>设断点</td></tr>
-<tr><td>break file.c:42</td><td>b file.c:42</td><td>在指定行设断点</td></tr>
-<tr><td>continue</td><td>c</td><td>继续运行</td></tr>
-<tr><td>step</td><td>s</td><td>单步进入函数</td></tr>
-<tr><td>next</td><td>n</td><td>单步跳过函数</td></tr>
-<tr><td>finish</td><td>fin</td><td>执行到函数返回</td></tr>
-<tr><td>print var</td><td>p var</td><td>打印变量</td></tr>
-<tr><td>print *ptr@10</td><td>p *ptr@10</td><td>打印数组前10项</td></tr>
-<tr><td>print /x var</td><td>p/x var</td><td>十六进制打印</td></tr>
-<tr><td>watch var</td><td>wa var</td><td>监视变量变化</td></tr>
-<tr><td>backtrace</td><td>bt</td><td>调用栈</td></tr>
-<tr><td>info registers</td><td>i r</td><td>CPU寄存器</td></tr>
-<tr><td>x/16x 0x20000000</td><td>-</td><td>查看内存(16个32位数)</td></tr>
-<tr><td>delete</td><td>d</td><td>删除断点</td></tr>
-<tr><td>info breakpoints</td><td>i b</td><td>查看断点</td></tr>
-<tr><td>load</td><td>-</td><td>烧录到芯片</td></tr>
-<tr><td>target remote :4242</td><td>-</td><td>连接GDB Server</td></tr>
+<tr><th>鍛戒护</th><th>缂╁啓</th><th>璇存槑</th></tr>
+<tr><td>break main</td><td>b main</td><td>璁炬柇鐐?/td></tr>
+<tr><td>break file.c:42</td><td>b file.c:42</td><td>鍦ㄦ寚瀹氳璁炬柇鐐?/td></tr>
+<tr><td>continue</td><td>c</td><td>缁х画杩愯</td></tr>
+<tr><td>step</td><td>s</td><td>鍗曟杩涘叆鍑芥暟</td></tr>
+<tr><td>next</td><td>n</td><td>鍗曟璺宠繃鍑芥暟</td></tr>
+<tr><td>finish</td><td>fin</td><td>鎵ц鍒板嚱鏁拌繑鍥?/td></tr>
+<tr><td>print var</td><td>p var</td><td>鎵撳嵃鍙橀噺</td></tr>
+<tr><td>print *ptr@10</td><td>p *ptr@10</td><td>鎵撳嵃鏁扮粍鍓?0椤?/td></tr>
+<tr><td>print /x var</td><td>p/x var</td><td>鍗佸叚杩涘埗鎵撳嵃</td></tr>
+<tr><td>watch var</td><td>wa var</td><td>鐩戣鍙橀噺鍙樺寲</td></tr>
+<tr><td>backtrace</td><td>bt</td><td>璋冪敤鏍?/td></tr>
+<tr><td>info registers</td><td>i r</td><td>CPU瀵勫瓨鍣?/td></tr>
+<tr><td>x/16x 0x20000000</td><td>-</td><td>鏌ョ湅鍐呭瓨(16涓?2浣嶆暟)</td></tr>
+<tr><td>delete</td><td>d</td><td>鍒犻櫎鏂偣</td></tr>
+<tr><td>info breakpoints</td><td>i b</td><td>鏌ョ湅鏂偣</td></tr>
+<tr><td>load</td><td>-</td><td>鐑у綍鍒拌姱鐗?/td></tr>
+<tr><td>target remote :4242</td><td>-</td><td>杩炴帴GDB Server</td></tr>
 </table>
 
-<h3>串口重定向printf</h3>
+<h3>涓插彛閲嶅畾鍚憄rintf</h3>
 
-<pre><code>// 方法1：HAL_UART（最常用）
-int fputc(int ch, FILE *f) {
+<pre><code>// 鏂规硶1锛欻AL_UART锛堟渶甯哥敤锛?int fputc(int ch, FILE *f) {
     HAL_UART_Transmit(&amp;huart1, (uint8_t *)&amp;ch, 1, HAL_MAX_DELAY);
     return ch;
 }
 
-// 方法2：ITM/SWO（更快，不占串口）
-int fputc(int ch, FILE *f) {
+// 鏂规硶2锛欼TM/SWO锛堟洿蹇紝涓嶅崰涓插彛锛?int fputc(int ch, FILE *f) {
     ITM_SendChar(ch);
     return ch;
 }
 
-// 方法3：DMA+环形缓冲区（最优雅，非阻塞）
-#define TX_BUF_SIZE 256
+// 鏂规硶3锛欴MA+鐜舰缂撳啿鍖猴紙鏈€浼橀泤锛岄潪闃诲锛?#define TX_BUF_SIZE 256
 static uint8_t tx_buf[TX_BUF_SIZE];
 static volatile uint16_t tx_head = 0, tx_tail = 0;
 
 int fputc(int ch, FILE *f) {
     tx_buf[tx_head] = ch;
     tx_head = (tx_head + 1) % TX_BUF_SIZE;
-    // 触发DMA发送...
+    // 瑙﹀彂DMA鍙戦€?..
     return ch;
 }</code></pre>
 
-<h3>常用位操作宏</h3>
+<h3>甯哥敤浣嶆搷浣滃畯</h3>
 
-<pre><code>// 位操作 — 嵌入式开发天天用
-#define BIT(x)          (1U &lt;&lt; (x))           // 第x位置1
-#define SET_BIT(reg, x)  ((reg) |= BIT(x))     // 置位
-#define CLR_BIT(reg, x)  ((reg) &amp;= ~BIT(x))   // 清零
-#define TOG_BIT(reg, x)  ((reg) ^= BIT(x))     // 翻转
-#define GET_BIT(reg, x)  (((reg) >> (x)) &amp; 1)  // 读取
+<pre><code>// 浣嶆搷浣?鈥?宓屽叆寮忓紑鍙戝ぉ澶╃敤
+#define BIT(x)          (1U &lt;&lt; (x))           // 绗瑇浣嶇疆1
+#define SET_BIT(reg, x)  ((reg) |= BIT(x))     // 缃綅
+#define CLR_BIT(reg, x)  ((reg) &amp;= ~BIT(x))   // 娓呴浂
+#define TOG_BIT(reg, x)  ((reg) ^= BIT(x))     // 缈昏浆
+#define GET_BIT(reg, x)  (((reg) >> (x)) &amp; 1)  // 璇诲彇
 
-// 多位操作
+// 澶氫綅鎿嶄綔
 #define SET_MASK(reg, mask)   ((reg) |= (mask))
 #define CLR_MASK(reg, mask)   ((reg) &amp;= ~(mask))
 
-// 寄存器写入（防编译器优化）
-#define REG32(addr)  (*(volatile uint32_t *)(addr))
+// 瀵勫瓨鍣ㄥ啓鍏ワ紙闃茬紪璇戝櫒浼樺寲锛?#define REG32(addr)  (*(volatile uint32_t *)(addr))
 #define REG16(addr)  (*(volatile uint16_t *)(addr))
 #define REG8(addr)   (*(volatile uint8_t *)(addr))
 
-// 示例：直接操作STM32寄存器
-#define RCC_APB2ENR  REG32(0x40021018)
+// 绀轰緥锛氱洿鎺ユ搷浣淪TM32瀵勫瓨鍣?#define RCC_APB2ENR  REG32(0x40021018)
 #define GPIOC_CRH    REG32(0x40011004)
 #define GPIOC_ODR    REG32(0x4001100C)
 
-// 使能GPIOC时钟
+// 浣胯兘GPIOC鏃堕挓
 SET_BIT(RCC_APB2ENR, 4);    // RCC_APB2ENR bit4 = IOPCEN
-// PC13推挽输出
+// PC13鎺ㄦ尳杈撳嚭
 GPIOC_CRH = (GPIOC_CRH &amp; ~0x00F00000) | 0x00300000;
-// PC13输出高
-SET_BIT(GPIOC_ODR, 13);</code></pre>
+// PC13杈撳嚭楂?SET_BIT(GPIOC_ODR, 13);</code></pre>
 
-<h3>STM32F103常用寄存器地址</h3>
+<h3>STM32F103甯哥敤瀵勫瓨鍣ㄥ湴鍧€</h3>
 
 <table>
-<tr><th>外设</th><th>寄存器</th><th>地址</th><th>说明</th></tr>
-<tr><td>RCC</td><td>CR</td><td>0x40021000</td><td>时钟控制</td></tr>
-<tr><td>RCC</td><td>APB2ENR</td><td>0x40021018</td><td>APB2外设时钟使能</td></tr>
-<tr><td>RCC</td><td>APB1ENR</td><td>0x4002101C</td><td>APB1外设时钟使能</td></tr>
-<tr><td>GPIOA</td><td>CRL</td><td>0x40010800</td><td>PA0-PA7配置</td></tr>
-<tr><td>GPIOA</td><td>CRH</td><td>0x40010804</td><td>PA8-PA15配置</td></tr>
-<tr><td>GPIOA</td><td>ODR</td><td>0x4001080C</td><td>输出数据</td></tr>
-<tr><td>GPIOA</td><td>IDR</td><td>0x40010808</td><td>输入数据</td></tr>
-<tr><td>GPIOC</td><td>CRH</td><td>0x40011004</td><td>PC8-PC15配置</td></tr>
-<tr><td>GPIOC</td><td>ODR</td><td>0x4001100C</td><td>输出数据</td></tr>
-<tr><td>USART1</td><td>SR</td><td>0x40013800</td><td>状态寄存器</td></tr>
-<tr><td>USART1</td><td>DR</td><td>0x40013804</td><td>数据寄存器</td></tr>
-<tr><td>USART1</td><td>BRR</td><td>0x40013808</td><td>波特率</td></tr>
+<tr><th>澶栬</th><th>瀵勫瓨鍣?/th><th>鍦板潃</th><th>璇存槑</th></tr>
+<tr><td>RCC</td><td>CR</td><td>0x40021000</td><td>鏃堕挓鎺у埗</td></tr>
+<tr><td>RCC</td><td>APB2ENR</td><td>0x40021018</td><td>APB2澶栬鏃堕挓浣胯兘</td></tr>
+<tr><td>RCC</td><td>APB1ENR</td><td>0x4002101C</td><td>APB1澶栬鏃堕挓浣胯兘</td></tr>
+<tr><td>GPIOA</td><td>CRL</td><td>0x40010800</td><td>PA0-PA7閰嶇疆</td></tr>
+<tr><td>GPIOA</td><td>CRH</td><td>0x40010804</td><td>PA8-PA15閰嶇疆</td></tr>
+<tr><td>GPIOA</td><td>ODR</td><td>0x4001080C</td><td>杈撳嚭鏁版嵁</td></tr>
+<tr><td>GPIOA</td><td>IDR</td><td>0x40010808</td><td>杈撳叆鏁版嵁</td></tr>
+<tr><td>GPIOC</td><td>CRH</td><td>0x40011004</td><td>PC8-PC15閰嶇疆</td></tr>
+<tr><td>GPIOC</td><td>ODR</td><td>0x4001100C</td><td>杈撳嚭鏁版嵁</td></tr>
+<tr><td>USART1</td><td>SR</td><td>0x40013800</td><td>鐘舵€佸瘎瀛樺櫒</td></tr>
+<tr><td>USART1</td><td>DR</td><td>0x40013804</td><td>鏁版嵁瀵勫瓨鍣?/td></tr>
+<tr><td>USART1</td><td>BRR</td><td>0x40013808</td><td>娉㈢壒鐜?/td></tr>
 </table>
 
-<div class="tip">💡 <b>小技巧：</b>用HAL库开发时一般不需要直接操作寄存器，但理解寄存器对排错很重要。当HAL库行为不符合预期时，查看寄存器值是最终手段。</div>
+<div class="tip">馃挕 <b>灏忔妧宸э細</b>鐢℉AL搴撳紑鍙戞椂涓€鑸笉闇€瑕佺洿鎺ユ搷浣滃瘎瀛樺櫒锛屼絾鐞嗚В瀵勫瓨鍣ㄥ鎺掗敊寰堥噸瑕併€傚綋HAL搴撹涓轰笉绗﹀悎棰勬湡鏃讹紝鏌ョ湅瀵勫瓨鍣ㄥ€兼槸鏈€缁堟墜娈点€?/div>
 
-<h3>寄存器地址计算规则</h3>
+<h3>瀵勫瓨鍣ㄥ湴鍧€璁＄畻瑙勫垯</h3>
 
-<p>上面的地址表看起来很多，但其实有规律。记住这个方法，换任何芯片都能自己算：</p>
+<p>涓婇潰鐨勫湴鍧€琛ㄧ湅璧锋潵寰堝锛屼絾鍏跺疄鏈夎寰嬨€傝浣忚繖涓柟娉曪紝鎹换浣曡姱鐗囬兘鑳借嚜宸辩畻锛?/p>
 
-<pre><code>// 寄存器地址 = 总线基地址 + 外设偏移 + 寄存器偏移
-//
-// STM32F103总线基地址：
-//   APB1: 0x40000000  (TIM2-TIM7, USART2-5, I2C, SPI2, CAN, USB...)
+<pre><code>// 瀵勫瓨鍣ㄥ湴鍧€ = 鎬荤嚎鍩哄湴鍧€ + 澶栬鍋忕Щ + 瀵勫瓨鍣ㄥ亸绉?//
+// STM32F103鎬荤嚎鍩哄湴鍧€锛?//   APB1: 0x40000000  (TIM2-TIM7, USART2-5, I2C, SPI2, CAN, USB...)
 //   APB2: 0x40010000  (AFIO, GPIOA-C, ADC1-2, TIM1, USART1, SPI1...)
 //   AHB:  0x40018000  (DMA, SDIO, FSMC...)
 //
-// 举例：GPIOC_ODR = APB2基地址 + GPIOC偏移 + ODR偏移
+// 涓句緥锛欸PIOC_ODR = APB2鍩哄湴鍧€ + GPIOC鍋忕Щ + ODR鍋忕Щ
 //                   0x40010000 + 0x00010000 + 0x0C = 0x4001100C
 //
-// 不同芯片基地址不同，查看对应芯片的Reference Manual:
-//   第1章 "Memory Map" 表格</code></pre>
+// 涓嶅悓鑺墖鍩哄湴鍧€涓嶅悓锛屾煡鐪嬪搴旇姱鐗囩殑Reference Manual:
+//   绗?绔?"Memory Map" 琛ㄦ牸</code></pre>
 
-<h3>常见错误码速查</h3>
+<h3>甯歌閿欒鐮侀€熸煡</h3>
 
 <table>
-<tr><th>来源</th><th>错误码</th><th>含义</th><th>解决</th></tr>
-<tr><td>HAL库</td><td>HAL_OK (0)</td><td>成功</td><td>—</td></tr>
-<tr><td>HAL库</td><td>HAL_ERROR (1)</td><td>一般错误</td><td>检查参数和硬件连接</td></tr>
-<tr><td>HAL库</td><td>HAL_BUSY (2)</td><td>外设忙</td><td>等待或检查上一次操作是否完成</td></tr>
-<tr><td>HAL库</td><td>HAL_TIMEOUT (3)</td><td>超时</td><td>检查接线/波特率/时钟配置</td></tr>
-<tr><td>DHT11</td><td>1</td><td>传感器无响应</td><td>检查接线、上拉电阻、换传感器</td></tr>
-<tr><td>DHT11</td><td>2</td><td>校验失败</td><td>读取间隔太短（最少2秒）</td></tr>
-<tr><td>esptool</td><td>Failed to connect</td><td>ESP32未进入下载模式</td><td>按住BOOT键点RST，或手动拉低GPIO0</td></tr>
-<tr><td>I2C</td><td>HAL_TIMEOUT</td><td>设备无应答</td><td>用i2c_scan确认地址，检查上拉电阻</td></tr>
+<tr><th>鏉ユ簮</th><th>閿欒鐮?/th><th>鍚箟</th><th>瑙ｅ喅</th></tr>
+<tr><td>HAL搴?/td><td>HAL_OK (0)</td><td>鎴愬姛</td><td>鈥?/td></tr>
+<tr><td>HAL搴?/td><td>HAL_ERROR (1)</td><td>涓€鑸敊璇?/td><td>妫€鏌ュ弬鏁板拰纭欢杩炴帴</td></tr>
+<tr><td>HAL搴?/td><td>HAL_BUSY (2)</td><td>澶栬蹇?/td><td>绛夊緟鎴栨鏌ヤ笂涓€娆℃搷浣滄槸鍚﹀畬鎴?/td></tr>
+<tr><td>HAL搴?/td><td>HAL_TIMEOUT (3)</td><td>瓒呮椂</td><td>妫€鏌ユ帴绾?娉㈢壒鐜?鏃堕挓閰嶇疆</td></tr>
+<tr><td>DHT11</td><td>1</td><td>浼犳劅鍣ㄦ棤鍝嶅簲</td><td>妫€鏌ユ帴绾裤€佷笂鎷夌數闃汇€佹崲浼犳劅鍣?/td></tr>
+<tr><td>DHT11</td><td>2</td><td>鏍￠獙澶辫触</td><td>璇诲彇闂撮殧澶煭锛堟渶灏?绉掞級</td></tr>
+<tr><td>esptool</td><td>Failed to connect</td><td>ESP32鏈繘鍏ヤ笅杞芥ā寮?/td><td>鎸変綇BOOT閿偣RST锛屾垨鎵嬪姩鎷変綆GPIO0</td></tr>
+<tr><td>I2C</td><td>HAL_TIMEOUT</td><td>璁惧鏃犲簲绛?/td><td>鐢╥2c_scan纭鍦板潃锛屾鏌ヤ笂鎷夌數闃?/td></tr>
 </table>
 
-<h3>社区与学习资源</h3>
+<h3>绀惧尯涓庡涔犺祫婧?/h3>
 
 <table>
-<tr><th>资源</th><th>链接/说明</th><th>适合</th></tr>
-<tr><td>正点原子教程</td><td><a href="http://www.openedv.com/" style="color:var(--a)">openedv.com</a> （视频+代码+开发板）</td><td>系统学STM32</td></tr>
-<tr><td>野火教程</td><td><a href="https://doc.embedfire.com/" style="color:var(--a)">doc.embedfire.com</a></td><td>系统学STM32</td></tr>
-<tr><td>STM32中文论坛</td><td><a href="https://www.stmcu.org.cn/" style="color:var(--a)">stmcu.org.cn</a></td><td>问题求助</td></tr>
-<tr><td>ESP-IDF官方文档</td><td><a href="https://docs.espressif.com/projects/esp-idf/zh_CN/" style="color:var(--a)">docs.espressif.com</a></td><td>ESP32开发</td></tr>
-<tr><td>FreeRTOS官方</td><td><a href="https://www.freertos.org/" style="color:var(--a)">freertos.org</a></td><td>RTOS学习</td></tr>
-<tr><td>B站嵌入式</td><td>搜"正点原子""野火""江协科技"</td><td>视频学习</td></tr>
-<tr><td>ST官方HAL库文档</td><td>STM32Cube_FW_F1/Drivers/STM32F1xx_HAL_Driver/</td><td>API参考</td></tr>
+<tr><th>璧勬簮</th><th>閾炬帴/璇存槑</th><th>閫傚悎</th></tr>
+<tr><td>姝ｇ偣鍘熷瓙鏁欑▼</td><td><a href="http://www.openedv.com/" style="color:var(--a)">openedv.com</a> 锛堣棰?浠ｇ爜+寮€鍙戞澘锛?/td><td>绯荤粺瀛TM32</td></tr>
+<tr><td>閲庣伀鏁欑▼</td><td><a href="https://doc.embedfire.com/" style="color:var(--a)">doc.embedfire.com</a></td><td>绯荤粺瀛TM32</td></tr>
+<tr><td>STM32涓枃璁哄潧</td><td><a href="https://www.stmcu.org.cn/" style="color:var(--a)">stmcu.org.cn</a></td><td>闂姹傚姪</td></tr>
+<tr><td>ESP-IDF瀹樻柟鏂囨。</td><td><a href="https://docs.espressif.com/projects/esp-idf/zh_CN/" style="color:var(--a)">docs.espressif.com</a></td><td>ESP32寮€鍙?/td></tr>
+<tr><td>FreeRTOS瀹樻柟</td><td><a href="https://www.freertos.org/" style="color:var(--a)">freertos.org</a></td><td>RTOS瀛︿範</td></tr>
+<tr><td>B绔欏祵鍏ュ紡</td><td>鎼?姝ｇ偣鍘熷瓙""閲庣伀""姹熷崗绉戞妧"</td><td>瑙嗛瀛︿範</td></tr>
+<tr><td>ST瀹樻柟HAL搴撴枃妗?/td><td>STM32Cube_FW_F1/Drivers/STM32F1xx_HAL_Driver/</td><td>API鍙傝€?/td></tr>
 </table>
 
 <hr style="border:1px solid var(--br);margin:30px 0;">
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch12')">← 第12章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch12')">鈫?绗?2绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
 <span></span>
 </div>
 
@@ -317,9 +306,180 @@ document.querySelectorAll('pre').forEach(pre => {
   pre.appendChild(btn);
 });
 </script>
+
+<h2>馃彈 宓屽叆寮忛」鐩灦鏋勮璁?/h2>
+
+<p>浠巇emo鍒颁骇鍝侊紝鏈€澶х殑鍖哄埆涓嶆槸浠ｇ爜閲忥紝鑰屾槸<b>鏋舵瀯</b>銆備竴涓ソ鐨勬灦鏋勮浠ｇ爜鍙淮鎶ゃ€佸彲娴嬭瘯銆佸彲鎵╁睍銆?/p>
+
+<h3>鍒嗗眰鏋舵瀯妯″瀷</h3>
+
+<pre><code>鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?鈹? 搴旂敤灞?(Application Layer)          鈹?鈹? 涓氬姟閫昏緫銆佺姸鎬佹満銆佺畻娉?             鈹?鈹溾攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?鈹? 涓棿浠跺眰 (Middleware)               鈹?鈹? FreeRTOS, LVGL, FATFS, LwIP, MQTT  鈹?鈹溾攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?鈹? 纭欢鎶借薄灞?(HAL / BSP)              鈹?鈹? 椹卞姩绋嬪簭銆佸璁惧皝瑁?                  鈹?鈹溾攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?鈹? 纭欢灞?(Hardware)                   鈹?鈹? MCU, 浼犳劅鍣? 鎵ц鍣? 鐢垫簮           鈹?鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
+// 榛勯噾娉曞垯锛氫笂灞備笉鐩存帴璁块棶瀵勫瓨鍣?// 搴旂敤灞傝皟鐢?bsp_led_on()锛屼笉鏄?HAL_GPIO_WritePin()</code></pre>
+
+<h3>妯″潡鍖栬璁℃ā寮?/h3>
+
+<pre><code>// 姣忎釜妯″潡= .h(鎺ュ彛) + .c(瀹炵幇)
+// 绀轰緥锛歀ED妯″潡
+
+// led.h 鈥斺€?鍙毚闇茬敤鎴烽渶瑕佺殑鎺ュ彛
+#ifndef LED_H
+#define LED_H
+
+#include &lt;stdint.h&gt;
+
+// 閿欒鐮?typedef enum {
+    LED_OK = 0,
+    LED_ERR_INVALID,
+    LED_ERR_HW
+} led_status_t;
+
+// 鍏紑API
+led_status_t led_init(uint8_t pin);
+void led_on(uint8_t pin);
+void led_off(uint8_t pin);
+void led_toggle(uint8_t pin);
+
+#endif
+// led.c 鈥斺€?瀹炵幇缁嗚妭闅愯棌璧锋潵
+// 鐢ㄦ埛涓嶉渶瑕佺煡閬撶敤浜嗗摢涓狦PIO鍙ｅ拰鍝釜瀹氭椂鍣?/code></pre>
+
+<h2>馃У 鐘舵€佹満璁捐</h2>
+
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>鐘舵€佹満灏卞儚<b>娲楄。鏈?/b>鈥斺€旀瘡涓樁娈?娉ㄦ按鈫掓礂娑も啋鎺掓按鈫掕劚姘?鏄竴涓姸鎬侊紝鍙湁鍦ㄧ壒瀹氱殑瑙﹀彂鏉′欢涓嬫墠浼氳烦杞埌涓嬩竴涓姸鎬併€傜敤鐘舵€佹満绠＄悊澶嶆潅鐨勭郴缁熻涓猴紝浠ｇ爜娓呮櫚100鍊嶃€?/div>
+
+<pre><code>// 鏅鸿兘鑺辩泦鎺у埗鍣細鏈夐檺鐘舵€佹満
+typedef enum {
+    STATE_IDLE,           // 绌洪棽
+    STATE_MEASURING,      // 姝ｅ湪娴嬮噺鍦熷￥婀垮害
+    STATE_WATERING,       // 娴囨按涓?    STATE_LOW_POWER,      // 浣庡姛鑰楀緟鏈猴紙澶滈棿锛?    STATE_ERROR           // 閿欒鐘舵€?} system_state_t;
+
+system_state_t state = STATE_IDLE;
+
+void state_machine_run(void) {
+    switch (state) {
+    case STATE_IDLE:
+        if (is_time_to_measure()) {
+            state = STATE_MEASURING;
+        } else if (is_night_time()) {
+            state = STATE_LOW_POWER;
+        }
+        break;
+        
+    case STATE_MEASURING:
+        moisture = read_soil_moisture();
+        if (moisture < THRESHOLD_DRY) {
+            state = STATE_WATERING;
+        } else {
+            state = STATE_IDLE;  // 婀垮害澶燂紝鍥炵┖闂?        }
+        break;
+        
+    case STATE_WATERING:
+        pump_on();
+        if (pump_timer_expired() || moisture >= THRESHOLD_WET) {
+            pump_off();
+            state = STATE_IDLE;
+        } else if (pump_fault()) {
+            state = STATE_ERROR;
+        }
+        break;
+        
+    case STATE_LOW_POWER:
+        if (is_day_time() || is_time_to_measure()) {
+            wake_from_low_power();
+            state = STATE_IDLE;
+        }
+        break;
+        
+    case STATE_ERROR:
+        led_error_blink();
+        if (error_cleared()) state = STATE_IDLE;
+        break;
+    }
+}</code></pre>
+
+<h2>馃搳 RTOS浠诲姟浼樺厛绾ц璁?/h2>
+
+<div class="warn">鈿?<b>浼樺厛绾ц鍒掓槸RTOS椤圭洰鎴愬姛鐨勫叧閿€?/b>浼樺厛绾ц缃笉褰撲細瀵艰嚧锛氶珮浼樺厛绾чタ姝讳綆浼樺厛绾?/ 浼樺厛绾у弽杞?/ 瀹炴椂鎬т笉婊¤冻銆?/div>
+
+<pre><code>// 浠诲姟浼樺厛绾у垎閰嶅師鍒欙紙鏁板瓧瓒婂ぇ浼樺厛绾ц秺楂橈級
+// 鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?// 鈹?浼樺厛绾?鈹?浠诲姟  鈹?璇存槑                    鈹?// 鈹溾攢鈹€鈹€鈹€鈹€鈹€鈹尖攢鈹€鈹€鈹€鈹€鈹€鈹尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?// 鈹? 3   鈹?鎺у埗  鈹?鐢垫満鎺у埗銆丳ID(纭疄鏃?     鈹?// 鈹? 2   鈹?閫氫俊  鈹?WiFi/BLE鍗忚鏍?           鈹?// 鈹? 2   鈹?閲囬泦  鈹?ADC閲囨牱 + DMA(1KHz)       鈹?// 鈹? 1   鈹?鏄剧ず  鈹?OLED/LCD鍒锋柊(10-30Hz)     鈹?// 鈹? 1   鈹?瀛樺偍  鈹?SD鍗?FATFS鍐欏叆            鈹?// 鈹? 0   鈹?鐩戞帶  鈹?蹇冭烦LED銆佺湅闂ㄧ嫍鍠傜嫍        鈹?// 鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹粹攢鈹€鈹€鈹€鈹€鈹€鈹粹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹?
+// 鍏抽敭瑙勫垯锛?// 1. 纭疄鏃朵换鍔＄粰鏈€楂樹紭鍏堢骇
+// 2. 璁＄畻瀵嗛泦鍨嬩换鍔＄粰浣庝紭鍏堢骇
+// 3. "杩愯鈫掗樆濉炩啋杩愯"鐨勪换鍔＄粰楂樹紭鍏堢骇
+// 4. 姘镐笉闃诲鐨勪换鍔＄粰鏈€浣庝紭鍏堢骇锛堝绌洪棽浠诲姟锛?/code></pre>
+
+<h2>馃敩 璋冭瘯涓庢棩蹇楃郴缁?/h2>
+
+<p>宓屽叆寮忔病鏈塸rintf鎺у埗鍙帮紵鑷繁寤轰竴涓紒</p>
+
+<pre><code>// 鍒嗙骇鏃ュ織绯荤粺
+typedef enum {
+    LOG_DEBUG,   // 璋冭瘯淇℃伅
+    LOG_INFO,    // 涓€鑸俊鎭?    LOG_WARN,    // 璀﹀憡
+    LOG_ERROR    // 閿欒
+} log_level_t;
+
+#define LOG_LEVEL LOG_DEBUG  // 缂栬瘧鏃惰缃棩蹇楃骇鍒?
+#define LOG(level, fmt, ...) do { \
+    if (level >= LOG_LEVEL) { \
+        printf("[%s] %s:%d " fmt "\r\n", \
+            #level, __FILE__, __LINE__, ##__VA_ARGS__); \
+    } \
+} while(0)
+
+// 浣跨敤
+LOG(LOG_INFO,  "绯荤粺鍚姩锛岀増鏈?%s", VERSION);
+LOG(LOG_DEBUG, "ADC鍘熷鍊? %d", adc_val);
+LOG(LOG_WARN,  "WiFi淇″彿寮? %d dBm", rssi);
+LOG(LOG_ERROR, "浼犳劅鍣ㄥ垵濮嬪寲澶辫触");
+
+// 鍙戝竷鐗堟湰鏀?LOG_LEVEL = LOG_WARN锛岃皟璇曚俊鎭叏閮ㄧЩ闄わ紒</code></pre>
+
+<div class="card">
+<div class="h"><span class="name">璋冭瘯宸ュ叿閾?/span><span class="tag y">蹇呭</span></div>
+<div class="b">
+<div class="desc">
+<b>纭欢璋冭瘯锛?/b><br>
+鈥?J-Link / ST-Link: 鏂偣銆佸崟姝ャ€佸彉閲忔煡鐪?br>
+鈥?SEGGER RTT: 楂橀€焢rintf锛屾瘮SWO蹇?0鍊?br>
+鈥?閫昏緫鍒嗘瀽浠?Saleae): I2C/SPI/UART閫氫俊鎶撳寘<br>
+鈥?绀烘尝鍣? PWM娉㈠舰銆佺數婧愬櫔澹般€佹椂搴?br><br>
+<b>杞欢宸ュ叿锛?/b><br>
+鈥?assert()瀹? 寮€鍙戞湡鎹曡幏闈炴硶鐘舵€?br>
+鈥?HardFault鍒嗘瀽鍣? 浠庢爤甯ц繕鍘熷穿婧冪幇鍦?br>
+鈥?Watchdog: 鏈€鍚庝竴涓畨鍏ㄧ綉<br>
+鈥?鍐呭瓨淇濇姢鍗曞厓(MPU): 闃查噹鎸囬拡鐮村潖
+</div></div></div>
+
+<h2>馃幆 瀹炴垬缁冧範</h2>
+
+<div class="tip">馃摑 <b>瀹屾暣椤圭洰锛氭櫤鑳藉灞呯幆澧冪洃娴嬩华</b><br>
+缁勫悎鎵€鏈夊杩囩殑鐭ヨ瘑鍋氫竴涓畬鏁撮」鐩細<br>
+<b>纭欢锛?/b>STM32 + DHT22(娓╂箍搴? + BMP280(姘斿帇) + OLED + ESP8266(WiFi)<br>
+<b>杞欢鏋舵瀯锛?/b>鈶犱紶鎰熷櫒閲囬泦浠诲姟(1s/娆? 鈶QTT涓婃姤浠诲姟(WiFi) 鈶LED鏄剧ず浠诲姟(500ms/娆? 鈶ED鎸囩ず浠诲姟<br>
+<b>杩涢樁鍔熻兘锛?/b>鈶燨TA杩滅▼鍗囩骇 鈶TC瀹氭椂鍞ら啋(浣庡姛鑰? 鈶SON鏁版嵁鏍煎紡 鈶ｆ柇缃戞湰鍦扮紦瀛?br><br>
+馃摑 <b>缁冧範2锛?/b>浣跨敤J-Link RTT浠ｆ浛UART printf锛屼綋楠屼笉鍗犵敤涓插彛鐨勯珮閫熸棩蹇楄緭鍑恒€?br><br>
+馃摑 <b>缁冧範3锛?/b>鏁呮剰鍒堕€犱竴涓狧ardFault锛堝璁块棶绌烘寚閽堬級锛岀敤璋冭瘯鍣ㄥ垎鏋愭爤甯у畾浣嶅穿婧冧綅缃€?/div>
+
+<h2>馃搵 缁堟瀬鐭ヨ瘑鐐瑰洖椤?/h2>
+<div class="summary">
+<b>鉁?椤圭洰鏋舵瀯鏍稿績锛?/b><br>
+鈥?鍒嗗眰璁捐锛氬簲鐢ㄢ啋涓棿浠垛啋HAL鈫掔‖浠?br>
+鈥?妯″潡鍖栵細.h鍏紑鎺ュ彛 + .c闅愯棌瀹炵幇<br>
+鈥?鐘舵€佹満锛歴witch-case绠＄悊澶嶆潅娴佺▼<br>
+鈥?浠诲姟浼樺厛绾э細纭疄鏃堕珮鈫掕绠椾綆锛屾案涓嶉樆濉炵粰鏈€浣?br>
+<b>馃洜 璋冭瘯姝﹀櫒搴擄細</b><br>
+鈥?鍒嗙骇鏃ュ織(DEBUG/INFO/WARN/ERROR) + 缂栬瘧鏃跺紑鍏?br>
+鈥?J-Link RTT + 閫昏緫鍒嗘瀽浠?+ 绀烘尝鍣?br>
+鈥?HardFault鍒嗘瀽 + Watchdog + MPU
+<b>馃摎 瀛︿範璺嚎涓嬩竴姝ワ細</b><br>
+鈥?缁х画娣卞叆锛歀inux宓屽叆寮忋€乑ephyr RTOS銆丮atter鍗忚<br>
+鈥?纭欢杩涢樁锛?灞侾CB璁捐銆丒MC娴嬭瘯銆侀噺浜FM<br>
+鈥?杞妧鑳斤細Git鍗忎綔銆侀渶姹傚垎鏋愩€佹妧鏈枃妗ｆ挵鍐?</div>
+
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch12')">◀ 上一章：项目实战</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
+  <a onclick="window.parent.loadPage('guide-ch12')">鈼€ 涓婁竴绔狅細椤圭洰瀹炴垬</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
   <span></span>
 </div>
 </body>
