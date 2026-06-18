@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第5章：烧录与调试 - 嵌入式小白完全指南</title>
+<title>绗?绔狅細鐑у綍涓庤皟璇?- 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,136 +57,321 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第5章：烧录与调试</h1>
-<div class="summary"><b>📖 小白完全指南 · 5/14</b> | 阅读时间约3分钟</div>
+<h1>绗?绔狅細鐑у綍涓庤皟璇?/h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 5/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
 
-<p>编译生成.bin/.hex文件后，需要用<strong>烧录器</strong>把它写进单片机的Flash里。调试则是让程序在芯片里<strong>暂停、单步执行、查看变量</strong>，像"慢放"一样找Bug。</p>
+<p>缂栬瘧鐢熸垚.bin/.hex鏂囦欢鍚庯紝闇€瑕佺敤<strong>鐑у綍鍣?/strong>鎶婂畠鍐欒繘鍗曠墖鏈虹殑Flash閲屻€傝皟璇曞垯鏄绋嬪簭鍦ㄨ姱鐗囬噷<strong>鏆傚仠銆佸崟姝ユ墽琛屻€佹煡鐪嬪彉閲?/strong>锛屽儚"鎱㈡斁"涓€鏍锋壘Bug銆?/p>
 
-<div class="analogy">💡 <b>类比：</b>烧录=把程序<strong>刻到芯片的DNA里</strong>（写死在Flash中），调试=给程序<strong>做体检</strong>（停住→检查→继续→再检查）。</div>
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>鐑у綍=鎶婄▼搴?strong>鍒诲埌鑺墖鐨凞NA閲?/strong>锛堝啓姝诲湪Flash涓級锛岃皟璇?缁欑▼搴?strong>鍋氫綋妫€</strong>锛堝仠浣忊啋妫€鏌モ啋缁х画鈫掑啀妫€鏌ワ級銆?/div>
 
-<h3>烧录方式对比</h3>
+<h3>璋冭瘯鎺ュ彛锛欽TAG vs SWD</h3>
+
+<p>ARM Cortex-M鑺墖鏀寔涓ょ璋冭瘯鎺ュ彛銆備簡瑙ｅ尯鍒湁鍔╀簬閫夊璋冭瘯鍣細</p>
 
 <table>
-<tr><th>方式</th><th>工具</th><th>速度</th><th>调试支持</th><th>价格</th></tr>
-<tr><td>ST-Link</td><td>st-flash / st-util</td><td>快</td><td>✅ GDB</td><td>¥10(仿)</td></tr>
-<tr><td>J-Link</td><td>JLinkGDBServer</td><td>极快</td><td>✅ GDB+SWO</td><td>¥500+</td></tr>
-<tr><td>DAP-Link</td><td>OpenOCD</td><td>中</td><td>✅ GDB</td><td>¥20</td></tr>
-<tr><td>串口烧录</td><td>STM32 USART bootloader</td><td>慢</td><td>❌</td><td>¥0</td></tr>
+<tr><th>鐗规€?/th><th>JTAG</th><th>SWD</th></tr>
+<tr><td>寮曡剼鏁?/td><td>5鏍癸紙TMS/TCK/TDI/TDO/TRST锛?/td><td>2鏍癸紙SWDIO/SWCLK锛?/td></tr>
+<tr><td>閫熷害</td><td>涓瓑</td><td>蹇紙涓撶敤鍗忚锛?/td></tr>
+<tr><td>鍗犵敤寮曡剼</td><td>澶氾紙5涓狦PIO锛?/td><td>灏戯紙2涓狦PIO锛?/td></tr>
+<tr><td>閫傜敤鍦烘櫙</td><td>鑰佽姱鐗?FPGA/澶氭牳</td><td>Cortex-M鍗曠墖鏈猴紙鏈€甯哥敤锛?/td></tr>
+<tr><td>鎺ㄨ崘</td><td>鍑犱箮涓嶇敤</td><td>鉁?榛樿閫夋嫨</td></tr>
 </table>
 
-<h3>OpenOCD 烧录</h3>
+<div class="tip">馃挕 <b>瀹為檯缁忛獙锛?/b>STM32鏈€灏忕郴缁熸澘涓婄殑4閽堟帓閽堬紙3V3/GND/SWDIO/SWCLK锛夊氨鏄疭WD鎺ュ彛銆傛棩甯歌皟璇曞彧闇€鎺ヨ繖4鏍瑰氨澶熶簡鈥斺€旀瘮JTAG鐪?鏍圭嚎锛岄€熷害杩樻洿蹇€係T-Link/V2鍜孌AP-Link閮芥敮鎸丼WD銆?/div>
 
-<div class="warn">⚠️ <b>前提条件：</b>需要先安装OpenOCD。由于GitHub下载被墙，请尝试以下方式：<br>
-① 搜索"OpenOCD xpack 国内镜像"下载<br>
-② 从淘宝购买开发板卖家提供的资料包（通常包含OpenOCD）<br>
-③ 让有VPN的朋友帮忙下载<br>
-下载后解压到 <code>D:\EmbeddedTools\OpenOCD</code>，把bin目录加PATH即可。</div>
+<div class="card">
+<div class="h"><span class="name">璋冭瘯鍣ㄩ€夎喘鎸囧崡</span><span class="tag g">鐪侀挶寤鸿</span></div>
+<div class="b">
+<div class="desc">甯傚満涓婅皟璇曞櫒鐞崇悈婊＄洰锛岄€夊鑳界渷涓嶅皯閽卞拰楹荤儲锛?/div>
+<table>
+<tr><th>璋冭瘯鍣?/th><th>浠锋牸</th><th>鏀寔鑺墖</th><th>閫熷害</th><th>鎺ㄨ崘搴?/th></tr>
+<tr><td>ST-Link/V2 浠?/td><td>楼8-15</td><td>STM32鍏ㄧ郴鍒?/td><td>4MHz SWD</td><td>猸愨瓙猸愨瓙猸?鍏ラ棬棣栭€?/td></tr>
+<tr><td>DAP-Link 浠?/td><td>楼15-30</td><td>鎵€鏈塁ortex-M</td><td>10MHz SWD</td><td>猸愨瓙猸愨瓙 鏇撮€氱敤</td></tr>
+<tr><td>J-Link EDU</td><td>楼400+</td><td>鎵€鏈堿RM鏍?/td><td>50MHz SWD</td><td>猸愨瓙猸?涓撲笟棣栭€?/td></tr>
+<tr><td>J-Link OB</td><td>楼30-50</td><td>STM32/閮ㄥ垎Cortex-M</td><td>4MHz SWD</td><td>猸愨瓙猸愨瓙 濂界敤浣嗚吹</td></tr>
+<tr><td>ST-Link/V3</td><td>楼80-120</td><td>STM32+STM8</td><td>24MHz SWD</td><td>猸愨瓙猸愨瓙 瀹樻柟鎺ㄨ崘</td></tr>
+</table>
+<div class="note">鈿狅笍 <b>娉ㄦ剰锛?/b>楼8鐨勪豢ST-Link鍝佽川鍙傚樊涓嶉綈銆傛湁浜?strong>涓嶈兘缁欑洰鏍囨澘渚涚數</strong>锛堥渶瑕侀澶栫粰鏉垮瓙渚涚數锛夛紝鏈変簺SWD閫熷害涓嶇ǔ瀹氥€備拱涔嬪墠鐪嬭瘎璁猴紝<strong>浼樺厛閫夋湁3.3V渚涚數杈撳嚭鐨?/strong>銆?/div>
+</div></div>
 
-<pre><code># 烧录命令
+<h3>鐑у綍鏂瑰紡瀵规瘮</h3>
+
+<table>
+<tr><th>鏂瑰紡</th><th>宸ュ叿</th><th>閫熷害</th><th>璋冭瘯鏀寔</th><th>浠锋牸</th></tr>
+<tr><td>ST-Link</td><td>st-flash / st-util</td><td>蹇?/td><td>鉁?GDB</td><td>楼10(浠?</td></tr>
+<tr><td>J-Link</td><td>JLinkGDBServer</td><td>鏋佸揩</td><td>鉁?GDB+SWO</td><td>楼500+</td></tr>
+<tr><td>DAP-Link</td><td>OpenOCD</td><td>涓?/td><td>鉁?GDB</td><td>楼20</td></tr>
+<tr><td>涓插彛鐑у綍</td><td>STM32 USART bootloader</td><td>鎱?/td><td>鉂?/td><td>楼0</td></tr>
+</table>
+
+<h3>OpenOCD 鐑у綍</h3>
+
+<div class="warn">鈿狅笍 <b>鍓嶆彁鏉′欢锛?/b>闇€瑕佸厛瀹夎OpenOCD銆傜敱浜嶨itHub涓嬭浇琚锛岃灏濊瘯浠ヤ笅鏂瑰紡锛?br>
+鈶?鎼滅储"OpenOCD xpack 鍥藉唴闀滃儚"涓嬭浇<br>
+鈶?浠庢窐瀹濊喘涔板紑鍙戞澘鍗栧鎻愪緵鐨勮祫鏂欏寘锛堥€氬父鍖呭惈OpenOCD锛?br>
+鈶?璁╂湁VPN鐨勬湅鍙嬪府蹇欎笅杞?br>
+涓嬭浇鍚庤В鍘嬪埌 <code>D:\EmbeddedTools\OpenOCD</code>锛屾妸bin鐩綍鍔燩ATH鍗冲彲銆?/div>
+
+<pre><code># 鐑у綍鍛戒护
 openocd -f interface/stlink.cfg -f target/stm32f1x.cfg     -c "program build/blink.elf verify reset exit"
 
-# 只擦除
+# 鍙摝闄?
 openocd -f interface/stlink.cfg -f target/stm32f1x.cfg     -c "init; reset halt; flash erase_sector 0 0 last; reset run; shutdown"</code></pre>
 
-<h3>ST-Link 烧录（st-flash）</h3>
+<h3>ST-Link 鐑у綍锛坰t-flash锛?/h3>
 
-<div class="warn">⚠️ <b>前提条件：</b>需要安装stlink工具。下载地址：<code>github.com/stlink-org/stlink/releases</code>（同GitHub，可能被墙）。替代方案：使用STM32CubeIDE自带的st-link驱动。</div>
+<div class="warn">鈿狅笍 <b>鍓嶆彁鏉′欢锛?/b>闇€瑕佸畨瑁卻tlink宸ュ叿銆備笅杞藉湴鍧€锛?code>github.com/stlink-org/stlink/releases</code>锛堝悓GitHub锛屽彲鑳借澧欙級銆傛浛浠ｆ柟妗堬細浣跨敤STM32CubeIDE鑷甫鐨剆t-link椹卞姩銆?/div>
 
-<pre><code># 安装stlink工具（需编译或下载预编译版）
+<pre><code># 瀹夎stlink宸ュ叿锛堥渶缂栬瘧鎴栦笅杞介缂栬瘧鐗堬級
 # github.com/stlink-org/stlink/releases
-# 下载后解压，把bin目录加PATH
+# 涓嬭浇鍚庤В鍘嬶紝鎶奲in鐩綍鍔燩ATH
 
-# 烧录BIN文件
+# 鐑у綍BIN鏂囦欢
 st-flash write blink.bin 0x08000000
 
-# 烧录HEX文件
+# 鐑у綍HEX鏂囦欢
 st-flash --format ihex write blink.hex
 
-# 擦除整片Flash
+# 鎿﹂櫎鏁寸墖Flash
 st-flash erase
 
-# 读取Flash内容
+# 璇诲彇Flash鍐呭
 st-flash read flash_dump.bin 0x08000000 0x10000</code></pre>
 
-<h3>串口ISP烧录（零硬件成本！）</h3>
+<h3>涓插彛ISP鐑у綍锛堥浂纭欢鎴愭湰锛侊級</h3>
 
-<div class="tip">💡 <b>没有ST-Link？用USB转TTL也能烧！</b>STM32内置Bootloader支持串口下载，只需要CH340模块（¥5）。速度比ST-Link慢，但<strong>零额外成本</strong>。</div>
+<div class="tip">馃挕 <b>娌℃湁ST-Link锛熺敤USB杞琓TL涔熻兘鐑э紒</b>STM32鍐呯疆Bootloader鏀寔涓插彛涓嬭浇锛屽彧闇€瑕丆H340妯″潡锛埪?锛夈€傞€熷害姣擲T-Link鎱紝浣?strong>闆堕澶栨垚鏈?/strong>銆?/div>
 
-<pre><code># 方式1：FlyMcu（最简单的Windows串口烧录工具）
-# 下载：www.flymcu.com（免费，中文界面）
-# 使用：
-# 1. BOOT0跳线接1（或按住BOOT0键上电）
-# 2. 打开FlyMcu → 选择COM口和hex文件
-# 3. 点击"开始编程"
-# 4. 烧录完成后BOOT0接回0，按复位键运行
+<pre><code># 鏂瑰紡1锛欶lyMcu锛堟渶绠€鍗曠殑Windows涓插彛鐑у綍宸ュ叿锛?
+# 涓嬭浇锛歸ww.flymcu.com锛堝厤璐癸紝涓枃鐣岄潰锛?
+# 浣跨敤锛?
+# 1. BOOT0璺崇嚎鎺?锛堟垨鎸変綇BOOT0閿笂鐢碉級
+# 2. 鎵撳紑FlyMcu 鈫?閫夋嫨COM鍙ｅ拰hex鏂囦欢
+# 3. 鐐瑰嚮"寮€濮嬬紪绋?
+# 4. 鐑у綍瀹屾垚鍚嶣OOT0鎺ュ洖0锛屾寜澶嶄綅閿繍琛?
 
-# 方式2：stm32flash（命令行工具）
-# 下载：github.com/ARMin stm32flash
-# 使用：
+# 鏂瑰紡2锛歴tm32flash锛堝懡浠よ宸ュ叿锛?
+# 涓嬭浇锛歡ithub.com/ARMin stm32flash
+# 浣跨敤锛?
 stm32flash -w blink.hex -v -g 0x0 COM3
-# -w 写入  -v 校验  -g 0x0 写完从0地址运行  COM3 你的串口</code></pre>
+# -w 鍐欏叆  -v 鏍￠獙  -g 0x0 鍐欏畬浠?鍦板潃杩愯  COM3 浣犵殑涓插彛</code></pre>
 
-<div class="note">⚠️ <b>串口烧录要点：</b><br>
-• BOOT0必须接高电平(1)才能进入下载模式<br>
-• 烧录完成后BOOT0接回低电平(0)，按复位键才能运行程序<br>
-• 有些最小系统板有BOOT0跳线帽，方便切换<br>
-• 每次烧录都要切换BOOT0，不如ST-Link方便，但学习阶段完全够用</div>
+<div class="note">鈿狅笍 <b>涓插彛鐑у綍瑕佺偣锛?/b><br>
+鈥?BOOT0蹇呴』鎺ラ珮鐢靛钩(1)鎵嶈兘杩涘叆涓嬭浇妯″紡<br>
+鈥?鐑у綍瀹屾垚鍚嶣OOT0鎺ュ洖浣庣數骞?0)锛屾寜澶嶄綅閿墠鑳借繍琛岀▼搴?br>
+鈥?鏈変簺鏈€灏忕郴缁熸澘鏈塀OOT0璺崇嚎甯斤紝鏂逛究鍒囨崲<br>
+鈥?姣忔鐑у綍閮借鍒囨崲BOOT0锛屼笉濡係T-Link鏂逛究锛屼絾瀛︿範闃舵瀹屽叏澶熺敤</div>
 
-<h3>GDB调试</h3>
+<h3>GDB璋冭瘯</h3>
 
-<div class="note">⚠️ <b>说明：</b>GDB调试需要硬件调试器（ST-Link/DAP-Link/J-Link）。如果你暂时没有调试器，可以先跳过GDB部分，用printf调试（第11章详解）。下面提供两种调试方案：<strong>方案A用OpenOCD</strong>（免费开源，DAP-Link/ST-Link通用），<strong>方案B用st-util</strong>（ST-Link专用，更简单）。</div>
+<div class="note">鈿狅笍 <b>璇存槑锛?/b>GDB璋冭瘯闇€瑕佺‖浠惰皟璇曞櫒锛圫T-Link/DAP-Link/J-Link锛夈€傚鏋滀綘鏆傛椂娌℃湁璋冭瘯鍣紝鍙互鍏堣烦杩嘒DB閮ㄥ垎锛岀敤printf璋冭瘯锛堢11绔犺瑙ｏ級銆備笅闈㈡彁渚涗袱绉嶈皟璇曟柟妗堬細<strong>鏂规A鐢∣penOCD</strong>锛堝厤璐瑰紑婧愶紝DAP-Link/ST-Link閫氱敤锛夛紝<strong>鏂规B鐢╯t-util</strong>锛圫T-Link涓撶敤锛屾洿绠€鍗曪級銆?/div>
 
-<h4>方案A：OpenOCD + GDB（推荐，通用性更好）</h4>
+<h4>鏂规A锛歄penOCD + GDB锛堟帹鑽愶紝閫氱敤鎬ф洿濂斤級</h4>
 
-<pre><code># 终端1：启动OpenOCD作为GDB Server
+<pre><code># 缁堢1锛氬惎鍔∣penOCD浣滀负GDB Server
 openocd -f interface/stlink.cfg -f target/stm32f1x.cfg
-# 看到 "Info : stm32f1x.cpu: hardware has 6 breakpoints" 就说明连接成功
+# 鐪嬪埌 "Info : stm32f1x.cpu: hardware has 6 breakpoints" 灏辫鏄庤繛鎺ユ垚鍔?
 
-# 终端2：启动GDB客户端
+# 缁堢2锛氬惎鍔℅DB瀹㈡埛绔?
 arm-none-eabi-gdb build/blink.elf
 
-# GDB常用命令（两方案通用）
-(gdb) target remote :3333         # 连接OpenOCD（注意端口3333）
-(gdb) monitor reset halt          # 复位并停住
-(gdb) load                         # 烧录程序到芯片
-(gdb) break main                   # 在main函数设断点
-(gdb) continue                     # 继续运行
-(gdb) step                         # 单步（进入函数）
-(gdb) next                         # 单步（跳过函数）
-(gdb) print variable               # 打印变量值
-(gdb) watch variable               # 监视变量变化
-(gdb) backtrace                    # 查看调用栈
-(gdb) info registers               # 查看CPU寄存器
-(gdb) x/10x 0x20000000            # 查看内存（16进制）
-(gdb) delete                       # 删除所有断点
-(gdb) quit                         # 退出</code></pre>
+# GDB甯哥敤鍛戒护锛堜袱鏂规閫氱敤锛?
+(gdb) target remote :3333         # 杩炴帴OpenOCD锛堟敞鎰忕鍙?333锛?
+(gdb) monitor reset halt          # 澶嶄綅骞跺仠浣?
+(gdb) load                         # 鐑у綍绋嬪簭鍒拌姱鐗?
+(gdb) break main                   # 鍦╩ain鍑芥暟璁炬柇鐐?
+(gdb) continue                     # 缁х画杩愯
+(gdb) step                         # 鍗曟锛堣繘鍏ュ嚱鏁帮級
+(gdb) next                         # 鍗曟锛堣烦杩囧嚱鏁帮級
+(gdb) print variable               # 鎵撳嵃鍙橀噺鍊?
+(gdb) watch variable               # 鐩戣鍙橀噺鍙樺寲
+(gdb) backtrace                    # 鏌ョ湅璋冪敤鏍?
+(gdb) info registers               # 鏌ョ湅CPU瀵勫瓨鍣?
+(gdb) x/10x 0x20000000            # 鏌ョ湅鍐呭瓨锛?6杩涘埗锛?
+(gdb) delete                       # 鍒犻櫎鎵€鏈夋柇鐐?
+(gdb) quit                         # 閫€鍑?/code></pre>
 
-<h4>方案B：st-util + GDB（ST-Link专用，简单）</h4>
+<h4>鏂规B锛歴t-util + GDB锛圫T-Link涓撶敤锛岀畝鍗曪級</h4>
 
-<div class="warn">⚠️ <b>前提：</b>需安装stlink工具：<code>github.com/stlink-org/stlink/releases</code>（GitHub可能被墙，替代：STM32CubeIDE自带st-link驱动）</div>
+<div class="warn">鈿狅笍 <b>鍓嶆彁锛?/b>闇€瀹夎stlink宸ュ叿锛?code>github.com/stlink-org/stlink/releases</code>锛圙itHub鍙兘琚锛屾浛浠ｏ細STM32CubeIDE鑷甫st-link椹卞姩锛?/div>
 
-<pre><code># 终端1：启动GDB Server
+<pre><code># 缁堢1锛氬惎鍔℅DB Server
 st-util -p 4242
 
-# 终端2：启动GDB客户端
+# 缁堢2锛氬惎鍔℅DB瀹㈡埛绔?
 arm-none-eabi-gdb build/blink.elf
 
-# GDB连接st-util
+# GDB杩炴帴st-util
 (gdb) target remote localhost:4242
 (gdb) load
 (gdb) break main
 (gdb) continue
-# 其余命令与方案A相同</code></pre>
+# 鍏朵綑鍛戒护涓庢柟妗圓鐩稿悓</code></pre>
 
-<div class="tip">💡 <b>没有调试器怎么办？</b>用<strong>串口printf调试</strong>！第11章详细介绍了printf重定向方法，足够解决80%的问题。买ST-Link只需¥10，建议入门后尽快入手。</div>
+<div class="tip">馃挕 <b>娌℃湁璋冭瘯鍣ㄦ€庝箞鍔烇紵</b>鐢?strong>涓插彛printf璋冭瘯</strong>锛佺11绔犺缁嗕粙缁嶄簡printf閲嶅畾鍚戞柟娉曪紝瓒冲瑙ｅ喅80%鐨勯棶棰樸€備拱ST-Link鍙渶楼10锛屽缓璁叆闂ㄥ悗灏藉揩鍏ユ墜銆?/div>
 
-<h3>VS Code Cortex-Debug 配置</h3>
+<h3>GDB楂橀樁鎶€宸?/h3>
 
-<div class="note">⚠️ <b>前提：</b>① 已安装Cortex-Debug插件 ② 已安装OpenOCD或stlink工具 ③ ST-Link调试器已连接</div>
+<div class="card">
+<div class="h"><span class="name">鏂偣绫诲瀷璇﹁В</span><span class="tag p">杩涢樁</span></div>
+<div class="b">
+<div class="desc">GDB鏀寔澶氱鏂偣绫诲瀷锛屼笉鍚屽満鏅敤涓嶅悓鏂偣鑳芥瀬澶ф彁楂樿皟璇曟晥鐜囷細</div>
+<pre><code># === 1. 鏅€氭柇鐐癸紙鏈€鍩虹锛?==
+(gdb) break main           # 鍦╩ain鍑芥暟鍏ュ彛
+(gdb) break main.c:42      # 鍦╩ain.c鐨勭42琛?
+(gdb) break HAL_UART_Transmit  # 鍦ㄥ嚱鏁板叆鍙?
 
-<h4>方案A配置：OpenOCD（推荐，与GDB方案A配套）</h4>
+# === 2. 鏉′欢鏂偣锛堝彧鍦ㄦ潯浠舵弧瓒虫椂鍋滀笅锛?==
+(gdb) break main.c:100 if count > 50
+(gdb) break blink.c:30 if error_code != 0
+# 绀轰緥锛氬彧鍦ㄦ俯搴?40掳C鏃跺仠鍦╮ead_temp鍑芥暟
+(gdb) break read_temp if raw_value > 500
 
-<pre><code>// .vscode/launch.json - OpenOCD方案
+# === 3. 涓存椂鏂偣锛堝懡涓竴娆″悗鑷姩鍒犻櫎锛?==
+(gdb) tbreak init_hardware
+# 閫傚悎"鎴戝彧鎯崇湅鍒濆鍖栬窇涓€娆?鐨勫満鏅?
+
+# === 4. 纭欢鏂偣锛堜笉淇敼Flash鍐呭锛?==
+(gdb) hbreak *(0x08000400)
+# 纭欢鏂偣涓嶄慨鏀笷lash锛岄€傚悎璋冭瘯Flash涓殑浠ｇ爜
+# 娉ㄦ剰锛欳ortex-M3鍙湁6涓‖浠舵柇鐐癸紒
+
+# === 5. 瑙傚療鐐癸紙鍙橀噺鍊兼敼鍙樻椂鍋滀笅锛?==
+(gdb) watch global_error_count
+(gdb) watch *0x20000100     # 鐩戣鍐呭瓨鍦板潃
+(gdb) rwatch *0x20000100    # 璇荤洃瑙嗭紙鍦板潃琚鏃跺仠涓嬶級
+(gdb) awatch *0x20000100    # 璇诲啓鐩戣锛堣鍐欓兘鍋滀笅锛?
+# 绀轰緥锛氭壘鍑鸿皝鏀逛簡鎴戠殑鍙橀噺
+(gdb) watch sensor_data.raw_value
+# 浠讳綍淇敼sensor_data.raw_value鐨勪唬鐮侀兘浼氳Е鍙戞柇鐐?
+
+# === 6. 鎹曡幏鐐癸紙鎹曡幏绯荤粺浜嬩欢锛?==
+(gdb) catch fork     # 鎹曡幏fork璋冪敤
+(gdb) catch throw    # 鎹曡幏C++寮傚父
+# 宓屽叆寮廏DB閫氬父涓嶆敮鎸乧atch锛圠inux搴旂敤璋冭瘯鎵嶅父鐢級</code></pre>
+<div class="note">鈿狅笍 <b>纭欢鏂偣闄愬埗锛?/b>Cortex-M绯诲垪鍙湁<strong>4-8涓‖浠舵柇鐐?/strong>锛圫TM32F103鏄?涓級銆傚綋浣犺缃7涓柇鐐规椂GDB浼氭姤閿欍€傝В鍐虫柟娉曪細鈶?鍒犳帀涓嶉渶瑕佺殑鏂偣 鈶?鐢ㄨ蒋浠舵柇鐐癸紙鏀笷lash锛屼絾Flash鏈夋摝鍐欏鍛介檺鍒讹級鈶?娣峰悎浣跨敤纭欢鏂偣鍜岃瀵熺偣銆?/div>
+</div></div>
+
+<div class="card">
+<div class="h"><span class="name">GDB鑴氭湰鍖栬皟璇?/span><span class="tag b">瀹炵敤鎶€宸?/span></div>
+<div class="b">
+<div class="desc">鎶婂父鐢ㄨ皟璇曞懡浠ゅ啓鍏?gdbinit鏂囦欢锛屾瘡娆¤皟璇曡嚜鍔ㄦ墽琛岋紝鐪佸幓閲嶅杈撳叆锛?/div>
+<pre><code># .gdbinit 鈥?鏀惧湪椤圭洰鏍圭洰褰曪紝GDB鍚姩鏃惰嚜鍔ㄥ姞杞?
+# VS Code Cortex-Debug榛樿绂佺敤.gdbinit锛堝畨鍏ㄥ師鍥狅級锛?
+# 闇€瑕佸湪launch.json涓缃?"gdbInitCommands": []
+
+# 鑷姩杩炴帴鐩爣
+target remote localhost:3333
+
+# 鑷姩鐑у綍
+monitor reset halt
+load
+
+# 鑷姩璁剧疆鏂偣
+break main
+break HardFault_Handler
+break Error_Handler
+
+# 鑷姩瀹氫箟鍛戒护锛堝揩閫熸煡鐪嬪叧閿彉閲忥級
+define show_system
+  printf "Tick: %lu\\n", xTaskGetTickCount()
+  printf "Stack: %d bytes free\\n", uxTaskGetStackHighWaterMark(NULL)
+  info registers pc lr sp
+end
+
+# 鑷姩瀹氫箟鍛戒护锛堝揩閫熸煡鐪嬪璁惧瘎瀛樺櫒锛?
+define show_gpio
+  x/4x 0x40011000  # GPIOC_CRL
+  x/4x 0x40011004  # GPIOC_CRH
+  x/4x 0x4001100C  # GPIOC_ODR
+end
+
+# 鍚姩鍚庤嚜鍔╟ontinue
+define hookpost-run
+  continue
+end</code></pre>
+<div class="tip">馃挕 <b>灏忔妧宸э細</b>鍦╒S Code鐨凜ortex-Debug涓紝鍙互鍦?code>launch.json</code>閲岀敤<code>"preLaunchCommands"</code>鍜?code>"postLaunchCommands"</code>鏇夸唬.gdbinit锛屾洿瀹夊叏涓旇法骞冲彴銆?/div>
+</div></div>
+
+<h3>瀹炴垬缁冧範</h3>
+
+<div class="tip">馃挕 <b>缁冧範1锛氳皟璇昄ED闂儊绋嬪簭</b><br>
+鐩爣锛氱敤GDB鎺у埗LED鐨勪寒鐏?br>
+瑕佹眰锛?br>
+鈶?鐑у綍LED闂儊绋嬪簭鍚庯紝鐢℅DB杩炴帴骞跺湪main璁炬柇鐐?br>
+鈶?鐢?code>monitor reset halt</code>澶嶄綅骞跺仠浣?br>
+鈶?鏌ョ湅GPIOC_ODR瀵勫瓨鍣紙<code>x/1x 0x4001100C</code>锛夛紝璁颁笅鍒濆鍊?br>
+鈶?鎵嬪姩鎵ц缈昏浆LED鐨勪唬鐮侊紙<code>set *(uint32_t*)0x4001100C ^= (1<<13)</code>锛?br>
+鈶?瑙傚療LED鏄惁鍙樺寲锛岀悊瑙ｅ瘎瀛樺櫒鎿嶄綔鐨勬湰璐?/div>
+
+<div class="tip">馃挕 <b>缁冧範2锛氱敤瑙傚療鐐规壘Bug</b><br>
+鐩爣锛氭湁浜轰笉灏忓績鍦ㄤ腑鏂噷淇敼浜嗗叏灞€鍙橀噺锛岀敤瑙傚療鐐规壘鍒扮姜榄佺ジ棣?br>
+瑕佹眰锛?br>
+鈶?鍐欎竴涓▼搴忥紝鍦═IM涓柇涓剰澶栦慨鏀逛簡sensor_data<br>
+鈶?鐢?code>watch sensor_data</code>璁剧疆瑙傚療鐐?br>
+鈶?<code>continue</code>杩愯锛岃瀵烥DB鍦ㄥ摢鍋滀笅<br>
+鈶?鐢?code>backtrace</code>鏌ョ湅璋冪敤鏍堬紝鎵惧埌淇敼鑰?/div>
+
+<h3>Bootloader锛氳浜у搧鑳借繙绋嬪崌绾?/h3>
+
+<div class="card">
+<div class="h"><span class="name">Bootloader姒傚康</span><span class="tag p">杩涢樁</span></div>
+<div class="b">
+<div class="desc">Bootloader鏄姱鐗囦笂鐢靛悗绗竴涓繍琛岀殑绋嬪簭锛屽畠鍐冲畾鏄?strong>璺宠浆鍒癆PP</strong>杩樻槸<strong>杩涘叆鍗囩骇妯″紡</strong>銆傛湁浜咮ootloader锛屼骇鍝佸嚭鍘傚悗鍙互閫氳繃涓插彛/WiFi/钃濈墮鍗囩骇鍥轰欢锛屼笉鐢ㄦ媶鏈洪噸鐑э細</div>
+<pre><code>// Bootloader鐨勫吀鍨嬪垽鏂€昏緫
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+    
+    // 鍒ゆ柇鏄惁杩涘叆鍗囩骇妯″紡
+    if (check_upgrade_pin() || check_upgrade_flag()) {
+        // 鍗囩骇妯″紡锛氱瓑寰呮帴鏀舵柊鍥轰欢
+        enter_upgrade_mode();  // 閫氳繃涓插彛/YModem鎺ユ敹鍥轰欢
+    } else {
+        // 姝ｅ父妯″紡锛氳烦杞埌APP
+        jump_to_app(APP_START_ADDR);  // 濡?0x08004000
+    }
+}
+
+// 璺宠浆鍒癆PP鐨勫嚱鏁?
+void jump_to_app(uint32_t app_addr) {
+    // 1. 妫€鏌ユ爤椤跺湴鍧€鏄惁鍚堟硶锛堝湪RAM鑼冨洿鍐咃級
+    uint32_t app_stack = *(uint32_t*)app_addr;
+    if ((app_stack & 0x2FFE0000) != 0x20000000) {
+        return;  // 鏍堝湴鍧€涓嶅湪SRAM鍖猴紝APP鏃犳晥
+    }
+    
+    // 2. 鍏抽棴鎵€鏈変腑鏂?
+    __disable_irq();
+    
+    // 3. 閲嶆柊璁剧疆鍚戦噺琛?
+    SCB->VTOR = app_addr;
+    
+    // 4. 璁剧疆鏍堟寚閽堝苟璺宠浆锛堝唴鑱旀眹缂栵級
+    __set_MSP(app_stack);
+    uint32_t app_entry = *(uint32_t*)(app_addr + 4);
+    void (*app_reset)(void) = (void(*)())app_entry;
+    app_reset();  // 姘歌繙涓嶄細杩斿洖
+}
+
+// APP绔渶瑕佸仛鐨勶細
+// 1. 閾炬帴鑴氭湰涓璅lash璧峰鍦板潃鏀逛负APP_START_ADDR
+// 2. main寮€澶寸棝璁剧疆VTOR: SCB->VTOR = APP_START_ADDR;
+// 3. 涓柇鍚戦噺鍋忕Щ涔熻鐩稿簲璋冩暣</code></pre>
+<div class="note">鈿狅笍 <b>鍏抽敭姒傚康锛?/b>Flash鍒嗗尯绀轰緥鈥斺€?br>
+鈥?0x08000000 - 0x08003FFF锛欱ootloader鍖猴紙16KB锛?br>
+鈥?0x08004000 - 0x0800FFFF锛欰PP鍖猴紙48KB锛?br>
+鈥?0x08010000 - 0x0801FFFF锛歄TA涓嬭浇鍖?閰嶇疆鍖?br>
+娉ㄦ剰锛欰PP鐨勯摼鎺ヨ剼鏈繀椤绘妸FLASH璧峰鍦板潃鏀逛负0x08004000锛屽惁鍒欏悜閲忚〃鍋忕Щ閿欒浼氬鑷存墍鏈変腑鏂け鏁堛€?/div>
+</div></div>
+
+<h3>VS Code Cortex-Debug 閰嶇疆</h3>
+
+<div class="note">鈿狅笍 <b>鍓嶆彁锛?/b>鈶?宸插畨瑁匔ortex-Debug鎻掍欢 鈶?宸插畨瑁匫penOCD鎴杝tlink宸ュ叿 鈶?ST-Link璋冭瘯鍣ㄥ凡杩炴帴</div>
+
+<h4>鏂规A閰嶇疆锛歄penOCD锛堟帹鑽愶紝涓嶨DB鏂规A閰嶅锛?/h4>
+
+<pre><code>// .vscode/launch.json - OpenOCD鏂规
 {
     "version": "0.2.0",
     "configurations": [
@@ -205,9 +390,9 @@ arm-none-eabi-gdb build/blink.elf
     ]
 }</code></pre>
 
-<h4>方案B配置：st-util（与GDB方案B配套）</h4>
+<h4>鏂规B閰嶇疆锛歴t-util锛堜笌GDB鏂规B閰嶅锛?/h4>
 
-<pre><code>// .vscode/launch.json - st-util方案
+<pre><code>// .vscode/launch.json - st-util鏂规
 {
     "version": "0.2.0",
     "configurations": [
@@ -226,19 +411,63 @@ arm-none-eabi-gdb build/blink.elf
     ]
 }</code></pre>
 
-<div class="trouble">🔍 <b>常见问题：GDB连接不上</b><br>
-1. ST-Link驱动是否安装？<code>st-info --probe</code> 测试<br>
-2. 是否有其他程序占用了ST-Link？（关闭STM32CubeIDE等）<br>
-3. 接线是否正确？SWDIO/SWCLK/GND三根线必须接</div>
+<div class="trouble">馃攳 <b>甯歌闂锛氱儳褰曞け璐ュ悎闆?/b><br>
+<b>1. "No ST-LINK detected" / "Cannot connect to target"</b><br>
+鈥?妫€鏌SB绾库€斺€旀湁浜涚嚎鍙兘鍏呯數涓嶈兘浼犳暟鎹紙鎹㈡牴绾胯瘯璇曪紒锛?br>
+鈥?妫€鏌WD鎺ョ嚎锛歋WDIO/SWCLK/GND鑷冲皯3鏍?br>
+鈥?妫€鏌ョ洰鏍囨澘鏄惁宸蹭緵鐢碉紙浠縎T-Link閫氬父涓嶇粰鐩爣鏉夸緵鐢碉紒锛?br>
+鈥?Windows璁惧绠＄悊鍣ㄩ噷鐪婼T-Link鏄惁琚瘑鍒紙鏈夐粍鑹叉劅鍙瑰彿=椹卞姩鏈锛?br>
+鈥?灏濊瘯鎷旀彃USB锛屾洿鎹SB鍙?br><b>2. "Flash download failed" / "Cannot program"</b><br>
+鈥?鑺墖鏄惁琚淇濇姢浜嗭紵鐢?<code>st-flash --read-unprotect</code> 鎴?<code>openocd -c "stm32f1x unlock 0"</code> 瑙ｉ攣<br>
+鈥?Flash鏄惁琚啓淇濇姢浜嗭紵妫€鏌ラ€夐」瀛楄妭锛圤ption Bytes锛?br>
+鈥?BOOT0寮曡剼鏄惁鎺ラ敊锛燂紙BOOT0=1浼氳繘鍏ョ郴缁烞ootloader锛孲WD鏃犳硶杩炴帴锛?br>
+<b>3. "Target voltage detection failed"</b><br>
+鈥?鐩爣鏉挎病鐢碉紒妫€鏌ョ洰鏍囨澘鐨?.3V渚涚數鏄惁姝ｅ父<br>
+鈥?濡傛灉鐢ㄤ豢ST-Link锛岀‘淇濆畠杈撳嚭3.3V缁欑洰鏍囨澘锛堟垨鍗曠嫭渚涚數锛?br>
+<b>4. 鐑у綍鎴愬姛浣嗙▼搴忎笉杩愯</b><br>
+鈥?BOOT0鏄惁宸叉帴鍥?锛燂紙涓插彛ISP鐑у綍鍚庡繀椤诲垏鍥濨OOT0=0锛?br>
+鈥?鎸変竴涓嬪浣嶉敭璇曡瘯<br>
+鈥?妫€鏌ュ惎鍔ㄦ枃浠?閾炬帴鑴氭湰鈥斺€斿悜閲忚〃鏄惁姝ｇ‘鏀剧疆锛?br>
+鈥?妫€鏌ystemInit()鏄惁姝ｇ‘閰嶇疆浜嗘椂閽?/div>
 
-<!-- ====== 第6章 ====== -->
+<div class="summary" style="margin-top:24px">
+<b>馃摎 绗?绔犵煡璇嗙偣鍥為【</b><br><br>
+<b>鉁?鐑у綍鏂瑰紡锛?/b><br>
+鈥?<strong>ST-Link锛堟帹鑽愶級</strong>锛毬?0浠垮埗鍝佸嵆鍙紝鏀寔SWD鐑у綍+GDB璋冭瘯<br>
+鈥?<strong>涓插彛ISP锛堢渷閽憋級</strong>锛氱敤CH340灏辫兘鐑э紝浣嗛渶瑕佸垏鎹OOT0锛屼笉鏀寔璋冭瘯<br>
+鈥?<strong>J-Link锛堜笓涓氾級</strong>锛氶€熷害蹇姛鑳藉叏锛屼絾楼400+锛屽垵瀛﹁€呬笉闇€瑕?br>
+鈥?<strong>DAP-Link锛堥€氱敤锛?/strong>锛氬紑婧愭柟妗堬紝鏀寔鎵€鏈塁ortex-M鑺墖<br><br>
+<b>鉁?璋冭瘯鎺ュ彛锛?/b><br>
+鈥?<strong>SWD</strong>锛?绾匡級鏄疌ortex-M鍗曠墖鏈虹殑鏍囧噯璋冭瘯鎺ュ彛<br>
+鈥?JTAG锛?绾匡級鍑犱箮涓嶇敤锛孲WD鏇村揩鏇寸渷寮曡剼<br>
+鈥?鏍囧噯SWD杩炴帴锛?V3 + GND + SWDIO + SWCLK锛?鏍圭嚎锛?br><br>
+<b>鉁?GDB璋冭瘯鏍稿績鎶€鑳斤細</b><br>
+鈥?<strong>鏂偣</strong>锛歜reak(鏅€?/tbreak(涓存椂)/hbreak(纭欢)/鏉′欢鏂偣<br>
+鈥?<strong>瑙傚療鐐?/strong>锛歸atch(鍐?/rwatch(璇?/awatch(璇诲啓)锛屾壘鍑鸿皝鏀逛簡鍙橀噺<br>
+鈥?<strong>鎺у埗鎵ц</strong>锛歝ontinue(缁х画)/step(杩涘叆)/next(璺宠繃)/finish(璺冲嚭)<br>
+鈥?<strong>鏌ョ湅鐘舵€?/strong>锛歱rint(鍙橀噺)/info registers(瀵勫瓨鍣?/backtrace(璋冪敤鏍?/x(鍐呭瓨)<br>
+鈥?<strong>鑴氭湰鍖?/strong>锛?gdbinit鑷姩鎵ц甯哥敤鍛戒护<br><br>
+<b>鉁?Bootloader鏍稿績姒傚康锛?/b><br>
+鈥?Bootloader鏄姱鐗囦笂鐢靛悗绗竴涓繍琛岀殑绋嬪簭<br>
+鈥?鍒ゆ柇鏉′欢鍚庡喅瀹氾細璺宠浆APP 杩樻槸 杩涘叆鍗囩骇妯″紡<br>
+鈥?APP闇€瑕侀噸鏂拌缃甐TOR锛堝悜閲忚〃鍋忕Щ锛?br>
+鈥?閾炬帴鑴氭湰涓瑼PP鐨凢lash璧峰鍦板潃蹇呴』淇敼<br><br>
+<b>鈿狅笍 甯歌闄烽槺锛?/b><br>
+鈥?浠縎T-Link涓嶈兘缁欑洰鏍囨澘渚涚數鈥斺€旈渶瑕侀澶栨帴3.3V<br>
+鈥?纭欢鏂偣鍙湁6涓紝鐢ㄥ畬灏变笉鑳藉姞<br>
+鈥?鐑у綍鎴愬姛浣嗕笉杩愯鈫掓鏌OOT0銆佹寜澶嶄綅閿?br>
+鈥?USB绾垮彧鑳藉厖鐢典笉鑳戒紶鏁版嵁鈫掓崲鏍圭嚎锛?br>
+鈥?HAL_Delay鍦ㄤ腑鏂噷璋冪敤涓斾紭鍏堢骇>SysTick鈫掓閿侊紒
+</div>
+
+<!-- ====== 绗?绔?====== -->
 <a id="ch6"></a>
-<div class="summary">📖 <b>第6章学完你能干啥：</b>会用STM32 HAL库操作GPIO/UART/TIM/ADC，理解中断优先级，能独立写STM32小程序。</div>
+<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>浼氱敤STM32 HAL搴撴搷浣淕PIO/UART/TIM/ADC锛岀悊瑙ｄ腑鏂紭鍏堢骇锛岃兘鐙珛鍐橲TM32灏忕▼搴忋€?/div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch04')">← 第4章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
-<a onclick="window.parent.loadPage('guide-ch06')">第6章 →</a>
+<a onclick="window.parent.loadPage('guide-ch04')">鈫?绗?绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
+<a onclick="window.parent.loadPage('guide-ch06')">绗?绔?鈫?/a>
 </div>
 
 <script>
@@ -257,9 +486,9 @@ document.querySelectorAll('pre').forEach(pre => {
 });
 </script>
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch04')">◀ 上一章：串口通信</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
-  <a onclick="window.parent.loadPage('guide-ch06')">STM32 ：下一章 ▶</a>
+  <a onclick="window.parent.loadPage('guide-ch04')">鈼€ 涓婁竴绔狅細涓插彛閫氫俊</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
+  <a onclick="window.parent.loadPage('guide-ch06')">STM32 锛氫笅涓€绔?鈻?/a>
 </div>
 </body>
 </html>
