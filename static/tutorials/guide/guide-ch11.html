@@ -174,6 +174,171 @@ void Hard_Fault_Handler(uint32_t *stack_frame) {
 <a id="ch12"></a>
 <div class="summary">馃摉 <b>绗?2绔犲瀹屼綘鑳藉共鍟ワ細</b>鑳界嫭绔嬪畬鎴愪竴涓畬鏁寸殑宓屽叆寮忛」鐩€斺€斾粠纭欢鎺ョ嚎鍒拌蒋浠剁紪鍐欏埌鐑у綍杩愯銆?/div>
 
+
+<h2>馃攱 鐢垫睜渚涚數绯荤粺璁捐</h2>
+
+<p>宓屽叆寮忚澶囧ぇ閮ㄥ垎鏄數姹犱緵鐢碉紝鐢垫睜绠＄悊鍋氫笉濂斤紝浜у搧浣撻獙灏卞簾浜嗕竴鍗娿€?/p>
+
+<h3>鐢垫睜閫夊瀷鎸囧崡</h3>
+
+<table>
+<tr><th>鐢垫睜绫诲瀷</th><th>鏍囩О鐢靛帇</th><th>鑳介噺瀵嗗害</th><th>鑷斁鐢?鏈?/th><th>閫傜敤鍦烘櫙</th></tr>
+<tr><td>CR2032绾芥墸</td><td>3.0V</td><td>~230mAh</td><td>鏋佷綆(&lt;1%)</td><td>BLE淇℃爣銆佷紶鎰熷櫒鑺傜偣</td></tr>
+<tr><td>Li-SOCl鈧?閿備簹)</td><td>3.6V</td><td>楂?2400mAh/AA)</td><td>鏋佷綆(&lt;0.5%)</td><td>宸ヤ笟浼犳劅鍣ㄣ€佹按琛ㄦ皵琛?/td></tr>
+<tr><td>Li-Po(閿傝仛鍚堢墿)</td><td>3.7V</td><td>楂?/td><td>~5%</td><td>鏃犱汉鏈恒€佹墜鎸佽澶?/td></tr>
+<tr><td>18650閿傜瀛?/td><td>3.7V</td><td>楂?2600-3500mAh)</td><td>~3%</td><td>澶у姛鐜囪澶囥€佺Щ鍔ㄧ數婧?/td></tr>
+<tr><td>NiMH(闀嶆阿)</td><td>1.2V脳N</td><td>涓瓑</td><td>楂?20-30%)</td><td>鐜╁叿銆侀仴鎺у櫒</td></tr>
+<tr><td>纰辨€х數姹?AA/AAA)</td><td>1.5V</td><td>~2500mAh(AA)</td><td>鏋佷綆</td><td>浣庢垚鏈竴娆℃€ц澶?/td></tr>
+</table>
+
+<div class="card">
+<div class="h"><span class="name">閿傜數姹犲厖鐢电鐞?/span><span class="tag r">杩涢樁</span></div>
+<div class="b">
+<div class="desc">
+<b>TP4056妯″潡锛堟渶甯哥敤鍗曡妭閿傜數鍏呯數鑺墖锛夛細</b><br>
+鈥?杈撳叆锛?V USB/Micro-USB<br>
+鈥?鍏呯數鐢垫祦锛氬彲缂栫▼锛圥ROG寮曡剼鐢甸樆璁剧疆锛岄粯璁?A锛?br>
+鈥?鍏呮弧鐢靛帇锛?.2V 卤1%<br>
+鈥?鍏呯數闃舵锛氭稉娴?2.9V浠ヤ笅)鈫掓亽娴?CC)鈫掓亽鍘?CV)鈫掓埅姝?C/10)<br>
+鈥?鐘舵€佽緭鍑猴細CHRG(STDBY)寮曡剼鈥斺€斿厖鐢垫椂浣庣數骞筹紝鍏呮弧楂樼數骞?br><br>
+<b>鍏抽敭淇濇姢锛?/b><br>
+鈥?DW01 + 8205A锛氶攤鐢垫睜淇濇姢鏉匡紙杩囧厖4.25V/杩囨斁2.4V/鐭矾淇濇姢锛?br>
+鈥?浠讳綍閿傜數姹犵數璺?b>蹇呴』鏈変繚鎶ゆ澘</b>锛岃８鐢垫睜鍏呯數=鍗遍櫓
+</div></div></div>
+
+<h3>鐢垫睜鐢甸噺娴嬮噺</h3>
+
+<pre><code>// 鐢垫睜鐢甸噺娴嬮噺锛氱數鍘嬫硶锛堟渶绠€鍗曪級
+// Li-Po: 4.2V=100%  3.85V=50%  3.5V=10%  3.0V=0%锛堟埅姝紒锛?
+float measure_battery_voltage(void) {
+    // 鍋囪鐢垫睜缁?:2鍒嗗帇鍚庢帴ADC锛?00K+100K鍒嗗帇锛?    HAL_ADC_Start(&hadc1);
+    HAL_ADC_PollForConversion(&hadc1, 10);
+    uint16_t adc = HAL_ADC_GetValue(&hadc1);
+    // 3.3V鍙傝€冿紝12浣岮DC
+    float v_adc = adc * 3.3f / 4096.0f;
+    float v_bat = v_adc * 2.0f;  // 鍒嗗帇1:2
+    return v_bat;
+}
+
+uint8_t battery_percent(float voltage) {
+    // Li-Po鏀剧數鏇茬嚎杩戜技锛堢畝鍖栫増锛?    if (voltage >= 4.15f) return 100;
+    if (voltage >= 4.05f) return 90;
+    if (voltage >= 3.95f) return 75;
+    if (voltage >= 3.85f) return 50;
+    if (voltage >= 3.75f) return 25;
+    if (voltage >= 3.65f) return 10;
+    return 5;  // 蹇病鐢典簡锛?}
+
+// 鏇寸簿纭殑鏂规硶锛氬簱浠戣锛堢數閲忕Н鍒嗭級
+// 鑺墖閫夋嫨锛歁AX17048(1-cell)銆丅Q27427銆丩TC2942
+// 搴撲粦璁￠€氳繃娴嬮噺鐢垫祦鐨勭Н鍒嗘潵璁＄畻瀹為檯娑堣€楃殑鐢甸噺</code></pre>
+
+<h2>馃攲 DC-DC鐢垫簮鎷撴墤</h2>
+
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>LDO鍍忎竴涓?b>鍙彉鐢甸樆闄嶅帇</b>鈥斺€旂數娴佷笉鍙橈紝宸€煎姛鐜囧叏鍙樻垚鐑噺銆侱C-DC鍍忎竴涓?b>鍙樺帇鍣ㄥ紑鍏?/b>鈥斺€旈珮閫熼€氭柇瀛樺偍鑳介噺锛屾晥鐜囬珮浣嗙汗娉㈠ぇ銆?/div>
+
+<h3>LDO锛堜綆鍘嬪樊绾挎€хǔ鍘嬪櫒锛?/h3>
+
+<pre><code>// LDO閫夊瀷鍏抽敭鍙傛暟
+// 1. 鍘嬪樊(Dropout Voltage): Vin-Vout鏈€灏忓€?// 2. 鏈€澶ц緭鍑虹數娴?// 3. 闈欐€佺數娴?Iq): 鑺墖鑷韩鐨勮€楃數鈥斺€旂數姹犺澶囬€塈q<10渭A
+// 4. PSRR(鐢垫簮绾规尝鎶戝埗姣?: 鎶戝埗杈撳叆鍣０鐨勮兘鍔?
+// 甯哥敤LDO鑺墖
+// AMS1117-3.3: 1A, 1.3V鍘嬪樊, 5-10mA闈欐€佺數娴?(涓嶆帹鑽愮數姹犺澶?)
+// HT7333-1: 250mA, 90mV鍘嬪樊, 5渭A闈欐€佺數娴?(閫傚悎鐢垫睜璁惧)
+// XC6206P332: 200mA, 250mV鍘嬪樊, 1渭A闈欐€佺數娴?(瓒呬綆鍔熻€?
+// TPS7A03: 200mA, 瓒冲帇宸? 200nA Iq (TI瓒呬綆鍔熻€楃郴鍒?
+
+// LDO鍔熻€楄绠?// P_loss = (Vin - Vout) 脳 I_load + Vin 脳 Iq
+// AMS1117: (5-3.3)脳0.1=0.17W (杩樺彲浠?
+// 12V鈫?.3V@100mA: (12-3.3)脳0.1=0.87W (鐑墜!)</code></pre>
+
+<h3>Buck锛堥檷鍘嬪瀷DC-DC锛?/h3>
+
+<pre><code>// Buck杞崲鍣細楂樻晥闄嶅帇
+// 鏁堢巼閫氬父85-95%锛岃繙浼樹簬LDO鍦ㄥぇ鍘嬪樊鍦烘櫙
+
+// 甯哥敤Buck鑺墖
+// MP1584: 3A, 4.5-28V鈫?.8-25V, 1.5MHz (浼樹俊鐢靛瓙3鍏冩ā鍧?
+// TPS5430: 3A, 5.5-36V鈫?.22-31V, 500KHz (宸ヤ笟绾?
+// XL6009: 鍗囧帇闄嶅帇 SEPIC, 5-32V鈫掑彲璋?(涓囩敤鐢垫簮鏂规)
+
+// Buck鍏抽敭鍏冧欢閫夊瀷
+// 1. 鐢垫劅锛歀 = (Vin-Vout)脳D/(螖I脳fsw)
+//    D = Vout/Vin, 螖I = 0.3脳Iload (鍏稿瀷30%绾规尝)
+//    楗卞拰鐢垫祦蹇呴』 > Iload_max + 螖I/2
+// 2. 杈撳嚭鐢靛锛氬喅瀹氳緭鍑虹數鍘嬬汗娉?//    螖Vout = 螖I/(8脳fsw脳Cout)
+// 3. 杈撳叆鐢靛锛氬簲瀵硅緭鍏ョ數娴佽剦鍐?// 4. 缁祦浜屾瀬绠★細鑲栫壒鍩?SS34/SS54)锛屼綆VF鍊?/code></pre>
+
+<div class="warn">鈿?<b>PCB甯冨眬榛勯噾娉曞垯锛?/b>DC-DC鐨勮緭鍏ョ數瀹瑰繀椤诲敖鍙兘闈犺繎IC寮曡剼(&lt;5mm)锛佽繙鏀?澶х數娴佺幆=EMI鍦扮嫳=涓嶇ǔ瀹氥€傚紑鍏宠妭鐐?SW/LX)闈㈢Н瓒婂皬瓒婂ソ鈥斺€斿畠鏄渶澶х殑杈愬皠澶╃嚎銆?/div>
+
+<h2>鈿?ESP32鍔熻€椾紭鍖栧疄鎴?/h2>
+
+<pre><code>// ESP32鍔熻€楃瓑绾э紙鍙傝€冩暟鎹級
+// 杩愯妯″紡(WiFi TX): ~350mA
+// 杩愯妯″紡(CPU 240MHz): ~68mA
+// Modem Sleep: ~3mA @ 2% DTIM
+// Light Sleep: ~0.8mA
+// Deep Sleep: ~5渭A (RTC+ULP鍙敤)
+// Hibernation: ~2.5渭A (浠匯TC瀹氭椂鍣?
+
+// Deep Sleep 瀹炴垬锛氭瘡30绉掑敜閱掗噰涓€娆℃俯婀垮害
+#include "esp_sleep.h"
+
+#define uS_TO_S_FACTOR 1000000
+#define TIME_TO_SLEEP  30
+
+void enter_deep_sleep(void) {
+    // 1. 鍏抽棴WiFi/BLE锛堝姛鑰楀ぇ澶达級
+    esp_wifi_stop();
+    esp_bt_controller_disable();
+    
+    // 2. 閰嶇疆鍞ら啋婧愶細瀹氭椂鍣?    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+    
+    // 3. 鍙€夛細EXT0鍞ら啋锛圧TC GPIO锛?    // esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 1);  // GPIO4楂樼數骞冲敜閱?    
+    // 4. 杩涘叆Deep Sleep
+    esp_deep_sleep_start();
+    // 鈿?杩欒浠ｇ爜姘歌繙鎵ц涓嶅埌锛丏eep Sleep鍚嶤PU瀹屽叏鏂數
+}
+
+void app_main(void) {
+    // 妫€鏌ュ敜閱掑師鍥?    esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+    if (cause == ESP_SLEEP_WAKEUP_TIMER) {
+        // 瀹氭椂鍣ㄥ敜閱掞細閲囬泦鏁版嵁
+        float temp = read_dht11_temperature();
+        ESP_LOGI("TEMP", "%.1f掳C", temp);
+        // 濡傛灉娓╁害娌″彉鍖栵紝璺宠繃鍙戦€侊紝鐩存帴鐫¤
+        if (abs(temp - last_temp) < 0.5f) {
+            enter_deep_sleep();
+        }
+    }
+    
+    // WiFi鍒濆鍖?+ 鍙戦€佹暟鎹紙绾?绉掞級
+    wifi_quick_connect();
+    send_data_to_server(temp);
+    
+    // 浠诲姟瀹屾垚锛岀潯瑙?    enter_deep_sleep();
+}</code></pre>
+
+<h2>馃幆 瀹炴垬缁冧範</h2>
+
+<div class="tip">馃摑 <b>缁冧範1锛?/b>鐢⊿TM32 ADC娴嬮噺鐢垫睜鐢靛帇锛屽湪OLED涓婃樉绀虹數閲忕櫨鍒嗘瘮锛堝浘鏍?鏁板瓧锛夛紝浣庝簬10%鏃禠ED闂儊鍛婅銆?br><br>
+馃摑 <b>缁冧範2锛?/b>鐢‥SP32瀹炵幇Deep Sleep + 瀹氭椂鍞ら啋閲囬泦娓╂箍搴?+ BLE骞挎挱锛屾祴閲忓钩鍧囧姛鑰楋紙鐢ㄤ竾鐢ㄨ〃渭A妗ｏ級銆傜洰鏍囨槸骞冲潎鐢垫祦&lt;100渭A銆?br><br>
+馃摑 <b>缁冧範3锛?/b>璁捐涓€涓攤鐢垫睜渚涚數绯荤粺锛歍P4056鍏呯數 + DW01淇濇姢 + HT7333 LDO绋冲帇鍒?.3V + STM32銆傜敤绀烘尝鍣ㄦ祴閲廘DO杈撳叆杈撳嚭鐨勭汗娉€?/div>
+
+<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
+<div class="summary">
+<b>鉁?鐢垫簮绠＄悊鏍稿績锛?/b><br>
+鈥?LDO vs DC-DC锛氬皬鍘嬪樊(&lt;1V)鐢↙DO(鏃犵汗娉?锛屽ぇ鍘嬪樊鐢―C-DC(楂樻晥)<br>
+鈥?閿傜數姹狅細鏍囩О3.7V銆佸厖婊?.2V銆佹埅姝?.0V锛屽繀椤绘湁淇濇姢鏉?br>
+鈥?鐢甸噺娴嬮噺锛氱數鍘嬫硶(绠€鍗曚絾涓嶅噯) vs 搴撲粦璁?绮剧‘浣嗚吹)<br>
+鈥?STM32浣庡姛鑰楋細Sleep(5mA)鈫扴top(20渭A)鈫扴tandby(2渭A)<br>
+鈥?ESP32 Deep Sleep: ~5渭A锛屽敜閱掓簮=瀹氭椂鍣?GPIO/ULP<br>
+<b>馃洜 璁捐妫€鏌ユ竻鍗曪細</b><br>
+鈥?PCB: DC-DC杈撳叆鐢靛&lt;5mm锛屽紑鍏宠妭鐐圭煭绮楋紝澶ч潰绉湴<br>
+鈥?鐢垫睜: 淇濇姢鏉垮繀椤绘湁(杩囧厖杩囨斁鐭矾)锛屽厖鐢礗C閫塗P4056<br>
+鈥?娴嬮噺: ADC鍒嗗帇娉ㄦ剰杈撳叆闃绘姉锛屽垎鍘嬬數闃婚€?00K浠ヤ笂鐪佺數<br>
+鈥?娴嬭瘯: 涓囩敤琛ㄎ糀妗ｄ覆鑱旀祴瀹為檯鍔熻€楋紝涓嶈鐩镐俊浼扮畻鍊?</div>
+
 <div class="chnav">
 <a onclick="window.parent.loadPage('guide-ch10')">鈫?绗?0绔?/a>
 <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
