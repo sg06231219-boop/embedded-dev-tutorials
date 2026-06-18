@@ -185,6 +185,184 @@ Build complete!</pre>
 <a id="ch4"></a>
 <div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>鐞嗚В涓插彛閫氫俊鍘熺悊锛屼細閰嶇疆娉㈢壒鐜?鏁版嵁浣嶏紝鑳界敤pyserial鍜孭uTTY鏀跺彂涓插彛鏁版嵁锛岀煡閬揢SB杞琓TL椹卞姩鎬庝箞瑁呫€?/div>
 
+
+<h2>馃彈 澶у瀷椤圭洰Makefile鏋舵瀯</h2>
+
+<p>褰撻」鐩秴杩?0涓簮鏂囦欢锛屾墜鍔ㄧ淮鎶akefile灏卞穿浜嗐€傛潵鐪嬬湅宸ヤ笟绾у仛娉曘€?/p>
+
+<h3>澶氱洰褰曢」鐩粨鏋?/h3>
+
+<pre><code>project/
+鈹溾攢鈹€ Makefile          # 椤跺眰Makefile锛氭€绘帶
+鈹溾攢鈹€ common.mk         # 鍏叡鍙橀噺鍜岃鍒?鈹溾攢鈹€ src/
+鈹?  鈹溾攢鈹€ Makefile      # 姣忎釜鐩綍涓€涓狹akefile
+鈹?  鈹溾攢鈹€ main.c
+鈹?  鈹溾攢鈹€ app/
+鈹?  鈹?  鈹溾攢鈹€ Makefile
+鈹?  鈹?  鈹溾攢鈹€ controller.c
+鈹?  鈹?  鈹斺攢鈹€ state_machine.c
+鈹?  鈹斺攢鈹€ driver/
+鈹?      鈹溾攢鈹€ Makefile
+鈹?      鈹溾攢鈹€ uart.c
+鈹?      鈹溾攢鈹€ spi.c
+鈹?      鈹斺攢鈹€ i2c.c
+鈹溾攢鈹€ lib/
+鈹?  鈹斺攢鈹€ third_party/
+鈹?      鈹斺攢鈹€ Makefile
+鈹斺攢鈹€ build/            # 鎵€鏈?o闆嗕腑瀛樻斁
+    鈹溾攢鈹€ src/
+    鈹溾攢鈹€ app/
+    鈹溾攢鈹€ driver/
+    鈹斺攢鈹€ lib/
+
+# 椤跺眰 Makefile
+include common.mk
+
+SUBDIRS = src/app src/driver lib/third_party
+OBJS = $(foreach dir,$(SUBDIRS),$(BUILD_DIR)/$(dir)/*.o)
+OBJS += $(BUILD_DIR)/src/*.o
+
+all: $(BUILD_DIR)/app.elf
+
+# 閫掑綊璋冪敤瀛愮洰褰曠殑Makefile
+$(BUILD_DIR):
+	mkdir -p $(addprefix $(BUILD_DIR)/,$(SUBDIRS))
+
+$(OBJS): $(BUILD_DIR)
+	@for dir in $(SUBDIRS) src; do \
+		$(MAKE) -C $$dir BUILD_DIR=$(abspath $(BUILD_DIR)/$$dir); \
+	done
+
+$(BUILD_DIR)/app.elf: $(OBJS)
+	$(CC) $^ -o $@ $(LDFLAGS)</code></pre>
+
+<h3>.d 渚濊禆鏂囦欢鑷姩鐢熸垚</h3>
+
+<div class="warn">鈿?<b>鏀逛簡涓€涓?h鏂囦欢锛孧ake涓嶇煡閬撳摢浜?c寮曠敤浜嗗畠锛岀粨鏋滀笉閲嶆柊缂栬瘧 鈫?杩愯鏃跺嚭鐜拌寮俠ug銆?/b>瑙ｅ喅锛氳嚜鍔ㄧ敓鎴?d渚濊禆鏂囦欢銆?/div>
+
+<pre><code># GCC鐨?MD閫夐」鑷姩鐢熸垚.d渚濊禆鏂囦欢
+# .d鏂囦欢鍐呭绀轰緥锛?# build/main.o: src/main.c inc/main.h inc/gpio.h inc/uart.h
+
+CFLAGS += -MMD -MP  # 涓烘瘡涓?c鐢熸垚瀵瑰簲鐨?d鏂囦欢
+
+# 妯″紡瑙勫垯锛堣嚜鍔ㄥ彉閲?渚濊禆鏂囦欢锛?$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) -c $< -o $@ $(CFLAGS)
+
+# 鍖呭惈鎵€鏈?d鏂囦欢锛堝鏋滃瓨鍦級
+DEPS = $(OBJS:.o=.d)
+-include $(DEPS)  # 鍓嶉潰鐨?琛ㄧず鏂囦欢涓嶅瓨鍦ㄤ篃涓嶆姤閿?
+# 鏁堟灉锛氭敼浜唃pio.h 鈫?鎵€鏈?include "gpio.h"鐨?c琚嚜鍔ㄩ噸鏂扮紪璇戯紒
+# 涓嶉渶瑕佹墜鍔ㄧ淮鎶や緷璧栧叧绯?/code></pre>
+
+<h2>馃帹 褰╄壊缂栬瘧杈撳嚭</h2>
+
+<pre><code># 璁╀汉鎰夋偊鐨勭紪璇戣緭鍑猴紙甯﹀僵鑹层€佸甫杩涘害锛?
+# ANSI棰滆壊鐮?C_GREEN  = \033[0;32m
+C_YELLOW = \033[0;33m
+C_RED    = \033[0;31m
+C_BLUE   = \033[0;34m
+C_CYAN   = \033[0;36m
+C_RESET  = \033[0m
+
+# 璁℃暟鍣紙缂栬瘧杩涘害锛?TOTAL_FILES = $(words $(SRCS))
+CURRENT = 0
+
+$(BUILD_DIR)/%.o: %.c
+	$(eval CURRENT=$(shell echo $$(( $(CURRENT) + 1 ))))
+	@printf "$(C_BLUE)[%3d/%-3d]$(C_RESET) $(C_GREEN)CC$(C_RESET)   %-40s" $(CURRENT) $(TOTAL_FILES) $<
+	@$(CC) -c $< -o $@ $(CFLAGS) 2>&1 | sed 's/^/  /'
+	@printf "\n"
+
+# 杈撳嚭鏁堟灉锛?# [  1/15 ] CC   src/main.c
+# [  2/15 ] CC   app/controller.c
+# ...
+# [ 15/15 ] LD   build/app.elf       鉁?196KB
+
+# 鍙橀噺鍖栫紪璇戝櫒閫夐」
+CC      = arm-none-eabi-gcc
+LD      = arm-none-eabi-gcc
+OBJCOPY = arm-none-eabi-objcopy
+SIZE    = arm-none-eabi-size
+
+# Debug vs Release 閰嶇疆
+ifeq ($(BUILD),debug)
+CFLAGS  += -O0 -g3 -DDEBUG
+else
+CFLAGS  += -O2 -DNDEBUG
+endif</code></pre>
+
+<h2>馃敆 閾炬帴鑴氭湰锛圠inker Script锛夌畝浠?/h2>
+
+<p>Makefile鏈€缁堣皟鐢ㄩ摼鎺ュ櫒(ld)锛岄摼鎺ヨ剼鏈憡璇塴d鎶婁唬鐮佸拰鏁版嵁鏀惧湪Flash/RAM鐨勫摢閲屻€?/p>
+
+<pre><code>/* STM32F103C8T6 閾炬帴鑴氭湰 (STM32F103C8Tx_FLASH.ld) */
+
+/* Flash璧峰鍦板潃鍜屽ぇ灏?*/
+MEMORY
+{
+  FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 64K
+  RAM   (rwx): ORIGIN = 0x20000000, LENGTH = 20K
+}
+
+/* 娈靛竷灞€ */
+SECTIONS
+{
+  /* 1. 涓柇鍚戦噺琛細Flash鏈€鍓嶉潰 */
+  .isr_vector :
+  {
+    KEEP(*(.isr_vector))   /* KEEP闃叉琚紭鍖栨帀 */
+  } > FLASH
+
+  /* 2. 浠ｇ爜+鍙鏁版嵁 */
+  .text :
+  {
+    *(.text)       /* 鎵€鏈?text娈碉紙鍑芥暟浠ｇ爜锛?*/
+    *(.rodata)     /* const鍙橀噺銆佸瓧绗︿覆 */
+  } > FLASH
+
+  /* 3. 宸插垵濮嬪寲鐨勫叏灞€/闈欐€佸彉閲?*/
+  .data :
+  {
+    _sdata = .;    /* RAM璧峰 */
+    *(.data)
+    _edata = .;    /* RAM缁撴潫 */
+  } > RAM AT> FLASH /* 鍊煎瓨鍦‵lash锛屽惎鍔ㄦ椂澶嶅埗鍒癛AM */
+
+  /* 4. 鏈垵濮嬪寲鍙橀噺(BSS) */
+  .bss :
+  {
+    _sbss = .;
+    *(.bss)
+    _ebss = .;
+  } > RAM
+
+  /* 5. 鏍堥《锛圧AM鏈€鍚庯級 */
+  _estack = ORIGIN(RAM) + LENGTH(RAM);  /* 0x20005000 */
+}</code></pre>
+
+<div class="card">
+<div class="h"><span class="name">Makefile杩涢樁宸ュ叿</span><span class="tag y">蹇呭</span></div>
+<div class="b">
+<div class="desc">
+<b>甯哥敤杈呭姪鍛戒护锛?/b><br>
+鈥?<code>arm-none-eabi-nm app.elf | sort</code> 鈥?鍒楀嚭鎵€鏈夌鍙峰拰鍦板潃<br>
+鈥?<code>arm-none-eabi-objdump -h app.elf</code> 鈥?鏌ョ湅娈靛ぇ灏?br>
+鈥?<code>arm-none-eabi-objdump -d app.elf &gt; disasm.txt</code> 鈥?鍙嶆眹缂?br>
+鈥?<code>arm-none-eabi-readelf -a app.elf</code> 鈥?鏌ョ湅ELF鍏ㄩ儴淇℃伅<br>
+鈥?<code>arm-none-eabi-strip app.elf</code> 鈥?鍘婚櫎璋冭瘯淇℃伅锛堝噺灏忎綋绉級<br><br>
+<b>鎺ㄨ崘鐨凪akefile妯℃澘搴擄細</b><br>
+鈥?STM32CubeIDE鐢熸垚鐨凪akefile锛堝畬鏁淬€佸彲鍙傝€冿級<br>
+鈥?libopencm3鐨凪akefile锛堢畝娲併€丄RM GCC鍘熺敓锛?br>
+鈥?xPack鐨刟rm-none-eabi-gcc椤圭洰妯℃澘
+</div></div></div>
+
+<h2>馃幆 瀹炴垬缁冧範</h2>
+
+<div class="tip">馃摑 <b>缁冧範1锛?/b>鍐欎竴涓敮鎸丏ebug/Release鍒囨崲鐨凪akefile銆侱ebug: -O0 -g3 -DDEBUG锛孯elease: -O2 -DNDEBUG銆傛坊鍔爉ake size鐩爣鏄剧ずFlash鍜孯AM鍗犵敤銆?br><br>
+馃摑 <b>缁冧範2锛?/b>涓轰笂闈㈢殑Makefile娣诲姞褰╄壊缂栬瘧杈撳嚭鍜岃繘搴﹁鏁板櫒([1/15]鏍煎紡)銆?br><br>
+馃摑 <b>缁冧範3锛?/b>娣诲姞鑷姩渚濊禆(.d鏂囦欢)鍔熻兘锛岄獙璇佷慨鏀?h鏂囦欢鍚庣浉鍏崇殑.c鏄惁鑷姩閲嶆柊缂栬瘧銆?/div>
+
 <div class="chnav">
 <a onclick="window.parent.loadPage('guide-ch02')">鈫?绗?绔?/a>
 <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
