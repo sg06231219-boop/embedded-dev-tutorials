@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第9章：通信协议详解 - 嵌入式小白完全指南</title>
+<title>绗?绔狅細閫氫俊鍗忚璇﹁В - 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,72 +57,506 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第9章：通信协议详解</h1>
-<div class="summary"><b>📖 小白完全指南 · 9/14</b> | 阅读时间约3分钟</div>
+<h1>绗?绔狅細閫氫俊鍗忚璇﹁В</h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 9/14</b> | 闃呰鏃堕棿绾?2鍒嗛挓</div>
 
-<p>单片机要与传感器、显示屏、存储器等外设通信，离不开<strong>通信协议</strong>。最常用的三种：UART、I2C、SPI，各有各的场景。</p>
+<p>鍗曠墖鏈鸿涓庝紶鎰熷櫒銆佹樉绀哄睆銆佸瓨鍌ㄥ櫒绛夊璁鹃€氫俊锛岀涓嶅紑<strong>閫氫俊鍗忚</strong>銆傛渶甯哥敤鐨勪笁绉嶏細UART銆両2C銆丼PI锛屽悇鏈夊悇鐨勫満鏅€?/p>
 
-<div class="analogy">💡 <b>类比：</b><br>
-• <strong>UART</strong>=对讲机（两点之间，全双工，各说各的）<br>
-• <strong>I2C</strong>=课堂点名（一条总线，老师(Master)点名，学生(Slave)应答，7位学号=地址）<br>
-• <strong>SPI</strong>=专线电话（四根线，一对一高速通话，片选=拨号选人）</div>
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b><br>
+鈥?<strong>UART</strong>=瀵硅鏈猴紙涓ょ偣涔嬮棿锛屽叏鍙屽伐锛屽悇璇村悇鐨勶級<br>
+鈥?<strong>I2C</strong>=璇惧爞鐐瑰悕锛堜竴鏉℃€荤嚎锛岃€佸笀(Master)鐐瑰悕锛屽鐢?Slave)搴旂瓟锛?浣嶅鍙?鍦板潃锛?br>
+鈥?<strong>SPI</strong>=涓撶嚎鐢佃瘽锛堝洓鏍圭嚎锛屼竴瀵逛竴楂橀€熼€氳瘽锛岀墖閫?鎷ㄥ彿閫変汉锛?/div>
 
-<h3>三种协议对比</h3>
+<h2>UART鍗忚娣卞害瑙ｆ瀽</h2>
+
+<p>UART锛圲niversal Asynchronous Receiver/Transmitter锛夋槸鏈€鍙よ€佷篃鏈€甯哥敤鐨勪覆琛岄€氫俊鍗忚銆傚畠鐨勬牳蹇冨師鐞嗘瀬鍏剁畝鍗曪細鍙屾柟绾﹀畾濂芥尝鐗圭巼锛屾寜浣嶄緷娆″彂閫佹暟鎹€?/p>
+
+<h3>UART甯ф牸寮?/h3>
+
+<p>涓€涓畬鏁寸殑UART鏁版嵁甯у寘鍚細<strong>璧峰浣?Start Bit) + 鏁版嵁浣?5~9浣? + 鍙€夋牎楠屼綅(Parity) + 鍋滄浣?Stop Bit)</strong>銆傜┖闂叉椂鎬荤嚎淇濇寔楂樼數骞炽€?/p>
 
 <table>
-<tr><th>特性</th><th>UART</th><th>I2C</th><th>SPI</th></tr>
-<tr><td>线数</td><td>2 (TX/RX)</td><td>2 (SDA/SCL)</td><td>4 (MOSI/MISO/SCK/CS)</td></tr>
-<tr><td>拓扑</td><td>点对点</td><td>多从机（地址寻址）</td><td>多从机（片选线）</td></tr>
-<tr><td>速度</td><td>≤1Mbps</td><td>≤3.4Mbps</td><td>≤80Mbps</td></tr>
-<tr><td>双工</td><td>全双工</td><td>半双工</td><td>全双工</td></tr>
-<tr><td>距离</td><td>远（15m+）</td><td>近（1m）</td><td>极近（0.3m）</td></tr>
-<tr><td>典型用途</td><td>串口调试/GPS</td><td>传感器/EEPROM</td><td>Flash/显示屏/ADC</td></tr>
+<tr><th>瀛楁</th><th>浣嶆暟</th><th>璇存槑</th></tr>
+<tr><td>璧峰浣?/td><td>1 bit</td><td>鎷変綆涓€涓綅鍛ㄦ湡锛岄€氱煡鎺ユ敹鏂?鎴戣鍙戞暟鎹簡"</td></tr>
+<tr><td>鏁版嵁浣?/td><td>5/6/7/8/9</td><td>瀹為檯鏁版嵁锛孡SB鍏堝彂锛堟渶浣庝綅鍏堝彂锛?/td></tr>
+<tr><td>鏍￠獙浣?/td><td>0鎴?</td><td>鍙€夈€傚鏍￠獙/鍋舵牎楠?鏃犳牎楠?/td></tr>
+<tr><td>鍋滄浣?/td><td>1/1.5/2</td><td>鎷夐珮锛屾爣蹇椾竴甯х粨鏉?/td></tr>
 </table>
 
-<h3>I2C协议详解</h3>
+<div class="example"><b>绀轰緥锛?/b>鍙戦€佸瓧绗?'A' (0x41, 浜岃繘鍒?0100_0001)<br>
+绌洪棽(H) 鈫?璧峰浣?L) 鈫?1鈫?鈫?鈫?鈫?鈫?鈫?鈫? (LSB鍏? 鈫?鍋滄浣?H) 鈫?绌洪棽(H)<br>
+娉㈠舰涓婄湅鍒扮殑灏辨槸锛?code>H L H L L L L L H L H H</code></div>
 
-<pre><code>// I2C读写示例（HAL库）
-// 写：主机→从机
-HAL_I2C_Mem_Write(&amp;hi2c1, 0x68&lt;&lt;1, 0x75, 1, &amp;data, 1, 1000);
-//           I2C句柄  从机地址(左移1位) 寄存器地址  长度  数据  长度  超时
+<h3>娉㈢壒鐜囦笌璇樊瀹瑰繊</h3>
 
-// 读：从机→主机
-uint8_t reg = 0x75;
+<p>UART閫氫俊鍙屾柟蹇呴』浣跨敤鐩稿悓娉㈢壒鐜囥€備絾瀹為檯鐢佃矾涓紝鏅舵尟璇樊瀵艰嚧娉㈢壒鐜囦笉鍙兘瀹屽叏涓€鑷淬€俇ART鐨勫閿欐満鍒讹細姣忎釜鏁版嵁甯ч兘浠庤捣濮嬩綅鐨勪笅闄嶆部閲嶆柊鍚屾锛屽洜姝ゅ疄闄呭彲瀹瑰繊绾?%~5%鐨勬尝鐗圭巼鍋忓樊銆?/p>
+
+<pre><code>// 甯哥敤娉㈢壒鐜囧鐓ц〃
+// 娉㈢壒鐜?   姣廱it鏃堕棿    1瀛楄妭鏃堕棿(8N1)    瀹為檯搴旂敤涓?..
+//   9600    104.17渭s     1.04ms           涓插彛璋冭瘯鏈€甯哥敤
+//  19200     52.08渭s     0.52ms           GPS妯″潡甯哥敤
+//  38400     26.04渭s     0.26ms           涓€浜涜摑鐗欐ā鍧?//  57600     17.36渭s     0.17ms           鈥?// 115200      8.68渭s     86.8渭s           楂橀€熻皟璇?涓嬭浇
+// 230400      4.34渭s     43.4渭s           STM32鍥轰欢涓嬭浇甯哥敤
+// 921600      1.09渭s     10.9渭s           USB杞覆鍙ｆ瀬闄?
+// 璁＄畻锛?15200bps鏃讹紝1涓瓧鑺?8N1=10bits)鑰楁椂 = 10/115200 鈮?86.8渭s
+// 1绉掗挓鐞嗚鏈€澶氫紶杈?115200/10 = 11520 瀛楄妭 鈮?11KB/s</code></pre>
+
+<h3>UART瀹屾暣鏀跺彂浠ｇ爜</h3>
+
+<pre><code>// UART杞鏀跺彂 鈥?鏈€绠€鍗曠殑鏂瑰紡
+#include "stm32f1xx_hal.h"
+
+UART_HandleTypeDef huart1;
+
+// 鍙戦€佸瓧绗︿覆锛堥樆濉炴柟寮忥級
+void uart_send_string(const char *str) {
+    HAL_UART_Transmit(&amp;huart1, (uint8_t *)str, strlen(str), HAL_MAX_DELAY);
+}
+
+// 鍙戦€佷竴涓瓧鑺?void uart_send_byte(uint8_t data) {
+    HAL_UART_Transmit(&amp;huart1, &amp;data, 1, 100);
+}
+
+// 鎺ユ敹涓€涓瓧鑺傦紙闃诲锛岀瓑寰呯洿鍒版敹鍒帮級
+uint8_t uart_recv_byte(void) {
+    uint8_t ch;
+    HAL_UART_Receive(&amp;huart1, &amp;ch, 1, HAL_MAX_DELAY); // 涓€鐩寸瓑
+    return ch;
+}
+
+// 鎺ユ敹涓€琛岋紙鐩村埌鏀跺埌鎹㈣绗︼級
+void uart_recv_line(char *buf, int max_len) {
+    int i = 0;
+    while (i &lt; max_len - 1) {
+        uint8_t ch;
+        HAL_UART_Receive(&amp;huart1, &amp;ch, 1, HAL_MAX_DELAY);
+        if (ch == '\n' || ch == '\r') {
+            if (ch == '\r') continue; // 璺宠繃鍥炶溅
+            break;
+        }
+        buf[i++] = ch;
+    }
+    buf[i] = '\0';
+}</code></pre>
+
+<div class="card">
+<div class="h"><span class="name">UART涓柇鎺ユ敹 鈥?闈為樆濉?/span><span class="tag b">杩涢樁</span><span class="tag g">鎺ㄨ崘</span></div>
+<div class="b">
+<div class="desc">闃诲寮忔帴鏀朵細鍗′綇CPU銆備腑鏂帴鏀惰CPU鍦ㄧ瓑寰呮暟鎹椂鍙互鍋氬叾浠栦簨銆?/div>
+
+<pre><code>// UART涓柇鎺ユ敹锛堝崟涓瓧鑺傦級
+uint8_t rx_byte;
+
+// 浣胯兘鎺ユ敹涓柇
+HAL_UART_Receive_IT(&amp;huart1, &amp;rx_byte, 1);
+
+// 涓柇鍥炶皟 鈥?鏀跺埌鏁版嵁鍚庤嚜鍔ㄨ皟鐢?void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart-&gt;Instance == USART1) {
+        // 澶勭悊鏀跺埌鐨勫瓧鑺?rx_byte
+        printf("Received: 0x%02X (%c)\n", rx_byte, rx_byte);
+
+        // 閲嶆柊浣胯兘鎺ユ敹锛堥噸瑕侊紒鍚﹀垯鍙敹涓€娆★級
+        HAL_UART_Receive_IT(&amp;huart1, &amp;rx_byte, 1);
+    }
+}</code></pre>
+
+<div class="tip">馃挕 <b>涓柇 vs DMA锛?/b>鍗曚釜瀛楄妭鐢ㄤ腑鏂氨澶熶簡銆傚鏋滆鎺ユ敹涓嶅畾闀挎暟鎹紙濡侫T鎸囦护鍝嶅簲锛夛紝鎺ㄨ崘鐢?strong>UART绌洪棽涓柇(IDLE)</strong>閰嶅悎DMA銆傚悗闈㈢珷鑺備細璇︾粏璁茶В銆?/div>
+</div></div>
+
+<h3>RS-232銆丷S-485涓嶵TL鐢靛钩</h3>
+
+<p>鏍囧噯鐨?涓插彛"瀹為檯涓婃湁澶氱鐗╃悊灞傛爣鍑嗐€傚紑鍙戞澘涓婄敤鐨勬槸<strong>TTL鐢靛钩锛?~3.3V鎴?~5V锛?/strong>锛岃€孭C涓婄殑DB9涓插彛鏄?strong>RS-232鐢靛钩锛?15V~-3V琛ㄧず閫昏緫1锛?3V~+15V琛ㄧず閫昏緫0锛?/strong>銆?/p>
+
+<table>
+<tr><th>鏍囧噯</th><th>鐢靛钩锛堥€昏緫0/1锛?/th><th>鏈€澶ц窛绂?/th><th>鎷撴墤</th><th>鐢ㄩ€?/th></tr>
+<tr><td>TTL</td><td>0V / 3.3V(鎴?V)</td><td>0.3m</td><td>鐐瑰鐐?/td><td>鑺墖闂撮€氫俊銆佸紑鍙戞澘璋冭瘯</td></tr>
+<tr><td>RS-232</td><td>+3~+15V / -3~-15V</td><td>15m</td><td>鐐瑰鐐?/td><td>PC涓插彛銆佸伐涓氳澶?/td></tr>
+<tr><td>RS-485</td><td>宸垎A-B&gt;+0.2V / A-B&lt;-0.2V</td><td>1200m</td><td>澶氳妭鐐癸紙鏈€澶?2涓級</td><td>宸ヤ笟鎺у埗銆丮odbus</td></tr>
+<tr><td>RS-422</td><td>宸垎锛堝悓485锛?/td><td>1200m</td><td>1鍙戝鏀讹紙鏈€澶?0涓級</td><td>闀胯窛绂诲崟鍚戜紶杈?/td></tr>
+</table>
+
+<div class="note">鈿狅笍 <b>娉ㄦ剰锛?/b>STM32鐨刄ART寮曡剼鏄疶TL鐢靛钩銆傚鏋滄帴PC涓插彛锛岄渶瑕丮AX232鑺墖鍋氱數骞宠浆鎹紱濡傛灉鎺S-485鎬荤嚎锛岄渶瑕丮AX485/SP3485绛夎浆鎹㈣姱鐗囥€?/div>
+
+<h3>涓夌鍗忚瀵规瘮</h3>
+
+<table>
+<tr><th>鐗规€?/th><th>UART</th><th>I2C</th><th>SPI</th></tr>
+<tr><td>绾挎暟</td><td>2 (TX/RX)</td><td>2 (SDA/SCL)</td><td>4 (MOSI/MISO/SCK/CS)</td></tr>
+<tr><td>鎷撴墤</td><td>鐐瑰鐐?/td><td>澶氫粠鏈猴紙鍦板潃瀵诲潃锛?/td><td>澶氫粠鏈猴紙鐗囬€夌嚎锛?/td></tr>
+<tr><td>閫熷害</td><td>鈮?Mbps</td><td>鈮?.4Mbps</td><td>鈮?0Mbps</td></tr>
+<tr><td>鍙屽伐</td><td>鍏ㄥ弻宸?/td><td>鍗婂弻宸?/td><td>鍏ㄥ弻宸?/td></tr>
+<tr><td>璺濈</td><td>杩滐紙15m+锛?/td><td>杩戯紙1m锛?/td><td>鏋佽繎锛?.3m锛?/td></tr>
+<tr><td>鍏稿瀷鐢ㄩ€?/td><td>涓插彛璋冭瘯/GPS</td><td>浼犳劅鍣?EEPROM</td><td>Flash/鏄剧ず灞?ADC</td></tr>
+</table>
+
+<h2>I2C鍗忚璇﹁В</h2>
+
+<h3>I2C鐢垫皵鐗规€?/h3>
+
+<p>I2C浣跨敤<strong>寮€婕忚緭鍑?Open-Drain)</strong>锛孲DA鍜孲CL閮藉繀椤诲鎺?strong>涓婃媺鐢甸樆锛堝吀鍨嬪€?.7K惟锛?/strong>銆傚紑婕忕殑濂藉锛氫换浣曡澶囬兘鍙互灏嗘€荤嚎鎷変綆锛屼笉浼氬洜杈撳嚭楂樼數骞冲啿绐佽€岀儳姣佸紩鑴氥€?/p>
+
+<div class="analogy">馃挕 <b>涓轰粈涔堝繀椤荤敤涓婃媺鐢甸樆锛?/b><br>
+鎯宠薄涓€鏍圭怀瀛愶紙鎬荤嚎锛夎寮圭哀锛堜笂鎷夌數闃伙級鎷夊埌澶╄姳鏉匡紙VCC楂樼數骞筹級銆傝皝閮藉彲浠ユ妸缁冲瓙寰€涓嬫嫿锛堟媺浣庯級锛屼絾璋佷篃涓嶈兘鎶婄怀瀛愬線涓婃姮鈥斺€斿彧鏈夊脊绨э紙涓婃媺鐢甸樆锛夎兘璁╁畠鍥炲埌楂樼數骞炽€傝繖鏍峰氨閬垮厤浜嗕袱涓汉鍚屾椂寰€涓婃姮鎵撴灦鐨勬儏鍐点€?/div>
+
+<pre><code>// I2C鏃跺簭鍥鹃€熻锛?//
+// START: SCL楂樻椂 SDA涓嬮檷娌?// STOP:  SCL楂樻椂 SDA涓婂崌娌?// DATA:  SCL浣庢椂SDA鍙彉鍖栵紝SCL楂樻椂SDA蹇呴』绋冲畾
+// ACK:   绗?涓猄CL鏃讹紝鎺ユ敹鏂瑰皢SDA鎷変綆琛ㄧず纭
+//
+// 娉㈠舰绀烘剰锛?// SCL: __|-|_|-|_|-|_|-|_|-|_|-|_|-|_|-|_|-|__
+// SDA: --\_______ DATA BIT7  BIT6 ... BIT0  ACK
+//       START鈫?                       浠庢満灏哠DA鎷変綆=ACK</code></pre>
+
+<h3>I2C鍦板潃璇﹁В</h3>
+
+<p>I2C鏈?strong>7浣嶅湴鍧€</strong>鍜?strong>10浣嶅湴鍧€</strong>涓ょ妯″紡銆?浣嶅湴鍧€鑼冨洿0x08~0x77锛?x00~0x07淇濈暀锛夛紝鐞嗚涓婂彲鎸?27涓澶囥€侶AL搴撲腑锛屽湴鍧€闇€瑕佸乏绉?浣嶏紙鍥犱负绗?浣嶆槸R/W鏂瑰悜浣嶏級銆?/p>
+
+<pre><code>// I2C鍦板潃鐨?鍧?锛氬乏绉?vs 涓嶅乏绉?// 寰堝鏁版嵁鎵嬪唽缁欏嚭鐨処2C鍦板潃宸茬粡鏄?浣嶅湴鍧€锛堝0x68锛?// HAL搴撹姹備紶鍏?7浣嶅湴鍧€宸︾Щ1浣嶏細0x68 &lt;&lt; 1 = 0xD0
+//
+// Arduino Wire搴撶敤鐨勬槸7浣嶅湴鍧€ 鈫?浼犲叆0x68
+// STM32 HAL搴撶敤鐨勬槸8浣嶅湴鍧€ 鈫?浼犲叆0x68&lt;&lt;1 = 0xD0
+// 
+// 濡傛灉鎼炴贩浜嗕細鎬庢牱锛?//   - 鐢?浣嶅湴鍧€浼犵粰HAL锛氳澶囦笉鍝嶅簲锛堝湴鍧€閿欒锛?//   - 鐢?浣嶅湴鍧€浼犵粰Arduino锛氳澶囦笉鍝嶅簲锛堝湴鍧€閿欒锛?//
+// 甯歌璁惧鍦板潃閫熸煡锛?// 0x3C 鈫?SSD1306 OLED (128x64)
+// 0x50 鈫?AT24C02 EEPROM
+// 0x68 鈫?MPU6050 / DS3231 RTC
+// 0x76 鈫?BME280 (閮ㄥ垎鍨嬪彿鏄?x77锛岀湅SDO寮曡剼)
+// 0x27 鈫?PCF8574 LCD鎵╁睍IC (閮ㄥ垎A0/A1/A2涓嶅悓)</code></pre>
+
+<h3>I2C璇诲啓绀轰緥</h3>
+
+<pre><code>// I2C璇诲啓绀轰緥锛圚AL搴擄級
+// 鍐欙細涓绘満鈫掍粠鏈?HAL_I2C_Mem_Write(&amp;hi2c1, 0x68&lt;&lt;1, 0x75, 1, &amp;data, 1, 1000);
+//           I2C鍙ユ焺  浠庢満鍦板潃(宸︾Щ1浣? 瀵勫瓨鍣ㄥ湴鍧€  闀垮害  鏁版嵁  闀垮害  瓒呮椂
+
+// 璇伙細浠庢満鈫掍富鏈?uint8_t reg = 0x75;
 HAL_I2C_Mem_Read(&amp;hi2c1, 0x68&lt;&lt;1, reg, 1, &amp;who_am_i, 1, 1000);
 
-// I2C地址扫描（扫描0x03-0x77）
-void i2c_scan(void) {
+// I2C鍦板潃鎵弿锛堟壂鎻?x03-0x77锛?void i2c_scan(void) {
     printf("I2C Scan:\n");
     for (uint8_t addr = 0x03; addr &lt; 0x78; addr++) {
         if (HAL_I2C_IsDeviceReady(&amp;hi2c1, addr&lt;&lt;1, 3, 10) == HAL_OK) {
-            printf("  Found device at 0x%02X
-", addr);
+            printf("  Found device at 0x%02X\n", addr);
         }
     }
 }</code></pre>
 
-<h3>SPI协议详解</h3>
+<h3>I2C鏃堕挓寤跺睍(Clock Stretching)</h3>
 
-<pre><code>// SPI读写（HAL库）
-// 写数据到SPI
-uint8_t tx_buf[] = {0x9F};  // 命令：读取Flash ID
+<p>褰撲粠鏈烘潵涓嶅強澶勭悊鏁版嵁鏃讹紝鍙互灏哠CL鎷変綆锛屽憡璇変富鏈?绛変竴绛?銆傝繖灏辨槸鏃堕挓寤跺睍銆備笉鏄墍鏈変粠鏈洪兘鏀寔鈥斺€斾篃姝ｅ洜涓哄姝わ紝鏈変簺I2C璁惧闇€瑕佸姞寤惰繜銆?/p>
+
+<pre><code>// 澶勭悊鏃堕挓寤跺睍鐨勭ǔ鍋2C璇诲嚱鏁?HAL_StatusTypeDef i2c_read_robust(I2C_HandleTypeDef *hi2c, uint8_t dev_addr,
+                                   uint8_t reg, uint8_t *data, uint16_t len) {
+    // 鍙戦€佸瘎瀛樺櫒鍦板潃
+    HAL_StatusTypeDef ret = HAL_I2C_Master_Transmit(hi2c, dev_addr, &amp;reg, 1, 100);
+    if (ret != HAL_OK) {
+        // 灏濊瘯澶嶄綅I2C鎬荤嚎
+        printf("I2C TX failed, resetting bus...\n");
+        return ret;
+    }
+
+    // 绛夊緟浠庢満鍑嗗灏辩华锛堝鐞嗘椂閽熷欢灞曪級
+    HAL_Delay(1);  // 缁欎粠鏈轰竴鐐瑰鐞嗘椂闂?
+    // 璇诲彇鏁版嵁
+    ret = HAL_I2C_Master_Receive(hi2c, dev_addr, data, len, 200);
+    return ret;
+}</code></pre>
+
+<h3>I2C澶氫富妯″紡</h3>
+
+<p>鏍囧噯I2C鏀寔澶氫釜涓昏澶囧叡瀛樸€傚綋涓€涓富鏈烘娴嬪埌SDA琚媺浣庝絾瀹冭嚜宸辨病鎷変綆鏃讹紝灏辩煡閬撳彂鐢熶簡鍐茬獊锛堝涓讳徊瑁侊級锛屼徊瑁佸け璐ョ殑涓绘満浼氳嚜鍔ㄩ€€鍑恒€備笉杩囧疄闄呴」鐩腑寰堝皯鐢ㄥ埌澶氫富妯″紡锛屽ぇ澶氭暟鍦烘櫙涓€涓狹aster瓒冲銆?/p>
+
+<div class="card">
+<div class="h"><span class="name">I2C璁惧璇诲啓瀹炴垬锛歋SD1306 OLED</span><span class="tag g">瀹炴垬</span><span class="tag b">I2C</span></div>
+<div class="b">
+<div class="desc">鍑犱箮姣忎釜宓屽叆寮忛」鐩兘浼氱敤鍒癘LED灞忋€備笅闈㈡槸涓€涓渶灏忓寲鐨凷SD1306鍒濆鍖栦笌鏄剧ず浠ｇ爜銆?/div>
+
+<pre><code>// ssd1306_mini.h 鈥?鏋佺畝OLED椹卞姩
+#include "stm32f1xx_hal.h"
+
+#define SSD1306_ADDR  0x3C  // 7浣嶅湴鍧€
+
+// 鍙戦€佸懡浠?void oled_send_cmd(uint8_t cmd) {
+    HAL_I2C_Mem_Write(&amp;hi2c1, SSD1306_ADDR&lt;&lt;1, 0x00, 1, &amp;cmd, 1, 100);
+}
+
+// 鍙戦€佹暟鎹?void oled_send_data(uint8_t data) {
+    HAL_I2C_Mem_Write(&amp;hi2c1, SSD1306_ADDR&lt;&lt;1, 0x40, 1, &amp;data, 1, 100);
+}
+
+// OLED鍒濆鍖栧簭鍒?void oled_init(void) {
+    HAL_Delay(100);  // 绛夊緟涓婄數绋冲畾
+
+    oled_send_cmd(0xAE);  // 鍏抽棴鏄剧ず
+    oled_send_cmd(0x20);  // 璁剧疆鍐呭瓨鍦板潃妯″紡
+    oled_send_cmd(0x00);  // 姘村钩瀵诲潃
+    oled_send_cmd(0xB0);  // 璁剧疆椤佃捣濮嬪湴鍧€
+    oled_send_cmd(0xC8);  // COM鎵弿鏂瑰悜
+    oled_send_cmd(0x00);  // 浣庡垪璧峰鍦板潃
+    oled_send_cmd(0x10);  // 楂樺垪璧峰鍦板潃
+    oled_send_cmd(0x40);  // 璧峰琛?    oled_send_cmd(0x81);  // 瀵规瘮搴?    oled_send_cmd(0x7F);  // 涓瓑瀵规瘮搴?0~255)
+    oled_send_cmd(0xA1);  // 娈甸噸鏄犲皠
+    oled_send_cmd(0xA6);  // 姝ｅ父鏄剧ず(闈炲弽鑹?
+    oled_send_cmd(0xA8);  // 澶氳矾澶嶇敤姣?    oled_send_cmd(0x3F);  // 1/64 duty
+    oled_send_cmd(0xA4);  // 浠嶳AM杈撳嚭
+    oled_send_cmd(0xD3);  // 鏄剧ず鍋忕Щ
+    oled_send_cmd(0x00);
+    oled_send_cmd(0xD5);  // 鎸崱棰戠巼
+    oled_send_cmd(0xF0);
+    oled_send_cmd(0xD9);  // 棰勫厖鐢靛懆鏈?    oled_send_cmd(0x22);
+    oled_send_cmd(0xDA);  // COM寮曡剼閰嶇疆
+    oled_send_cmd(0x12);
+    oled_send_cmd(0xDB);  // VCOMH
+    oled_send_cmd(0x20);
+    oled_send_cmd(0x8D);  // 鐢佃嵎娉?    oled_send_cmd(0x14);  // 浣胯兘鐢佃嵎娉?    oled_send_cmd(0xAF);  // 寮€鍚樉绀?}
+
+// 濉厖鍏ㄥ睆锛堝崟鑹诧級
+void oled_fill(uint8_t color) {
+    for (int page = 0; page &lt; 8; page++) {
+        oled_send_cmd(0xB0 + page);  // 璁剧疆椤?        oled_send_cmd(0x00);         // 鍒椾綆鍦板潃
+        oled_send_cmd(0x10);         // 鍒楅珮鍦板潃
+        for (int col = 0; col &lt; 128; col++) {
+            oled_send_data(color);
+        }
+    }
+}</code></pre>
+
+<div class="tip">馃挕 <b>璋冭瘯鎶€宸э細</b>濡傛灉OLED涓嶄寒锛屽厛鐢╥2c_scan()纭鍦板潃鏄惁涓?x3C銆係SD1306鐨勫湴鍧€鍙兘鏄?x3C鎴?x3D锛屽彇鍐充簬妯″潡鑳岄潰鐢甸樆鐒婃帴鏂瑰紡銆傛窐瀹濅拱鐨勬ā鍧楅€氬父鏄?x3C銆?/div>
+</div></div>
+
+<div class="tip">馃挕 <b>瀹炴垬缁冧範锛欼2C澶氳澶囬€氫俊</b><br>
+浠诲姟锛氱敤涓€鏍笽2C鎬荤嚎鍚屾椂杩炴帴SSD1306(0x3C)鍜孊ME280(0x76)锛屽疄鐜版俯搴﹂噰闆?OLED鏄剧ず<br>
+瑕佺偣锛氣憼涓や釜璁惧鍏辩敤SDA/SCL锛屽彧闇€涓€缁勪笂鎷夌數闃?鈶℃敞鎰廈ME280鏈塻ensor mode鍒囨崲寤惰繜 鈶LED鍒峰睆鎱紙~10ms锛夛紝涓嶈鍦ㄤ腑鏂噷鍒锋柊<br>
+鎻愮ず锛氬厛鍒嗗埆璋冮€氫袱涓澶囷紝鍐嶅悎骞朵唬鐮併€傚垎鑰屾不涔嬫槸璋冭瘯閫氫俊鍗忚鐨勯搧寰嬨€?/div>
+
+<h2>SPI鍗忚璇﹁В</h2>
+
+<h3>SPI鍥涚妯″紡(CPOL/CPHA)</h3>
+
+<p>SPI鐨?鍧?鍦ㄤ簬瀹冩湁4绉嶅伐浣滄ā寮忥紝鐢盋POL锛堟椂閽熸瀬鎬э級鍜孋PHA锛堟椂閽熺浉浣嶏級鍐冲畾銆備富浠庡弻鏂瑰繀椤讳娇鐢ㄧ浉鍚屾ā寮忋€?/p>
+
+<table>
+<tr><th>妯″紡</th><th>CPOL</th><th>CPHA</th><th>绌洪棽鏃堕挓鐢靛钩</th><th>鏁版嵁閲囨牱娌?/th><th>鏁版嵁鍙樺寲娌?/th></tr>
+<tr><td>Mode 0</td><td>0</td><td>0</td><td>浣庣數骞?/td><td>涓婂崌娌?绗?涓?</td><td>涓嬮檷娌?/td></tr>
+<tr><td>Mode 1</td><td>0</td><td>1</td><td>浣庣數骞?/td><td>涓嬮檷娌?绗?涓?</td><td>涓婂崌娌?/td></tr>
+<tr><td>Mode 2</td><td>1</td><td>0</td><td>楂樼數骞?/td><td>涓嬮檷娌?绗?涓?</td><td>涓婂崌娌?/td></tr>
+<tr><td>Mode 3</td><td>1</td><td>1</td><td>楂樼數骞?/td><td>涓婂崌娌?绗?涓?</td><td>涓嬮檷娌?/td></tr>
+</table>
+
+<div class="note">鈿狅笍 <b>鏈€甯歌闄烽槺锛?/b>STM32鐨凜ubeMX榛樿SPI妯″紡鏄疢ode 0銆備絾W25Qxx Flash鑺墖鏁版嵁鎵嬪唽璇存槸Mode 0鎴朚ode 3閮借兘鐢ㄣ€傚鏋滈€氫俊寮傚父锛岀涓€涓妫€鏌ョ殑灏辨槸CPOL/CPHA閰嶇疆銆?/div>
+
+<h3>SPI鏁版嵁鎵嬪唽瑙ｈ</h3>
+
+<p>浠25Q64 Flash鑺墖涓轰緥锛岀湅鏁版嵁鎵嬪唽濡備綍鎻忚堪SPI妯″紡锛?/p>
+
+<pre><code>// W25Q64 鏁版嵁鎵嬪唽鍏稿瀷鎻忚堪锛?// "SPI Mode 0 (CPOL=0, CPHA=0) and Mode 3 (CPOL=1, CPHA=3) are supported.
+//  Data is sampled on the rising edge of CLK."
+//
+// 瑙ｈ锛歁ode 0 鍜?Mode 3 閮借兘鐢紝鍥犱负Mode 3鍙湪鏃堕挓绌洪棽鐢靛钩涓婁笉鍚岋紝
+// 浣嗘瘡娆′紶杈撳墠CS浼氱敤涓嬮檷娌块噸鏂板悓姝ワ紝鎵€浠ュ疄闄呮晥鏋滀竴鏍枫€?//
+// 鏃跺簭鍥惧叧閿俊鍙凤細
+//    CS# : \____________________________________/
+//    CLK :  _|~|_|~|_|~|_|~|_|~|_|~|_|~|_|~|_
+//    DI  :  X__D7_X__D6_X__D5_X__D4_...
+//    DO  :  High-Z_____X__D7_X__D6_X__D5_...
+//           鈫?CS鎷変綆鍚庯紝DO浠庨珮闃绘€佸彉涓烘湁鏁堟暟鎹?/code></pre>
+
+<h3>SPI鍗忚浠ｇ爜绀轰緥</h3>
+
+<pre><code>// SPI璇诲啓锛圚AL搴擄級
+// 鍐欐暟鎹埌SPI
+uint8_t tx_buf[] = {0x9F};  // 鍛戒护锛氳鍙朏lash ID
 uint8_t rx_buf[4] = {0};
 HAL_SPI_TransmitReceive(&amp;hspi1, tx_buf, rx_buf, 4, 1000);
 // rx_buf[1-3] = Manufacturer ID + Memory Type + Capacity
 
-// 带CS控制的SPI操作
-HAL_GPIO_WritePin(GPIOA, SPI_CS_PIN, GPIO_PIN_RESET);  // CS拉低
+// 甯S鎺у埗鐨凷PI鎿嶄綔
+HAL_GPIO_WritePin(GPIOA, SPI_CS_PIN, GPIO_PIN_RESET);  // CS鎷変綆
 HAL_SPI_Transmit(&amp;hspi1, &amp;cmd, 1, 1000);
 HAL_SPI_Receive(&amp;hspi1, rx_buf, len, 1000);
-HAL_GPIO_WritePin(GPIOA, SPI_CS_PIN, GPIO_PIN_SET);    // CS拉高</code></pre>
+HAL_GPIO_WritePin(GPIOA, SPI_CS_PIN, GPIO_PIN_SET);    // CS鎷夐珮</code></pre>
 
-<h3>CAN总线简介</h3>
+<h3>SPI Flash瀹屾暣椹卞姩</h3>
 
-<p>CAN(Controller Area Network)是汽车和工业控制的<strong>标准总线</strong>。差分信号抗干扰，最高1Mbps，支持多节点，有优先级仲裁。</p>
+<pre><code>// W25Q64 SPI Flash瀹屾暣椹卞姩
+#define W25Q64_CS_LOW()   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET)
+#define W25Q64_CS_HIGH()  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET)
 
-<div class="note">⚠️ <b>前提：</b>STM32的CAN外设需要配置波特率、过滤器、中断。以下代码基于STM32F103 + HAL库，需先用CubeMX启用CAN外设。</div>
+// 甯哥敤鍛戒护
+#define CMD_READ_ID      0x9F   // 璇诲彇鍘傚晢鍜岃澶嘔D
+#define CMD_READ_STATUS  0x05   // 璇荤姸鎬佸瘎瀛樺櫒
+#define CMD_WRITE_ENABLE 0x06   // 鍐欎娇鑳?#define CMD_READ_DATA    0x03   // 璇绘暟鎹?#define CMD_PAGE_PROGRAM 0x02   // 椤电紪绋?鏈€澶?56瀛楄妭)
+#define CMD_SECTOR_ERASE 0x20   // 鎵囧尯鎿﹂櫎(4KB)
+#define CMD_CHIP_ERASE   0xC7   // 鍏ㄧ墖鎿﹂櫎
 
-<pre><code>// STM32 HAL CAN初始化（CubeMX生成后补充）
+// 璇诲彇Flash ID
+void w25q64_read_id(uint8_t *manuf_id, uint8_t *dev_id) {
+    uint8_t cmd = CMD_READ_ID;
+    uint8_t rx[3] = {0};
+
+    W25Q64_CS_LOW();
+    HAL_SPI_Transmit(&amp;hspi1, &amp;cmd, 1, 100);
+    HAL_SPI_Receive(&amp;hspi1, rx, 3, 100);
+    W25Q64_CS_HIGH();
+
+    *manuf_id = rx[1];   // 棰勬湡0xEF (Winbond)
+    *dev_id   = rx[2];   // 棰勬湡0x16 (W25Q64)
+}
+
+// 绛夊緟Flash绌洪棽锛圔USY浣嶆竻闄わ級
+void w25q64_wait_busy(void) {
+    uint8_t cmd = CMD_READ_STATUS;
+    uint8_t status;
+    do {
+        W25Q64_CS_LOW();
+        HAL_SPI_Transmit(&amp;hspi1, &amp;cmd, 1, 100);
+        HAL_SPI_Receive(&amp;hspi1, &amp;status, 1, 100);
+        W25Q64_CS_HIGH();
+    } while (status &amp; 0x01);  // BUSY浣?1鍒欑瓑寰?}
+
+// 璇诲彇鏁版嵁
+void w25q64_read(uint32_t addr, uint8_t *buf, uint16_t len) {
+    uint8_t cmd[4] = {
+        CMD_READ_DATA,
+        (uint8_t)(addr &gt;&gt; 16),  // 鍦板潃楂?浣?        (uint8_t)(addr &gt;&gt; 8),   // 鍦板潃涓?浣?        (uint8_t)(addr)          // 鍦板潃浣?浣?    };
+
+    W25Q64_CS_LOW();
+    HAL_SPI_Transmit(&amp;hspi1, cmd, 4, 100);
+    HAL_SPI_Receive(&amp;hspi1, buf, len, 1000);
+    W25Q64_CS_HIGH();
+}
+
+// 椤电紪绋嬶紙涓€椤垫渶澶?56瀛楄妭锛屼笉鑳借法椤碉紒锛?void w25q64_page_program(uint32_t addr, uint8_t *buf, uint16_t len) {
+    w25q64_wait_busy();
+
+    // 鍐欎娇鑳?    uint8_t wen = CMD_WRITE_ENABLE;
+    W25Q64_CS_LOW();
+    HAL_SPI_Transmit(&amp;hspi1, &amp;wen, 1, 100);
+    W25Q64_CS_HIGH();
+
+    // 鍙戦€佸湴鍧€+鏁版嵁
+    uint8_t cmd[4] = {CMD_PAGE_PROGRAM,
+                      (uint8_t)(addr &gt;&gt; 16),
+                      (uint8_t)(addr &gt;&gt; 8),
+                      (uint8_t)(addr)};
+
+    W25Q64_CS_LOW();
+    HAL_SPI_Transmit(&amp;hspi1, cmd, 4, 100);
+    HAL_SPI_Transmit(&amp;hspi1, buf, len, 1000);
+    W25Q64_CS_HIGH();
+
+    w25q64_wait_busy();
+}</code></pre>
+
+<div class="card">
+<div class="h"><span class="name">SPI DMA鍔犻€?鈥?楂橀€熶紶杈?/span><span class="tag p">杩涢樁</span><span class="tag b">DMA</span></div>
+<div class="b">
+<div class="desc">褰撻渶瑕佽繛缁鍐欏ぇ閲忔暟鎹紙濡侺CD鍒锋柊銆佹暟鎹噰闆嗭級锛孌MA鍙互瑙ｆ斁CPU锛岃SPI鍏ㄩ€熻繍琛屻€?/div>
+
+<pre><code>// SPI DMA鎺ユ敹閰嶇疆锛圫TM32 HAL锛?#define SPI_DMA_BUF_SIZE 512
+uint8_t spi_dma_rx_buf[SPI_DMA_BUF_SIZE];
+volatile uint8_t spi_dma_done = 0;
+
+// 鍚姩DMA鎺ユ敹
+void spi_start_dma_receive(void) {
+    spi_dma_done = 0;
+    HAL_SPI_Receive_DMA(&amp;hspi1, spi_dma_rx_buf, SPI_DMA_BUF_SIZE);
+}
+
+// DMA瀹屾垚鍥炶皟
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi) {
+    if (hspi-&gt;Instance == SPI1) {
+        spi_dma_done = 1;
+        // 鏁版嵁鍦?spi_dma_rx_buf 涓紝鍙互鍦ㄤ富寰幆涓鐞?    }
+}
+
+// 涓诲惊鐜腑妫€鏌?while (1) {
+    spi_start_dma_receive();
+    // 鍦―MA浼犺緭鏈熼棿锛孋PU鍙互鍋氬叾浠栦簨
+    do_other_work();
+    while (!spi_dma_done);  // 绛夊緟瀹屾垚
+    process_data(spi_dma_rx_buf, SPI_DMA_BUF_SIZE);
+}</code></pre>
+
+<div class="tip">馃挕 <b>缁忛獙娉曞垯锛?/b>灏忎簬100瀛楄妭鐢ㄨ疆璇紝100~1000瀛楄妭鐢ㄤ腑鏂紝澶т簬1000瀛楄妭鐢―MA銆侱MA鐨勫紑閿€浣撶幇鍦ㄥ垵濮嬪寲閰嶇疆涓婏紝鏁版嵁閲忓皬鍙嶈€屼笉鍒掔畻銆?/div>
+</div></div>
+
+<div class="tip">馃挕 <b>瀹炴垬缁冧範锛歋PI Flash鏁版嵁璁板綍鍣?/b><br>
+浠诲姟锛氱敤W25Q64瀛樺偍浼犳劅鍣ㄦ暟鎹紝瀹炵幇"鍐欐弧鍚庡惊鐜鐩?鍔熻兘<br>
+瑕佺偣锛氣憼 蹇呴』鎸夋墖鍖烘摝闄?4KB)鍚庡啀鍐欏叆 鈶?灏忓績璺ㄩ〉鍐欏叆锛?56瀛楄妭杈圭晫锛?鈶?鐢╓25Q64鏈€鍚?涓墖鍖哄瓨鍌?褰撳墠鍐欏叆浣嶇疆"鎸囬拡 鈶?鎿﹂櫎涓€涓墖鍖洪渶瑕亊50ms锛岃繖娈垫椂闂翠笉鑳芥搷浣淔lash<br>
+杩涢樁闇€姹傦細瀹炵幇绠€鍗曠殑纾ㄦ崯鍧囪　锛圵ear Leveling锛夆€斺€旇褰曟瘡涓墖鍖虹殑鎿﹂櫎娆℃暟锛屼紭鍏堜娇鐢ㄦ摝闄ゆ鏁板皯鐨勬墖鍖恒€?/div>
+
+<h2>CAN鎬荤嚎娣卞害瑙ｆ瀽</h2>
+
+<h3>CAN鎬荤嚎绠€浠?/h3>
+
+<p>CAN(Controller Area Network)鏄苯杞﹀拰宸ヤ笟鎺у埗鐨?strong>鏍囧噯鎬荤嚎</strong>銆傚樊鍒嗕俊鍙锋姉骞叉壈锛屾渶楂?Mbps锛屾敮鎸佸鑺傜偣锛屾湁浼樺厛绾т徊瑁併€?/p>
+
+<div class="note">鈿狅笍 <b>鍓嶆彁锛?/b>STM32鐨凜AN澶栬闇€瑕侀厤缃尝鐗圭巼銆佽繃婊ゅ櫒銆佷腑鏂€備互涓嬩唬鐮佸熀浜嶴TM32F103 + HAL搴擄紝闇€鍏堢敤CubeMX鍚敤CAN澶栬銆?/div>
+
+<h3>CAN甯ф牸寮?/h3>
+
+<p>CAN鎬荤嚎鏈変袱绉嶅抚鏍煎紡锛?strong>鏍囧噯甯?11浣岻D)</strong>鍜?strong>鎵╁睍甯?29浣岻D)</strong>銆傛瘡甯ф渶澶?瀛楄妭鏁版嵁锛岀敱ID鍐冲畾浼樺厛绾э紙ID瓒婂皬浼樺厛绾ц秺楂橈紝鐢ㄤ簬浠茶锛夈€?/p>
+
+<table>
+<tr><th>瀛楁</th><th>浣嶆暟</th><th>璇存槑</th></tr>
+<tr><td>SOF</td><td>1</td><td>甯ц捣濮嬶紙鏄炬€х數骞筹級</td></tr>
+<tr><td>ID(鏍囧噯)</td><td>11</td><td>鍚屾椂涔熺敤浜庝徊瑁侊紝ID瓒婂皬浼樺厛绾ц秺楂?/td></tr>
+<tr><td>RTR</td><td>1</td><td>杩滅▼甯ф爣璁帮紙璇锋眰瀵规柟鍙戦€佹暟鎹級</td></tr>
+<tr><td>IDE</td><td>1</td><td>0=鏍囧噯甯? 1=鎵╁睍甯?/td></tr>
+<tr><td>DLC</td><td>4</td><td>鏁版嵁闀垮害锛?~8瀛楄妭锛?/td></tr>
+<tr><td>Data</td><td>0~64</td><td>瀹為檯鏁版嵁锛?~8瀛楄妭锛?/td></tr>
+<tr><td>CRC</td><td>15</td><td>寰幆鍐椾綑鏍￠獙</td></tr>
+<tr><td>ACK</td><td>2</td><td>搴旂瓟锛堣嚦灏戜竴涓妭鐐规媺浣庡嵆涓虹‘璁わ級</td></tr>
+<tr><td>EOF</td><td>7</td><td>甯х粨鏉燂紙闅愭€х數骞筹級</td></tr>
+</table>
+
+<h3>CAN鎬荤嚎浠茶鏈哄埗</h3>
+
+<p>CAN鏈€绮惧鐨勮璁℃槸<strong>鏃犳崯閫愪綅浠茶</strong>锛氬涓妭鐐瑰悓鏃跺彂閫佹椂锛孖D灏忕殑鑷姩鑳滃嚭锛孖D澶х殑鑷姩閫€鍑恒€佺◢鍚庨噸鍙戙€傛暣涓繃绋嬩笉闇€瑕佷富鏈哄崗璋冦€?/p>
+
+<div class="analogy">馃挕 <b>浠茶绫绘瘮锛?/b><br>
+涓や釜浜哄悓鏃跺紑濮嬪枈鑷繁鐨勮韩浠借瘉鍙枫€傛瘡鍠婁竴浣嶅氨鍚竴涓嬶紝濡傛灉鍙戠幇鍒汉鍦ㄥ枈"1"鑰岃嚜宸卞湪鍠?0"锛圕AN涓樉鎬?0浼樺厛绾ч珮锛夛紝灏辫嚜鍔ㄩ棴鍢达紝璁╅偅涓枈"0"鐨勪汉璇村畬銆傛暣涓繃绋嬩笉闇€瑕佽鍒も€斺€旇繖灏辨槸CAN鎬荤嚎鐨?CSMA/CD-AMP"锛堣浇娉㈢洃鍚璺闂?閫愪綅浠茶锛夈€?/div>
+
+<pre><code>// 浠茶绀轰緥锛?// 鑺傜偣A鍙戦€?ID=0x123 (浜岃繘鍒?0010_0100_0011)
+// 鑺傜偣B鍙戦€?ID=0x125 (浜岃繘鍒?0010_0100_0101)
+// 
+// 鍓?浣嶇浉鍚?鈫?缁х画
+// 绗?浣嶏細A=0, B=1 鈫?A鑳滃嚭锛丅鑷姩閫€鍑猴紝A缁х画鍙戦€?// B浼氬湪A鍙戦€佸畬姣曞悗鑷姩閲嶈瘯</code></pre>
+
+<h3>CAN娉㈢壒鐜囪绠?/h3>
+
+<p>CAN娉㈢壒鐜囩敱涓変釜鍙傛暟鍐冲畾锛?strong>Prescaler锛堥鍒嗛鍣級</strong>銆?strong>TimeSeg1锛堟椂闂存1锛?/strong>銆?strong>TimeSeg2锛堟椂闂存2锛?/strong>銆傚啀鍔犱竴涓浐瀹氱殑鍚屾娈?1TQ)銆?/p>
+
+<pre><code>// CAN娉㈢壒鐜囧叕寮忥細
+// 娉㈢壒鐜?= CAN鏃堕挓棰戠巼 / (Prescaler 脳 (1 + TimeSeg1 + TimeSeg2))
+//
+// 涓句緥锛歋TM32F103 CAN鏃堕挓=36MHz (APB1=36MHz, 缁忚繃梅2棰勫垎棰?18MHz??)
+// 瀹為檯涓奀AN鎸傚湪APB1涓婏紝APB1=36MHz鏃讹紝CAN鏃堕挓=36MHz
+//
+// 鐩爣500Kbps锛?//   Prescaler = 9, TimeSeg1 = 3, TimeSeg2 = 4
+//   娉㈢壒鐜?= 36MHz / (9 脳 (1+3+4)) = 36M / 72 = 500Kbps 鉁?//
+// 鐩爣250Kbps锛?//   Prescaler = 18, TimeSeg1 = 3, TimeSeg2 = 4
+//   娉㈢壒鐜?= 36MHz / (18 脳 8) = 36M / 144 = 250Kbps 鉁?
+// 閲囨牱鐐?= (1 + TimeSeg1) / (1 + TimeSeg1 + TimeSeg2) 脳 100%
+// 鎺ㄨ崘鐨勯噰鏍风偣浣嶇疆锛?5%~87.5%
+// 涓婇潰500Kbps閰嶇疆鐨勯噰鏍风偣 = (1+3)/(1+3+4) = 50%  鈫?鍋忎綆锛?// 鏀硅繘閰嶇疆锛歍imeSeg1=12, TimeSeg2=3, Prescaler=4
+//   娉㈢壒鐜?= 36M/(4脳16) = 562.5K 鈮?500K? 涓嶈
+//   瀹為檯 = 36M/(4脳16) = 562.5K 璇樊澶ぇ
+//   鏈€浣筹細TimeSeg1=13, TimeSeg2=2, Prescaler=4
+//   娉㈢壒鐜?= 36M/(4脳16) = 562.5K... 涓嶅
+//   36M/(4脳(1+13+2)) = 36M/(4脳16) = 562.5K
+//   TimeSeg1=11, TimeSeg2=4, Prescaler=4 鈫?36M/(4脳16)=562.5K
+//   鏈€鎺ヨ繎: TimeSeg1=13, TimeSeg2=3, Prescaler=4
+//                      36M/(4脳17)=529K 璇樊5.8% 鈫愬媺寮鸿兘鐢?//   鏇村ソ: Prescaler=6, TimeSeg1=5, TimeSeg2=3
+//         36M/(6脳9)=666K 涓嶅ソ
+//   鍥炲埌: Prescaler=9, TimeSeg1=5, TimeSeg2=2
+//         36M/(9脳8)=500K 瀹岀編!閲囨牱鐐?(1+5)/8=75% 寰堝ソ!</code></pre>
+
+<div class="note">鈿狅笍 <b>鍏抽敭姒傚康锛?/b>鍚屼竴CAN鎬荤嚎涓婃墍鏈夎妭鐐圭殑<strong>娉㈢壒鐜囧繀椤诲畬鍏ㄤ竴鑷?/strong>锛堜笉鍍廢ART鏈夊閿欙級锛屽惁鍒欎細棰戠箒浜х敓閿欒甯с€佽繘鍏us-Off鐘舵€併€?/div>
+
+<h3>CAN鍒濆鍖栦笌鍙戦€?/h3>
+
+<pre><code>// STM32 HAL CAN鍒濆鍖栵紙CubeMX鐢熸垚鍚庤ˉ鍏咃級
 CAN_HandleTypeDef hcan;
 
 void MX_CAN_Init(void) {
@@ -130,9 +564,9 @@ void MX_CAN_Init(void) {
     hcan.Init.Prescaler = 4;           // 72MHz/4=18MHz
     hcan.Init.Mode = CAN_MODE_NORMAL;
     hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-    hcan.Init.TimeSeg1 = CAN_BS1_13TQ; // 时间段1
-    hcan.Init.TimeSeg2 = CAN_BS2_2TQ;  // 时间段2
-    // 波特率 = 18MHz / (1+13+2) = 1MHz... 实际500Kbps常用
+    hcan.Init.TimeSeg1 = CAN_BS1_13TQ; // 鏃堕棿娈?
+    hcan.Init.TimeSeg2 = CAN_BS2_2TQ;  // 鏃堕棿娈?
+    // 娉㈢壒鐜?= 18MHz / (1+13+2) = 1MHz... 瀹為檯500Kbps甯哥敤
     hcan.Init.TimeTriggeredMode = DISABLE;
     hcan.Init.AutoBusOff = ENABLE;
     hcan.Init.AutoWakeUp = DISABLE;
@@ -140,8 +574,7 @@ void MX_CAN_Init(void) {
     HAL_CAN_Init(&amp;hcan);
 }
 
-// 配置过滤器（必须！否则收不到数据）
-CAN_FilterTypeDef filter;
+// 閰嶇疆杩囨护鍣紙蹇呴』锛佸惁鍒欐敹涓嶅埌鏁版嵁锛?CAN_FilterTypeDef filter;
 filter.FilterBank = 0;
 filter.FilterMode = CAN_FILTERMODE_IDMASK;
 filter.FilterScale = CAN_FILTERSCALE_32BIT;
@@ -155,8 +588,7 @@ HAL_CAN_ConfigFilter(&amp;hcan, &amp;filter);
 HAL_CAN_Start(&amp;hcan);
 HAL_CAN_ActivateNotification(&amp;hcan, CAN_IT_RX_FIFO0_MSG_PENDING);</code></pre>
 
-<pre><code>// STM32 HAL CAN发送
-CAN_TxHeaderTypeDef tx_header;
+<pre><code>// STM32 HAL CAN鍙戦€?CAN_TxHeaderTypeDef tx_header;
 tx_header.StdId = 0x123;
 tx_header.IDE   = CAN_ID_STD;
 tx_header.RTR   = CAN_RTR_DATA;
@@ -166,7 +598,7 @@ uint8_t tx_data[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
 uint32_t tx_mailbox;
 HAL_CAN_AddTxMessage(&amp;hcan, &amp;tx_header, tx_data, &amp;tx_mailbox);</code></pre>
 
-<pre><code>// CAN接收中断回调
+<pre><code>// CAN鎺ユ敹涓柇鍥炶皟
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     CAN_RxHeaderTypeDef rx_header;
     uint8_t rx_data[8];
@@ -179,51 +611,246 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     }
 }</code></pre>
 
-<h3>逻辑分析仪</h3>
+<h3>CAN鎵╁睍甯т笌鎬荤嚎閿欒澶勭悊</h3>
 
-<p>逻辑分析仪是调试通信协议的<strong>必备神器</strong>——它同时抓取多路数字信号，用软件解码I2C/SPI/UART等协议的数据。</p>
+<pre><code>// CAN鎵╁睍甯э紙29浣岻D锛夊彂閫佺ず渚?CAN_TxHeaderTypeDef tx_header;
+tx_header.ExtId = 0x18F00102;  // 29浣岻D锛堝父鐢ㄥ湪J1939鍗忚锛?tx_header.IDE   = CAN_ID_EXT;  // 鍏抽敭锛氬繀椤昏涓篍XT锛?tx_header.RTR   = CAN_RTR_DATA;
+tx_header.DLC   = 8;
+
+// CAN鎬荤嚎閿欒璇婃柇
+void can_error_check(void) {
+    uint32_t err = HAL_CAN_GetError(&amp;hcan);
+
+    if (err &amp; HAL_CAN_ERROR_EWG)  printf("CAN Warning: Error Warning\n");
+    if (err &amp; HAL_CAN_ERROR_EPV)  printf("CAN Error Passive!\n");
+    if (err &amp; HAL_CAN_ERROR_BOF)  printf("CAN Bus Off!! 妫€鏌ユ€荤嚎/缁堢鐢甸樆\n");
+
+    // TEC/REC璁℃暟鍣紙鍙戦€?鎺ユ敹閿欒璁℃暟鍣級
+    // TEC>96 鈫?Error Passive
+    // TEC>255 鈫?Bus Off锛堝繀椤昏蒋浠舵仮澶嶏紒锛?}
+
+// 浠嶣us-Off鎭㈠
+if (HAL_CAN_GetError(&amp;hcan) &amp; HAL_CAN_ERROR_BOF) {
+    HAL_CAN_Stop(&amp;hcan);
+    HAL_Delay(10);
+    HAL_CAN_ResetError(&amp;hcan);
+    HAL_CAN_Start(&amp;hcan);
+    printf("CAN recovered from Bus-Off\n");
+}</code></pre>
 
 <div class="card">
-<div class="h"><span class="name">逻辑分析仪</span><span class="tag g">协议调试</span><span class="tag y">¥20-50</span></div>
+<div class="h"><span class="name">CANopen鍗忚绠€浠?/span><span class="tag p">杩涢樁</span><span class="tag y">宸ヤ笟鏍囧噯</span></div>
 <div class="b">
-<div class="desc">8通道/24MHz采样率就够用。配合 sigrok/PulseView 开源软件，能自动解码I2C/SPI/UART/CAN等协议。</div>
-<pre><code># PulseView（开源逻辑分析仪软件）
-# 1. 下载：sigrok.org
-# 2. 连接逻辑分析仪到USB
-# 3. 选择通道和采样率（推荐8MHz以上）
-# 4. 添加协议解码器（I2C/SPI/UART等）
-# 5. 捕获→查看解码数据</code></pre>
+<div class="desc">CAN鍙畾涔変簡鐗╃悊灞傚拰鏁版嵁閾捐矾灞傘€侰ANopen鍦–AN涔嬩笂瀹氫箟浜嗗簲鐢ㄥ眰鍗忚锛屽箍娉涚敤浜庝己鏈嶇數鏈恒€佹満鍣ㄤ汉銆佸尰鐤楄澶囥€?/div>
+
+<pre><code>// CANopen鏍稿績姒傚康锛?// - 姣忎釜璁惧鏈塏ode-ID (1~127)
+// - COB-ID = Function Code + Node-ID
+//   NMT:    0x000  (缃戠粶绠＄悊)
+//   SYNC:   0x080  (鍚屾淇″彿)
+//   EMCY:   0x080 + Node-ID (绱ф€ユ姤鏂?
+//   PDO1tx: 0x180 + Node-ID (杩囩▼鏁版嵁瀵硅薄)
+//   PDO1rx: 0x200 + Node-ID
+//   SDOtx:  0x580 + Node-ID (鏈嶅姟鏁版嵁瀵硅薄)
+//   SDOrx:  0x600 + Node-ID
+//   Heartbeat: 0x700 + Node-ID (蹇冭烦)
+
+// 瀵硅薄瀛楀吀(Object Dictionary)锛?//   绱㈠紩1000h: 璁惧绫诲瀷
+//   绱㈠紩1017h: Heartbeat鍛ㄦ湡(ms)
+//   绱㈠紩1018h: 鍘傚晢淇℃伅
+//   绱㈠紩6060h: 鎿嶄綔妯″紡(浼烘湇鐢垫満)
+//   绱㈠紩6040h: 鎺у埗瀛?//   绱㈠紩6041h: 鐘舵€佸瓧</code></pre>
+
+<p>CANopen鏄粡鍏哥殑"鍏堣鏍囧噯鍐嶅啓浠ｇ爜"鍗忚銆傞渶瑕佸畬鏁寸悊瑙ｅ璞″瓧鍏稿拰鐘舵€佹満銆傛帹鑽愯祫鏂欙細CiA瀹樼綉(can-cia.org)鍜屻€奅mbedded CANopen銆嬩竴涔︺€?/p>
 </div></div>
 
-<div class="trouble">🔍 <b>常见问题：I2C设备无响应</b><br>
-1. 上拉电阻！I2C的SDA/SCL必须各接4.7K上拉电阻到VCC<br>
-2. 地址是否正确？很多传感器有AD0引脚，接地/接VCC地址不同<br>
-3. 用 i2c_scan() 扫描确认设备是否存在<br>
-4. 逻辑分析仪抓波形，看是否有ACK</div>
+<h2>RS-485涓嶮odbus鍗忚</h2>
+
+<p>宸ヤ笟鐗╄仈缃?IoT)涓渶甯哥敤鐨勬湁绾块€氫俊鏂规鏄疪S-485鐗╃悊灞?+ Modbus鍗忚銆傚嚑涔庢墍鏈夌殑PLC銆佸彉棰戝櫒銆佷紶鎰熷櫒閮芥敮鎸併€?/p>
+
+<h3>Modbus RTU甯ф牸寮?/h3>
+
+<pre><code>// Modbus RTU甯х粨鏋勶紙鍩轰簬RS-485/TTL UART锛?// 璧峰       鍦板潃   鍔熻兘鐮?  鏁版嵁鍖?       CRC16    缁撴潫
+// 鈮?.5瀛楃   1瀛楄妭  1瀛楄妭   N瀛楄妭         2瀛楄妭    鈮?.5瀛楃
+// (甯ч棿闅?                                  (浣庡瓧鑺傚湪鍓?)
+
+// 甯哥敤鍔熻兘鐮侊細
+// 0x01 璇荤嚎鍦?Read Coils)
+// 0x02 璇荤鏁ｉ噺杈撳叆
+// 0x03 璇讳繚鎸佸瘎瀛樺櫒(Read Holding Registers) 鈫?鏈€甯哥敤
+// 0x04 璇昏緭鍏ュ瘎瀛樺櫒
+// 0x05 鍐欏崟涓嚎鍦?// 0x06 鍐欏崟涓瘎瀛樺櫒
+// 0x10 鍐欏涓瘎瀛樺櫒
+//
+// 涓句緥锛氳鍙栦粠鏈哄湴鍧€0x01鐨勪繚鎸佸瘎瀛樺櫒锛堜粠0x0000寮€濮嬶紝璇?涓級
+// 璇锋眰: 01 03 00 00 00 02 C4 0B
+//        鍦板潃 鍔熻兘鐮?璧峰鍦板潃  鏁伴噺  CRC16
+// 鍝嶅簲: 01 03 04 00 64 00 C8 XX XX
+//        鍦板潃 鍔熻兘鐮?瀛楄妭鏁? 鏁版嵁0  鏁版嵁1  CRC
+//        鏁版嵁0=0x0064=100, 鏁版嵁1=0x00C8=200</code></pre>
+
+<pre><code>// Modbus RTU CRC16璁＄畻锛堟煡琛ㄦ硶锛屽凡楠岃瘉姝ｇ‘锛?static const uint16_t crc16_table[256] = {
+    0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241,
+    0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
+    // ... 鍏朵綑鐪佺暐锛屽疄闄呬娇鐢ㄦ椂鏀惧畬鏁?56椤?};
+
+uint16_t modbus_crc16(uint8_t *buf, uint16_t len) {
+    uint16_t crc = 0xFFFF;
+    while (len--) {
+        crc = (crc &gt;&gt; 8) ^ crc16_table[(crc ^ *buf++) &amp; 0xFF];
+    }
+    return crc;
+}
+
+// 鍙戦€丮odbus RTU璇锋眰
+void modbus_read_holding_regs(uint8_t slave_addr, uint16_t start_addr,
+                               uint16_t reg_count) {
+    uint8_t frame[8];
+    frame[0] = slave_addr;
+    frame[1] = 0x03;  // 鍔熻兘鐮侊細璇讳繚鎸佸瘎瀛樺櫒
+    frame[2] = (start_addr &gt;&gt; 8) &amp; 0xFF;
+    frame[3] = start_addr &amp; 0xFF;
+    frame[4] = (reg_count &gt;&gt; 8) &amp; 0xFF;
+    frame[5] = reg_count &amp; 0xFF;
+
+    uint16_t crc = modbus_crc16(frame, 6);
+    frame[6] = crc &amp; 0xFF;       // CRC浣庡瓧鑺傚湪鍓嶏紒
+    frame[7] = (crc &gt;&gt; 8) &amp; 0xFF;
+
+    // RS-485鍙戦€佸墠闇€浣胯兘鍙戦€佸紩鑴?DE/RE)
+    HAL_GPIO_WritePin(GPIOA, RS485_DE_PIN, GPIO_PIN_SET);
+    HAL_UART_Transmit(&amp;huart2, frame, 8, 100);
+    HAL_GPIO_WritePin(GPIOA, RS485_DE_PIN, GPIO_PIN_RESET); // 鎭㈠鎺ユ敹
+}</code></pre>
+
+<div class="note">鈿狅笍 <b>RS-485鍏抽敭瑕佺偣锛?/b><br>
+鈶?宸垎绾緼/B涓ょ蹇呴』鍚勬帴<strong>120惟缁堢鐢甸樆</strong>锛堝惛鏀朵俊鍙峰弽灏勶級<br>
+鈶?鎬荤嚎鎷撴墤蹇呴』鏄?strong>鑿婅姳閾?Daisy Chain)</strong>锛屼笉鑳芥槦褰㈠垎鏀?br>
+鈶?姣忎釜鑺傜偣蹇呴』鏈夌嫭绔嬬殑5V/GND渚涚數锛堟垨鑰呯敤闅旂鐢垫簮锛?br>
+鈶?鏈€澶ч€氫俊璺濈涓庢尝鐗圭巼鎴愬弽姣旓細9600bps鈫?200m锛?15200bps鈫?00m</div>
+
+<div class="tip">馃挕 <b>瀹炴垬缁冧範锛歁odbus娓╂箍搴﹂噰闆嗗櫒</b><br>
+浠诲姟锛氬皢绗?2绔犵殑鐜鐩戞祴绔欐敼閫犱负Modbus浠庢満锛岀敤Modbus Poll杞欢璇诲彇娓╂箍搴?br>
+瑕佹眰锛氣憼 鏀寔鍔熻兘鐮?x03锛堣淇濇寔瀵勫瓨鍣級 鈶?瀵勫瓨鍣?x0000=娓╁害(脳10)锛?x0001=婀垮害(脳10) 鈶?鍦板潃閫氳繃鎷ㄧ爜寮€鍏虫垨瀹忓畾涔夎缃?鈶?姝ｇ‘瀹炵幇甯ч棿闅旀娴嬶紙鈮?.5瀛楃鏃堕棿=鏃犳暟鎹秴鏃讹級<br>
+楠岃瘉锛氱敤PC涓婄殑Modbus Poll杞欢杩炴帴锛岃兘璇诲埌姝ｇ‘鐨勬俯婀垮害鏁版嵁銆?/div>
+
+<h2>閫昏緫鍒嗘瀽浠?/h2>
+
+<p>閫昏緫鍒嗘瀽浠槸璋冭瘯閫氫俊鍗忚鐨?strong>蹇呭绁炲櫒</strong>鈥斺€斿畠鍚屾椂鎶撳彇澶氳矾鏁板瓧淇″彿锛岀敤杞欢瑙ｇ爜I2C/SPI/UART绛夊崗璁殑鏁版嵁銆?/p>
+
+<div class="card">
+<div class="h"><span class="name">閫昏緫鍒嗘瀽浠?/span><span class="tag g">鍗忚璋冭瘯</span><span class="tag y">楼20-50</span></div>
+<div class="b">
+<div class="desc">8閫氶亾/24MHz閲囨牱鐜囧氨澶熺敤銆傞厤鍚?sigrok/PulseView 寮€婧愯蒋浠讹紝鑳借嚜鍔ㄨВ鐮両2C/SPI/UART/CAN绛夊崗璁€?/div>
+<pre><code># PulseView锛堝紑婧愰€昏緫鍒嗘瀽浠蒋浠讹級
+# 1. 涓嬭浇锛歴igrok.org
+# 2. 杩炴帴閫昏緫鍒嗘瀽浠埌USB
+# 3. 閫夋嫨閫氶亾鍜岄噰鏍风巼锛堟帹鑽?MHz浠ヤ笂锛?# 4. 娣诲姞鍗忚瑙ｇ爜鍣紙I2C/SPI/UART绛夛級
+# 5. 鎹曡幏鈫掓煡鐪嬭В鐮佹暟鎹?/code></pre>
+</div></div>
+
+<h3>鐢ㄩ€昏緫鍒嗘瀽浠В鐮両2C娉㈠舰</h3>
+
+<div class="analogy">馃挕 <b>鐪熶汉妗堜緥锛?/b>鏈変釜瀛﹀憳鐢⊿SD1306 OLED姝绘椿涓嶄寒锛屼唬鐮佸弽澶嶆鏌ユ病闂銆傜敤閫昏緫鍒嗘瀽浠竴鎶擄紝鍙戠幇SCL鏈夋尝褰絾SDA鏄钩鐨勨€斺€斿師鏉ユ槸鏉滈偊绾挎柇浜嗐€備笉鎶撴尝褰紝鏍规湰鎯充笉鍒版槸纭欢闂銆?鍧楅挶鐨勯€昏緫鍒嗘瀽浠渷浜?灏忔椂鐨勭瀻鎶樿吘銆?/div>
+
+<pre><code>// 閫昏緫鍒嗘瀽浠皟璇旾2C鐨勬爣鍑嗘祦绋嬶細
+//
+// 1. 杩炴帴锛氶€氶亾0=SDA, 閫氶亾1=SCL, GND=GND
+// 2. PulseView娣诲姞瑙ｇ爜鍣細I2C 鈫?SDA=閫氶亾0, SCL=閫氶亾1
+// 3. 璁剧疆瑙﹀彂锛歋CL涓嬮檷娌匡紙鎴栧叾浠栬竟娌匡級
+// 4. 鎶撳彇 鈫?鐪嬭В鐮佺粨鏋?//
+// 甯歌娉㈠舰闂锛?// 鈶?鍏ㄦ槸楂樼數骞?鈫?涓婃媺鐢甸樆娌℃帴
+// 鈶?鏈夎捣濮嬫潯浠朵絾娌℃暟鎹?鈫?鍦板潃閿欒
+// 鈶?鏈夊湴鍧€+ACK浣嗘暟鎹叏鏄? 鈫?瀵勫瓨鍣ㄥ湴鍧€閿欒
+// 鈶?娉㈠舰鏈夋瘺鍒?鈫?涓婃媺鐢甸樆澶ぇ鎴栬蛋绾垮お闀?// 鈶?START鍚庣珛鍗砈TOP 鈫?浠庢満涓嶅瓨鍦?鏃燗CK)</code></pre>
+
+<h2>鎺掗敊鎸囧崡涓庡父瑙侀敊璇?/h2>
+
+<div class="trouble">馃攳 <b>甯歌闂1锛欼2C璁惧鏃犲搷搴?/b><br>
+1. 涓婃媺鐢甸樆锛両2C鐨凷DA/SCL蹇呴』鍚勬帴4.7K涓婃媺鐢甸樆鍒癡CC<br>
+2. 鍦板潃鏄惁姝ｇ‘锛熷緢澶氫紶鎰熷櫒鏈堿D0寮曡剼锛屾帴鍦?鎺CC鍦板潃涓嶅悓<br>
+3. 鐢?i2c_scan() 鎵弿纭璁惧鏄惁瀛樺湪<br>
+4. 閫昏緫鍒嗘瀽浠姄娉㈠舰锛岀湅鏄惁鏈堿CK</div>
+
+<div class="trouble">馃攳 <b>甯歌闂2锛歋PI閫氫俊鏁版嵁鍏ㄤ负闆舵垨鍏ㄤ负FF</b><br>
+鍘熷洜1锛欳POL/CPHA妯″紡涓嶅尮閰?鈫?妫€鏌ユ暟鎹墜鍐岋紝SCLK绌洪棽鐢靛钩涓庨噰鏍锋部<br>
+鍘熷洜2锛欳S鐗囬€夋病鏈夋媺浣?鈫?鐢ㄩ€昏緫鍒嗘瀽浠‘璁S鐢靛钩<br>
+鍘熷洜3锛氭帴绾块敊璇?鈫?MOSI鎺ISO銆丮ISO鎺OSI锛堝緢澶氫汉鎼炲弽锛?br>
+鍘熷洜4锛歋PI鏃堕挓澶揩 鈫?鍏堢敤浣庨€燂紙&lt;1MHz锛夋祴璇曪紝璋冮€氬悗鍐嶆彁閫?br>
+鍘熷洜5锛氳姱鐗囨湭閫€鍑虹潯鐪犳ā寮?鈫?Flash/浼犳劅鍣ㄤ笂鐢靛悗闇€瑕佸彂閫佸敜閱掑懡浠?/div>
+
+<div class="trouble">馃攳 <b>甯歌闂3锛欳AN鎬荤嚎Bus-Off閿欒</b><br>
+1. 妫€鏌ANH/CANL涔嬮棿鏄惁鏈?strong>120惟缁堢鐢甸樆</strong>锛堢煭绾垮彲涓嶈锛岄暱绾垮繀椤诲姞锛?br>
+2. CANH鍜孋ANL鏄惁鎺ュ弽锛堣窡UART TX/RX涓嶅悓锛孋AN鏄樊鍒嗗锛屾帴鍙嶄篃鑳藉伐浣滀絾瀹规槗鍑洪敊锛?br>
+3. 鎬荤嚎涓婃槸鍚︽墍鏈夎妭鐐规尝鐗圭巼涓€鑷达紙涓€涓兘涓嶈锛侊級<br>
+4. 鐢ㄧず娉㈠櫒鐪婥ANH/CANL娉㈠舰锛屽簲鏈夋槑鏄剧殑宸垎鎽嗗箙锛垀2V锛?br>
+5. 妫€鏌AN鏀跺彂鍣ㄨ姱鐗囷紙濡俆JA1050锛変緵鐢垫槸鍚︽甯革紙3.3V鎴?V瑙嗗瀷鍙凤級</div>
+
+<div class="trouble">馃攳 <b>甯歌闂4锛歎ART鏀跺埌涔辩爜</b><br>
+1. 娉㈢壒鐜囦笉鍖归厤 鈥斺€?鏈€甯歌锛佷袱杈归兘妫€鏌ュ疄闄呴厤缃€?br>
+2. 鏃堕挓棰戠巼涓嶅 鈥斺€?SystemCoreClock涓庡疄闄呮櫠鎸笉涓€鑷存椂锛屾墍鏈夊璁炬椂閽熼兘鍋?br>
+3. TTL鍜孯S-232鐢靛钩娣锋帴 鈥斺€?STM32鐩磋繛PC涓插彛浼氱儳鑺墖锛佸繀椤诲姞MAX232<br>
+4. 鏁版嵁浣?鏍￠獙浣?鍋滄浣嶄笉鍖归厤 鈥斺€?甯歌锛?N1 vs 7E1 vs 8O1<br>
+5. 鎺ュ湴涓嶈壇 鈥斺€?UART閫氫俊蹇呴』鍏卞湴锛?/div>
 
 <div class="example-block">
-<div class="ex-title">📝 完整示例：I2C设备扫描</div>
-<div class="ex-input">场景：OLED屏幕(SSD1306)接在I2C1上，确认设备地址</div>
-<pre><code>// 调用 i2c_scan() 后串口输出：</code></pre>
-<div class="ex-output">输出结果：</div>
+<div class="ex-title">馃摑 瀹屾暣绀轰緥锛欼2C璁惧鎵弿</div>
+<div class="ex-input">鍦烘櫙锛歄LED灞忓箷(SSD1306)鎺ュ湪I2C1涓婏紝纭璁惧鍦板潃</div>
+<pre><code>// 璋冪敤 i2c_scan() 鍚庝覆鍙ｈ緭鍑猴細</code></pre>
+<div class="ex-output">杈撳嚭缁撴灉锛?/div>
 <pre><code>I2C Scan:
-  Found device at 0x3C    ← 这就是OLED屏幕！
-  Found device at 0x68    ← MPU6050加速度计
-2 device(s) found</code></pre>
-<div class="ex-input">使用地址0x3C读写OLED：</div>
-<pre><code>uint8_t cmd = 0xAE;  // 关闭显示命令
+  Found device at 0x3C    鈫?杩欏氨鏄疧LED灞忓箷锛?  Found device at 0x68    鈫?MPU6050鍔犻€熷害璁?2 device(s) found</code></pre>
+<div class="ex-input">浣跨敤鍦板潃0x3C璇诲啓OLED锛?/div>
+<pre><code>uint8_t cmd = 0xAE;  // 鍏抽棴鏄剧ず鍛戒护
 HAL_I2C_Mem_Write(&amp;hi2c1, 0x3C&lt;&lt;1, 0x00, 1, &amp;cmd, 1, 1000);
-// OLED屏幕关闭</code></pre>
+// OLED灞忓箷鍏抽棴</code></pre>
 </div>
 
-<!-- ====== 第10章 ====== -->
+<h2>鍗忚閫夊瀷鎸囧崡</h2>
+
+<p>闈㈠涓€涓柊椤圭洰锛岃鐢ㄥ摢涓€氫俊鍗忚锛熸病鏈夐摱寮癸紝浣嗘湁浠ヤ笅缁忛獙娉曞垯锛?/p>
+
+<table>
+<tr><th>鍦烘櫙</th><th>鎺ㄨ崘鍗忚</th><th>鍘熷洜</th></tr>
+<tr><td>璋冭瘯杈撳嚭銆丟PS妯″潡銆佽摑鐗欎覆鍙ｆā鍧?/td><td>UART</td><td>鏈€绠€鍗曪紝PC绔洿鎺OM鍙ｈ鍙?/td></tr>
+<tr><td>鏉夸笂澶氫釜浼犳劅鍣?瀛樺偍鍣紙&lt;10涓級</td><td>I2C</td><td>涓ゆ牴绾挎寕鎵€鏈夎澶囷紝鐪佸紩鑴?/td></tr>
+<tr><td>闇€瑕侀珮閫熻鍐欙紙LCD/Flash/楂橀€烝DC锛?/td><td>SPI</td><td>鍏ㄥ弻宸ャ€侀€熷害蹇?/td></tr>
+<tr><td>宸ヤ笟鐜銆佽繙璺濈銆佸鑺傜偣</td><td>CAN鎴朢S-485</td><td>宸垎鎶楀共鎵帮紝鏈夐敊璇娴?/td></tr>
+<tr><td>IoT璁惧涓婁簯</td><td>WiFi+MQTT</td><td>鐩存帴杩炰簰鑱旂綉锛堣绗?4绔狅級</td></tr>
+<tr><td>闇€瑕佺儹鎻掓嫈銆佸嵆鎻掑嵆鐢?/td><td>USB</td><td>鑷姩鏋氫妇锛屼絾杞欢澶嶆潅搴﹂珮</td></tr>
+</table>
+
+<div class="card">
+<div class="h"><span class="name">鍗曟€荤嚎(1-Wire)鍗忚</span><span class="tag p">杩涢樁</span><span class="tag g">鐪佸紩鑴?/span></div>
+<div class="b">
+<div class="desc">鍙敤涓€鏍规暟鎹嚎锛堝姞鍦扮嚎锛夊氨鑳介€氫俊銆傚吀鍨嬪簲鐢細DS18B20娓╁害浼犳劅鍣ㄣ€丏HT11/DHT22娓╂箍搴︿紶鎰熷櫒銆傛椂搴忚姹備弗鏍硷紙寰绾э級锛岄渶瑕佸叧涓柇淇濇姢銆?/div>
+
+<pre><code>// 鍗曟€荤嚎鏃跺簭瑕佺偣锛?// 澶嶄綅鑴夊啿锛氫富鏈烘媺浣?80渭s 鈫?閲婃斁 鈫?浠庢満鎷変綆60~240渭s搴旂瓟
+// 鍐?锛氫富鏈烘媺浣?~15渭s 鈫?閲婃斁 鈫?淇濇寔楂?鈮?0渭s
+// 鍐?锛氫富鏈烘媺浣庘墺60渭s 鈫?閲婃斁
+// 璇绘暟鎹細涓绘満鎷変綆1~15渭s 鈫?閲婃斁 鈫?璇诲彇鐢靛钩 鈫?寤舵椂鈮?5渭s
+//
+// 鏈€澶ч棶棰橈細鏃跺簭渚濊禆鍏充腑鏂紒FreeRTOS浣跨敤瑕佺壒鍒皬蹇冧换鍔″垏鎹€?// __disable_irq() / __enable_irq() 鏄崟鎬荤嚎鐨?濂芥湅鍙?</code></pre>
+</div></div>
+
+<h2>鏈珷鎬荤粨</h2>
+
+<div class="summary"><b>馃搵 鐭ヨ瘑鐐瑰洖椤撅細</b><br><br>
+<b>UART锛?/b>寮傛銆佸叏鍙屽伐銆?绾?TX/RX)銆傛尝鐗圭巼闇€鍙屾柟涓€鑷达紝鏈墌3%瀹归敊銆俆TL/RS-232/RS-485鏄笉鍚岀墿鐞嗗眰鏍囧噯銆?br><br>
+<b>I2C锛?/b>鍚屾銆佸崐鍙屽伐銆?绾?SDA/SCL)銆傚紑婕忚緭鍑猴紝蹇呴』涓婃媺鐢甸樆(4.7K)銆?浣嶅湴鍧€0x08~0x77銆侶AL搴撳湴鍧€瑕佸乏绉?浣嶃€?br><br>
+<b>SPI锛?/b>鍚屾銆佸叏鍙屽伐銆?绾?MOSI/MISO/SCK/CS)銆?绉嶅伐浣滄ā寮?CPOL/CPHA)銆傞€熷害鏈€蹇彲杈?0Mbps銆傛棤鏍囧噯鍗忚灞傦紝鍚勮姱鐗囧懡浠ゆ牸寮忎笉鍚屻€?br><br>
+<b>CAN锛?/b>宸垎銆佸涓汇€佹湁浠茶鏈哄埗銆傛爣鍑嗗抚11浣岻D锛屾墿灞曞抚29浣岻D銆傛瘡甯?瀛楄妭鏁版嵁銆傞渶瑕佺粓绔數闃?20惟銆傚箍娉涚敤浜庢苯杞﹀拰宸ヤ笟銆?br><br>
+<b>RS-485/Modbus锛?/b>宸垎杩滆窛绂汇€佸鑺傜偣(鏈€澶?2/256)銆侻odbus鏄簲鐢ㄥ眰鍗忚锛孯TU鏍煎紡鏈€甯哥敤銆侰RC16鏍￠獙銆?br><br>
+<b>璋冭瘯绁炲櫒锛?/b>閫昏緫鍒嗘瀽浠?楼20-50) + PulseView杞欢 = 鍗忚闂缁堢粨鑰呫€傛尝褰笉浼氳璋庛€?br><br>
+<b>閫夊瀷鍘熷垯锛?/b>杩戣窛绂诲璁惧=I2C锛岄珮閫熸暟鎹?SPI锛岃皟璇?UART锛屽伐涓?姹借溅=CAN鎴朢S-485銆?</div>
+
+<!-- ====== 绗?0绔?====== -->
 <a id="ch10"></a>
-<div class="summary">📖 <b>第10章学完你能干啥：</b>能看懂原理图，会读数据手册关键参数，会用万用表测电压/通断，了解焊接和基本元件。</div>
+<div class="summary">馃摉 <b>绗?0绔犲瀹屼綘鑳藉共鍟ワ細</b>鑳界湅鎳傚師鐞嗗浘锛屼細璇绘暟鎹墜鍐屽叧閿弬鏁帮紝浼氱敤涓囩敤琛ㄦ祴鐢靛帇/閫氭柇锛屼簡瑙ｇ剨鎺ュ拰鍩烘湰鍏冧欢銆?/div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch08')">← 第8章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
-<a onclick="window.parent.loadPage('guide-ch10')">第10章 →</a>
+<a onclick="window.parent.loadPage('guide-ch08')">鈫?绗?绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
+<a onclick="window.parent.loadPage('guide-ch10')">绗?0绔?鈫?/a>
 </div>
 
 <script>
@@ -242,9 +869,9 @@ document.querySelectorAll('pre').forEach(pre => {
 });
 </script>
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch08')">◀ 上一章：FreeRTOS</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
-  <a onclick="window.parent.loadPage('guide-ch10')">PCB硬件 ：下一章 ▶</a>
+  <a onclick="window.parent.loadPage('guide-ch08')">鈼€ 涓婁竴绔狅細FreeRTOS</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
+  <a onclick="window.parent.loadPage('guide-ch10')">PCB纭欢 锛氫笅涓€绔?鈻?/a>
 </div>
 </body>
 </html>
