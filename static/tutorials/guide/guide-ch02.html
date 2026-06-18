@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第2章：CMake构建系统 - 嵌入式小白完全指南</title>
+<title>绗?绔狅細CMake鏋勫缓绯荤粺 - 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,14 +57,14 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第2章：CMake构建系统</h1>
-<div class="summary"><b>📖 小白完全指南 · 2/14</b> | 阅读时间约4分钟</div>
+<h1>绗?绔狅細CMake鏋勫缓绯荤粺</h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 2/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
 
-<p>CMake不直接编译代码——它是<strong>"构建文件生成器"</strong>。你写CMakeLists.txt描述项目结构，CMake帮你生成Makefile，再用make编译。</p>
+<p>CMake涓嶇洿鎺ョ紪璇戜唬鐮佲€斺€斿畠鏄?strong>"鏋勫缓鏂囦欢鐢熸垚鍣?</strong>銆備綘鍐機MakeLists.txt鎻忚堪椤圭洰缁撴瀯锛孋Make甯綘鐢熸垚Makefile锛屽啀鐢╩ake缂栬瘧銆?/p>
 
-<div class="analogy">💡 <b>类比：</b>CMake就像<strong>建筑设计师</strong>，你告诉他"我要3层楼、2个卧室"（CMakeLists.txt），他画出施工图纸（Makefile），施工队（make）按图纸盖房子（编译）。</div>
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>CMake灏卞儚<strong>寤虹瓚璁捐甯?/strong>锛屼綘鍛婅瘔浠?鎴戣3灞傛ゼ銆?涓崸瀹?锛圕MakeLists.txt锛夛紝浠栫敾鍑烘柦宸ュ浘绾革紙Makefile锛夛紝鏂藉伐闃燂紙make锛夋寜鍥剧焊鐩栨埧瀛愶紙缂栬瘧锛夈€?/div>
 
-<h3>CMakeLists.txt 最小模板</h3>
+<h3>CMakeLists.txt 鏈€灏忔ā鏉?/h3>
 
 <pre><code>cmake_minimum_required(VERSION 3.20)
 project(stm32_blink C ASM)
@@ -86,7 +86,7 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -O ihex ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex
     COMMAND ${CMAKE_SIZE} ${PROJECT_NAME}.elf)</code></pre>
 
-<h3>交叉编译工具链文件</h3>
+<h3>浜ゅ弶缂栬瘧宸ュ叿閾炬枃浠?/h3>
 
 <pre><code># toolchain-arm.cmake
 set(CMAKE_SYSTEM_NAME Generic)
@@ -106,40 +106,287 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)</code></pre>
 
-<h3>构建命令</h3>
+<h3>鏋勫缓鍛戒护</h3>
 
-<pre><code># 创建build目录（保持源码干净）
+<pre><code># 鍒涘缓build鐩綍锛堜繚鎸佹簮鐮佸共鍑€锛?
 mkdir build &amp;&amp; cd build
 
-# 配置（生成Makefile）
+# 閰嶇疆锛堢敓鎴怣akefile锛?
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake -DCMAKE_BUILD_TYPE=Debug ..
 
-# 编译（4线程并行）
+# 缂栬瘧锛?绾跨▼骞惰锛?
 cmake --build . -j4
 
-# 清理
-cmake --build . --target clean</code></pre>
+# 娓呯悊
+cmake --build . --target clean
 
-<div class="trouble">🔍 <b>常见问题：cmake找不到arm-none-eabi-gcc</b><br>
-工具链没加PATH。解决：把ARM GCC的bin目录加到PATH，或在toolchain文件写死路径：<br><code>set(CMAKE_C_COMPILER "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/arm-none-eabi-gcc.exe")</code></div>
+# 鍒楀嚭鎵€鏈夊彲鐢ㄧ殑target
+cmake --build . --target help
+
+# 鍙紪璇戜笉閾炬帴
+cmake --build . --target blink.elf.o</code></pre>
+
+<h3>CMake鍙橀噺鍜屼綔鐢ㄥ煙</h3>
+
+<p>CMake鐨勬牳蹇冩槸<strong>鍙橀噺</strong>鈥斺€斿嚑涔庢墍鏈夋瀯寤洪€昏緫閮介潬鍙橀噺浼犻€掋€傜悊瑙ｅ彉閲忎綔鐢ㄥ煙鏄啓澶嶆潅CMakeLists.txt鐨勫熀纭€銆?/p>
+
+<h4>鍙橀噺鍩虹鎿嶄綔</h4>
+
+<pre><code># set() 鈥斺€?璁剧疆鍙橀噺
+set(MY_VAR "hello")              # 鏅€氬彉閲?
+set(MY_LIST "a" "b" "c")        # 鍒楄〃锛堢┖鏍兼垨鍒嗗彿鍒嗛殧锛?
+set(MY_LIST a b c)               # 绛変环鍐欐硶
+
+# message() 鈥斺€?鎵撳嵃鍙橀噺锛堣皟璇曞繀澶囷級
+message(STATUS "MY_VAR = ${MY_VAR}")    # 鐘舵€佷俊鎭?
+message(WARNING "妫€鏌ヨ繖涓€? ${MY_VAR}") # 璀﹀憡锛堢户缁墽琛岋級
+message(FATAL_ERROR "鑷村懡閿欒锛?)        # 缁堟閰嶇疆
+
+# list() 鈥斺€?鍒楄〃鎿嶄綔
+list(APPEND MY_LIST "d" "e")     # 杩藉姞鍏冪礌
+list(LENGTH MY_LIST len)          # 鑾峰彇闀垮害 ${len}=5
+list(GET MY_LIST 0 first)         # 鑾峰彇绗竴涓厓绱?
+list(REMOVE_ITEM MY_LIST "c")     # 鍒犻櫎鍏冪礌
+
+# string() 鈥斺€?瀛楃涓叉搷浣?
+string(TIMESTAMP TODAY %Y-%m-%d)  # 褰撳墠鏃ユ湡
+string(REPLACE "." "_" result ${CMAKE_SYSTEM_VERSION})</code></pre>
+
+<h4>鍙橀噺浣滅敤鍩熼櫡闃?/h4>
+
+<pre><code># CMake鍙橀噺榛樿鏄嚱鏁颁綔鐢ㄥ煙 鈥斺€?鍦ㄥ嚱鏁伴噷set鐨勫彉閲忓闈㈢湅涓嶅埌锛?
+function(my_func)
+    set(LOCAL_VAR "鍙湪鍑芥暟鍐呭彲瑙?)
+    # ${LOCAL_VAR} 鍦ㄨ繖閲岃兘鐢?
+endfunction()
+my_func()
+message(STATUS "${LOCAL_VAR}")  # 鉂?绌虹殑锛?
+
+# 瑕佽鍙橀噺"绌块€?鍑哄幓锛岀敤 PARENT_SCOPE
+function(my_func_out)
+    set(OUT_VAR "鐖朵綔鐢ㄥ煙鍙" PARENT_SCOPE)
+endfunction()
+my_func_out()
+message(STATUS "${OUT_VAR}")    # 鉁?鑳界湅鍒颁簡
+
+# macro() 娌℃湁鐙珛浣滅敤鍩?鈥斺€?璺熻皟鐢ㄨ€呭叡浜彉閲?
+macro(my_macro)
+    set(MACRO_VAR "闅忓鍙敤")
+endmacro()
+my_macro()
+message(STATUS "${MACRO_VAR}")  # 鉁?macro娌℃湁浣滅敤鍩熼殧绂?/code></pre>
+
+<div class="warn">鈿狅笍 <b>甯歌鐨勫潙锛?/b>鍦?<code>function()</code> 閲岀敤 <code>set()</code> 淇敼鍙橀噺锛屽闈㈢湅涓嶅埌鈥斺€旇繖鏄柊鎵嬫渶瀹规槗鍥版儜鐨凜Make琛屼负銆傝В鍐筹細瑕佷箞鐢?<code>macro()</code>锛岃涔堢敤 <code>set(var value PARENT_SCOPE)</code>銆?/div>
+
+<h3>澶氱洰褰曢」鐩鐞?/h3>
+
+<p>鐪熷疄宓屽叆寮忛」鐩粷涓嶄細鍙湁涓€涓簮鏂囦欢鐩綍銆傚簱銆侀┍鍔ㄣ€佸崗璁爤鍚勬湁鍚勭殑鏂囦欢澶癸紝鐢?<code>add_subdirectory</code> 缁勭粐锛?/p>
+
+<h4>瀹炴垬椤圭洰缁撴瀯</h4>
+
+<pre><code># 椤圭洰鐩綍鏍?
+stm32-project/
+鈹溾攢鈹€ CMakeLists.txt            # 鏍笴Make锛堟€绘寚鎸ワ級
+鈹溾攢鈹€ toolchain-arm.cmake
+鈹溾攢鈹€ STM32F103C8Tx.ld
+鈹溾攢鈹€ src/
+鈹?  鈹溾攢鈹€ CMakeLists.txt        # 搴旂敤灞?
+鈹?  鈹斺攢鈹€ main.c
+鈹溾攢鈹€ drivers/
+鈹?  鈹溾攢鈹€ CMakeLists.txt        # 椹卞姩灞?
+鈹?  鈹溾攢鈹€ gpio/
+鈹?  鈹?  鈹溾攢鈹€ CMakeLists.txt    # GPIO椹卞姩
+鈹?  鈹?  鈹溾攢鈹€ gpio.c
+鈹?  鈹?  鈹斺攢鈹€ gpio.h
+鈹?  鈹斺攢鈹€ uart/
+鈹?      鈹溾攢鈹€ CMakeLists.txt    # UART椹卞姩
+鈹?      鈹溾攢鈹€ uart.c
+鈹?      鈹斺攢鈹€ uart.h
+鈹斺攢鈹€ lib/
+    鈹溾攢鈹€ CMakeLists.txt        # 绗笁鏂瑰簱
+    鈹斺攢鈹€ tinyprintf/
+        鈹溾攢鈹€ CMakeLists.txt
+        鈹斺攢鈹€ tinyprintf.c</code></pre>
+
+<h4>鍚勫眰CMakeLists.txt瀹炵幇</h4>
+
+<pre><code># 鈹€鈹€ 鏍?CMakeLists.txt 鈹€鈹€
+cmake_minimum_required(VERSION 3.20)
+project(stm32_demo C)
+
+# 鍏ㄥ眬缂栬瘧閫夐」锛堝瓙鐩綍缁ф壙锛?
+add_compile_options(
+    -mcpu=cortex-m3 -mthumb -Wall -O2 -g3
+    -ffunction-sections -fdata-sections
+    -DSTM32F103C8T6
+)
+
+# 鍏ㄥ眬澶存枃浠惰矾寰?
+include_directories(inc)
+
+# 閫掑綊鍔犺浇瀛愮洰褰曪紙椤哄簭鍐冲畾渚濊禆鍏崇郴锛?
+add_subdirectory(lib)       # 鍏堢紪璇戝簱
+add_subdirectory(drivers)   # 鍐嶇紪璇戦┍鍔紙鍙兘渚濊禆搴擄級
+add_subdirectory(src)       # 鏈€鍚庣紪璇戜富绋嬪簭
+
+
+# 鈹€鈹€ drivers/gpio/CMakeLists.txt 鈹€鈹€
+# 鏂瑰紡1锛氬垱寤洪潤鎬佸簱锛堟帹鑽愨€斺€斿鐢ㄦ€у己锛?
+add_library(gpio STATIC
+    gpio.c
+)
+target_include_directories(gpio PUBLIC .)  # gpio.h鐨勮矾寰?
+# PUBLIC = 閾炬帴gpio鐨勭洰鏍囦篃浼氳幏寰楄繖涓ご鏂囦欢璺緞
+
+
+# 鈹€鈹€ drivers/CMakeLists.txt 鈹€鈹€
+# 閫掑綊鍔犺浇瀛愰┍鍔ㄦā鍧?
+add_subdirectory(gpio)
+add_subdirectory(uart)
+
+
+# 鈹€鈹€ lib/tinyprintf/CMakeLists.txt 鈹€鈹€
+add_library(tinyprintf STATIC
+    tinyprintf.c
+)
+target_include_directories(tinyprintf PUBLIC .)
+
+
+# 鈹€鈹€ lib/CMakeLists.txt 鈹€鈹€
+add_subdirectory(tinyprintf)
+
+
+# 鈹€鈹€ src/CMakeLists.txt 鈹€鈹€
+add_executable(${PROJECT_NAME}.elf
+    main.c
+)
+
+# 閾炬帴渚濊禆搴?
+target_link_libraries(${PROJECT_NAME}.elf
+    gpio         # 鏉ヨ嚜 drivers/gpio
+    uart         # 鏉ヨ嚜 drivers/uart
+    tinyprintf   # 鏉ヨ嚜 lib/tinyprintf
+)
+
+# 閾炬帴閫夐」锛堝彧缁欏彲鎵ц鏂囦欢鍔狅紝涓嶇粰搴撳姞锛?
+target_link_options(${PROJECT_NAME}.elf PRIVATE
+    -mcpu=cortex-m3 -mthumb
+    -T${CMAKE_SOURCE_DIR}/STM32F103C8Tx.ld
+    -Wl,--gc-sections
+    -Wl,-Map=${PROJECT_NAME}.map
+    --specs=nano.specs --specs=nosys.specs
+)
+
+# 鍚庡鐞嗭細鐢熸垚.bin/.hex骞舵樉绀哄ぇ灏?
+add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O binary ${PROJECT_NAME}.elf ${PROJECT_NAME}.bin
+    COMMAND ${CMAKE_OBJCOPY} -O ihex ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex
+    COMMAND ${CMAKE_SIZE} ${PROJECT_NAME}.elf
+)</code></pre>
+
+<div class="note">馃挕 <b>鍏抽敭姒傚康锛歋TATIC搴?vs OBJECT搴?/b><br>
+鈥?<code>STATIC</code> 鈥?鎵撳寘鎴?.a 鏂囦欢锛岄摼鎺ユ椂鍙彁鍙栫敤鍒扮殑绗﹀彿锛堟帹鑽愶級<br>
+鈥?<code>OBJECT</code> 鈥?缂栬瘧鎴?.o 浣嗕笉鎵撳寘锛岃窡椤圭洰涓€璧烽摼鎺ワ紙绗﹀彿鍏ㄩ儴淇濈暀锛?br>
+鈥?<code>INTERFACE</code> 鈥?鍙湁澶存枃浠剁殑搴擄紙header-only library锛?br>
+宓屽叆寮忓紑鍙戜腑锛岄┍鍔ㄥ眰鍜屽簱灞傜敤 <code>STATIC</code> 鏈€鍚堥€傘€?/div>
+
+<h3>CMake鐢熸垚鍣ㄨ〃杈惧紡锛圙enerator Expressions锛?/h3>
+
+<p>鐢熸垚鍣ㄨ〃杈惧紡鍦?strong>鐢熸垚鏋勫缓鏂囦欢鏃?/strong>鎵嶆眰鍊尖€斺€旀瘮鏅€氬彉閲忔洿鐏垫椿锛岀壒鍒€傚悎澶勭悊澶氶厤缃満鏅紙Debug/Release锛夊拰澶氬钩鍙版瀯寤恒€?/p>
+
+<pre><code># 鍩烘湰璇硶锛?&lt;琛ㄨ揪寮?gt;
+# $&lt;BOOL:expr&gt;      鈫?expr涓虹湡杩斿洖1锛屽惁鍒欒繑鍥?
+# $&lt;IF:cond,true,false&gt; 鈫?鏉′欢琛ㄨ揪寮?
+# $&lt;CONFIG&gt;          鈫?褰撳墠鏋勫缓绫诲瀷锛圖ebug/Release/MinSizeRel锛?
+# $&lt;TARGET_FILE:tgt&gt; 鈫?鐩爣鏂囦欢鐨勫畬鏁磋矾寰?
+
+# === 宓屽叆寮忓紑鍙戜腑鐨勫疄闄呯敤娉?===
+
+# 鈶?鏍规嵁鏋勫缓绫诲瀷閫夋嫨浼樺寲绛夌骇
+target_compile_options(${TARGET}.elf PRIVATE
+    $&lt;$&lt;CONFIG:Debug&gt;:-O0&gt;          # Debug=涓嶄紭鍖?
+    $&lt;$&lt;CONFIG:Release&gt;:-O2&gt;        # Release=閫熷害浼樺寲
+    $&lt;$&lt;CONFIG:MinSizeRel&gt;:-Os&gt;     # MinSizeRel=浣撶Н浼樺寲
+)
+
+# 鈶?鍙湪Debug妯″紡鍔犺皟璇曟爣蹇?
+target_compile_definitions(${TARGET}.elf PRIVATE
+    $&lt;$&lt;CONFIG:Debug&gt;:DEBUG=1&gt;     # Debug鏃跺畾涔塂EBUG瀹?
+    $&lt;$&lt;CONFIG:Debug&gt;:ENABLE_ASSERT&gt; # Debug鏃跺紑鍚柇瑷€
+)
+
+# 鈶?鏍规嵁鐩爣鍚嶅姩鎬佺敓鎴愯緭鍑鸿矾寰?
+add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O binary
+        $&lt;TARGET_FILE:${PROJECT_NAME}.elf&gt;
+        $&lt;TARGET_FILE_DIR:${PROJECT_NAME}.elf&gt;/${PROJECT_NAME}.bin
+)</code></pre>
+
+<h3>鑷畾涔夊嚱鏁板拰瀹?/h3>
+
+<pre><code># 鎶婇噸澶嶉€昏緫灏佽鎴愬嚱鏁帮紝鎻愰珮鍙淮鎶ゆ€?
+
+# 宓屽叆寮忔簮鏂囦欢鑷姩鍙戠幇鍑芥暟
+function(collect_sources OUTPUT_VAR search_dir)
+    file(GLOB_RECURSE sources
+        ${search_dir}/*.c
+        ${search_dir}/*.s
+    )
+    set(${OUTPUT_VAR} ${sources} PARENT_SCOPE)
+endfunction()
+
+# 浣跨敤
+collect_sources(APP_SOURCES src/)
+collect_sources(DRV_SOURCES drivers/)
+add_executable(app.elf ${APP_SOURCES} ${DRV_SOURCES})
+
+
+# 鑷姩鐢熸垚缂栬瘧鏁版嵁搴擄紙compile_commands.json锛?
+function(enable_compile_commands)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON PARENT_SCOPE)
+    message(STATUS "鉁?缂栬瘧鏁版嵁搴撳凡鍚敤锛堢敤浜巆langd/IDE鏅鸿兘鎻愮ず锛?)
+endfunction()
+
+
+# 蹇€熷垱寤哄祵鍏ュ紡鍙墽琛岀洰鏍?
+function(add_embedded_target name)
+    add_executable(${name}.elf ${ARGN})
+    target_compile_options(${name}.elf PRIVATE
+        -mcpu=cortex-m3 -mthumb -Wall -O2 -g3
+        -ffunction-sections -fdata-sections)
+    target_link_options(${name}.elf PRIVATE
+        -mcpu=cortex-m3 -mthumb
+        -T${CMAKE_SOURCE_DIR}/STM32F103C8Tx.ld
+        -Wl,--gc-sections -Wl,-Map=${name}.map
+        --specs=nano.specs --specs=nosys.specs)
+    add_custom_command(TARGET ${name}.elf POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -O binary ${name}.elf ${name}.bin
+        COMMAND ${CMAKE_SIZE} ${name}.elf)
+endfunction()
+
+# 浣跨敤鈥斺€斾竴琛屼唬鐮佹悶瀹氾紒锛堝弬鏁伴€氳繃 ARGN 浼犲叆锛?
+add_embedded_target(blink src/main.c src/stm32f1xx_it.c)</code></pre>
+
+<div class="trouble">馃攳 <b>甯歌闂锛歝make鎵句笉鍒癮rm-none-eabi-gcc</b><br>
+宸ュ叿閾炬病鍔燩ATH銆傝В鍐筹細鎶夾RM GCC鐨刡in鐩綍鍔犲埌PATH锛屾垨鍦╰oolchain鏂囦欢鍐欐璺緞锛?br><code>set(CMAKE_C_COMPILER "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/arm-none-eabi-gcc.exe")</code></div>
 
 <div class="example-block">
-<div class="ex-title">📝 完整示例：CMake构建STM32项目</div>
-<div class="ex-input">项目结构 + 构建命令：</div>
+<div class="ex-title">馃摑 瀹屾暣绀轰緥锛欳Make鏋勫缓STM32椤圭洰</div>
+<div class="ex-input">椤圭洰缁撴瀯 + 鏋勫缓鍛戒护锛?/div>
 <pre><code>stm32-project/
-├── CMakeLists.txt
-├── toolchain-arm.cmake
-├── STM32F103C8Tx.ld
-├── inc/
-└── src/
-    ├── main.c
-    └── stm32f1xx_it.c
+鈹溾攢鈹€ CMakeLists.txt
+鈹溾攢鈹€ toolchain-arm.cmake
+鈹溾攢鈹€ STM32F103C8Tx.ld
+鈹溾攢鈹€ inc/
+鈹斺攢鈹€ src/
+    鈹溾攢鈹€ main.c
+    鈹斺攢鈹€ stm32f1xx_it.c
 
-# 构建步骤：
+# 鏋勫缓姝ラ锛?
 mkdir build &amp;&amp; cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build . -j4</code></pre>
-<div class="ex-output">输出结果：</div>
+<div class="ex-output">杈撳嚭缁撴灉锛?/div>
 <pre><code>-- The C compiler identification is GNU 14.2.1
 -- Configuring done
 -- Generating done
@@ -152,20 +399,20 @@ PostBuild: arm-none-eabi-objcopy -O ihex stm32_blink.elf stm32_blink.hex
    text    data     bss     dec     hex filename
    1580      20     256    1856     740 stm32_blink.elf
 
-✅ 构建成功！烧录：st-flash write stm32_blink.bin 0x08000000</pre>
+鉁?鏋勫缓鎴愬姛锛佺儳褰曪細st-flash write stm32_blink.bin 0x08000000</pre>
 </div>
 
-<h3>🚀 5分钟快速上手：最小可编译项目</h3>
+<h3>馃殌 5鍒嗛挓蹇€熶笂鎵嬶細鏈€灏忓彲缂栬瘧椤圭洰</h3>
 
-<p>跟着做，<strong>从零到一个能编译的项目</strong>，只需5分钟：</p>
+<p>璺熺潃鍋氾紝<strong>浠庨浂鍒颁竴涓兘缂栬瘧鐨勯」鐩?/strong>锛屽彧闇€5鍒嗛挓锛?/p>
 
-<div class="step"><b>步骤1：</b>创建项目目录</div>
+<div class="step"><b>姝ラ1锛?/b>鍒涘缓椤圭洰鐩綍</div>
 <pre><code>mkdir stm32-blink &amp;&amp; cd stm32-blink
 mkdir src inc</code></pre>
 
-<div class="step"><b>步骤2：</b>创建最小main.c（点灯程序，无需任何库）</div>
-<pre><code># src/main.c - 最小STM32程序（纯寄存器，无需HAL库）
-// 定义寄存器地址
+<div class="step"><b>姝ラ2锛?/b>鍒涘缓鏈€灏弇ain.c锛堢偣鐏▼搴忥紝鏃犻渶浠讳綍搴擄級</div>
+<pre><code># src/main.c - 鏈€灏廠TM32绋嬪簭锛堢函瀵勫瓨鍣紝鏃犻渶HAL搴擄級
+// 瀹氫箟瀵勫瓨鍣ㄥ湴鍧€
 #define RCC_APB2ENR  (*(volatile uint32_t*)0x40021018)
 #define GPIOC_CRH    (*(volatile uint32_t*)0x40011004)
 #define GPIOC_ODR    (*(volatile uint32_t*)0x4001100C)
@@ -175,23 +422,23 @@ void delay(volatile uint32_t count) {
 }
 
 int main(void) {
-    // 使能GPIOC时钟
+    // 浣胯兘GPIOC鏃堕挓
     RCC_APB2ENR |= (1 &lt;&lt; 4);
     
-    // 配置PC13为推挽输出（50MHz）
+    // 閰嶇疆PC13涓烘帹鎸借緭鍑猴紙50MHz锛?
     GPIOC_CRH = (GPIOC_CRH &amp; ~0x00F00000) | 0x00300000;
     
     while(1) {
-        GPIOC_ODR ^= (1 &lt;&lt; 13);  // 翻转PC13
+        GPIOC_ODR ^= (1 &lt;&lt; 13);  // 缈昏浆PC13
         delay(500000);
     }
 }</code></pre>
 
-<div class="step"><b>步骤3：</b>创建最小链接脚本</div>
-<pre><code>/* STM32F103C8Tx.ld - 最小版（含向量表） */
+<div class="step"><b>姝ラ3锛?/b>鍒涘缓鏈€灏忛摼鎺ヨ剼鏈?/div>
+<pre><code>/* STM32F103C8Tx.ld - 鏈€灏忕増锛堝惈鍚戦噺琛級 */
 ENTRY(Reset_Handler)
 
-_estack = ORIGIN(RAM) + LENGTH(RAM);  /* 栈顶 = RAM末尾 */
+_estack = ORIGIN(RAM) + LENGTH(RAM);  /* 鏍堥《 = RAM鏈熬 */
 
 MEMORY {
   FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 64K
@@ -200,7 +447,7 @@ MEMORY {
 SECTIONS {
   .isr_vector : {
     . = ALIGN(4);
-    KEEP(*(.isr_vector))  /* 中断向量表（必须保留！） */
+    KEEP(*(.isr_vector))  /* 涓柇鍚戦噺琛紙蹇呴』淇濈暀锛侊級 */
     . = ALIGN(4);
   } > FLASH
 
@@ -210,30 +457,30 @@ SECTIONS {
   .bss : { *(.bss*) *(COMMON) } > RAM
 }
 
-/* 最小启动代码（添加到main.c底部） */
+/* 鏈€灏忓惎鍔ㄤ唬鐮侊紙娣诲姞鍒癿ain.c搴曢儴锛?*/
 /*
 __attribute__((section(".isr_vector")))
 void (* const g_pfnVectors[])(void) = {
-    (void *)&_estack,     // 初始栈指针
-    Reset_Handler,         // 复位向量
+    (void *)&_estack,     // 鍒濆鏍堟寚閽?
+    Reset_Handler,         // 澶嶄綅鍚戦噺
 };
 
 void Reset_Handler(void) {
-    // 复制.data段从Flash到RAM
+    // 澶嶅埗.data娈典粠Flash鍒癛AM
     extern uint32_t _sdata, _edata, _sidata;
     uint32_t *src = &_sidata, *dst = &_sdata;
     while (dst < &_edata) *dst++ = *src++;
-    // 清零.bss段
+    // 娓呴浂.bss娈?
     extern uint32_t _sbss, _ebss;
     dst = &_sbss;
     while (dst < &_ebss) *dst++ = 0;
-    // 跳转到main
+    // 璺宠浆鍒癿ain
     main();
     while(1);
 }
 */</code></pre>
 
-<div class="step"><b>步骤4：</b>创建CMakeLists.txt</div>
+<div class="step"><b>姝ラ4锛?/b>鍒涘缓CMakeLists.txt</div>
 <pre><code>cmake_minimum_required(VERSION 3.20)
 project(stm32_blink C)
 add_compile_options(-mcpu=cortex-m3 -mthumb -Wall -O2 -g3 -ffunction-sections -fdata-sections)
@@ -243,8 +490,8 @@ add_custom_command(TARGET blink.elf POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -O binary blink.elf blink.bin
     COMMAND ${CMAKE_SIZE} blink.elf)</code></pre>
 
-<div class="step"><b>步骤4.5：</b>创建工具链文件（保存为 <code>toolchain-arm.cmake</code>，放在项目根目录）</div>
-<pre><code># toolchain-arm.cmake - 告诉CMake用ARM编译器
+<div class="step"><b>姝ラ4.5锛?/b>鍒涘缓宸ュ叿閾炬枃浠讹紙淇濆瓨涓?<code>toolchain-arm.cmake</code>锛屾斁鍦ㄩ」鐩牴鐩綍锛?/div>
+<pre><code># toolchain-arm.cmake - 鍛婅瘔CMake鐢ˋRM缂栬瘧鍣?
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR ARM)
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
@@ -260,14 +507,14 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)</code></pre>
 
-<div class="step"><b>步骤5：</b>构建！</div>
+<div class="step"><b>姝ラ5锛?/b>鏋勫缓锛?/div>
 <pre><code>mkdir build &amp;&amp; cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake ..
 cmake --build .</code></pre>
 
 <div class="example-block">
-<div class="ex-title">📝 构建成功输出</div>
-<div class="ex-output">预期结果：</div>
+<div class="ex-title">馃摑 鏋勫缓鎴愬姛杈撳嚭</div>
+<div class="ex-output">棰勬湡缁撴灉锛?/div>
 <pre><code>-- The C compiler identification is GNU 14.2.1
 -- Configuring done
 -- Generating done
@@ -277,19 +524,179 @@ PostBuild: arm-none-eabi-objcopy -O binary blink.elf blink.bin
    text    data     bss     dec     hex filename
     120       0       0     120     78 blink.elf
 
-✅ 编译成功！blink.bin就是你的固件，可以烧录了！</pre>
+鉁?缂栬瘧鎴愬姛锛乥link.bin灏辨槸浣犵殑鍥轰欢锛屽彲浠ョ儳褰曚簡锛?/pre>
 </div>
 
-<div class="tip">💡 <b>为什么用纯寄存器不用HAL库？</b>因为这个项目<strong>不依赖任何外部文件</strong>，你能直接编译通过！等熟悉了流程，再用CubeMX生成HAL库工程（第6章会教）。</div>
+<div class="tip">馃挕 <b>涓轰粈涔堢敤绾瘎瀛樺櫒涓嶇敤HAL搴擄紵</b>鍥犱负杩欎釜椤圭洰<strong>涓嶄緷璧栦换浣曞閮ㄦ枃浠?/strong>锛屼綘鑳界洿鎺ョ紪璇戦€氳繃锛佺瓑鐔熸倝浜嗘祦绋嬶紝鍐嶇敤CubeMX鐢熸垚HAL搴撳伐绋嬶紙绗?绔犱細鏁欙級銆?/div>
 
-<!-- ====== 第3章 ====== -->
+<h3>馃悰 甯歌CMake閿欒鎺掓煡</h3>
+
+<div class="trouble">馃攳 <b>閿欒1锛欳Make Error: The source directory "..." does not appear to contain CMakeLists.txt</b><br>
+<strong>浣犲湪娌℃湁CMakeLists.txt鐨勭洰褰曡繍琛屼簡cmake銆?/strong>纭繚褰撳墠鐩綍锛堟垨 <code>..</code> 鎸囧悜鐨勭洰褰曪級鏈塁MakeLists.txt銆傛渶甯稿彂鐢熷湪浣犲繕璁颁簡鍏?<code>mkdir build && cd build</code>銆?/div>
+
+<div class="trouble">馃攳 <b>閿欒2锛歛dd_library cannot create ALIAS target "xxx" because another target with the same name already exists</b><br>
+<strong>CMake鐩爣鍚嶅叏灞€鍞竴銆?/strong>涓嶅悓瀛愮洰褰曠殑CMakeLists.txt閲屼笉鑳芥湁鍚屽悕鐨?add_library / add_executable銆傞闃诧細缁欏簱鍚嶅姞妯″潡鍓嶇紑锛堝 <code>drv_gpio</code> 鑰岄潪 <code>gpio</code>锛夈€?/div>
+
+<div class="trouble">馃攳 <b>閿欒3锛欳annot specify link libraries for target "xxx" which is not built by this project</b><br>
+<strong>浣犲湪 target_link_libraries 涓紩鐢ㄤ簡涓嶅瓨鍦ㄧ殑target銆?/strong>妫€鏌ワ細鈶犳嫾鍐欐槸鍚︽纭?鈶dd_subdirectory鏄惁鍖呭惈浜嗗畾涔夎target鐨勭洰褰?鈶㈤『搴忥細鍏坅dd_subdirectory鍐峵arget_link_libraries銆?/div>
+
+<div class="trouble">馃攳 <b>閿欒4锛歛rm-none-eabi-gcc: error: unrecognized command line option '-mthumb'</b><br>
+<strong>鐢ㄤ簡x86鐨刧cc鑰岄潪ARM GCC銆?/strong>纭繚锛氣憼鎸囧畾浜?toolchain-arm.cmake 鈶′唬鐮佷腑鍐欑殑鏄?<code>arm-none-eabi-gcc</code> 鑰岄潪 <code>gcc</code>銆傚厛纭 <code>arm-none-eabi-gcc --version</code> 鑳芥墽琛屻€?/div>
+
+<div class="trouble">馃攳 <b>閿欒5锛欳Make Warning: Manually-specified variables were not used by the project: CMAKE_TOOLCHAIN_FILE</b><br>
+<strong>CMake缂撳瓨涓瓨浜嗘棫閰嶇疆锛?D鍙傛暟琚拷鐣ャ€?/strong>瑙ｅ喅锛氭竻绌篵uild鐩綍锛屼粠澶撮噸鏂癱make锛?br><code>rm -r build && mkdir build && cd build && cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake ..</code></div>
+
+<h3>馃弸锔?瀹炴垬缁冧範</h3>
+
+<div class="tip">馃挕 <b>缁冧範1锛氭惌寤哄绾х洰褰旵Make椤圭洰</b><br>
+鍒涘缓涓€涓嚦灏?灞傜洰褰曠殑CMake宓屽叆寮忛」鐩紝瑕佹眰锛?br>
+鈶?鏍圭洰褰旵MakeLists.txt瀹氫箟鍏ㄥ眬缂栬瘧閫夐」<br>
+鈶?drivers/ 涓嬫湁鑷冲皯2涓瓙椹卞姩锛坓pio, uart锛夛紝姣忎釜缂栬瘧涓洪潤鎬佸簱<br>
+鈶?lib/ 涓嬫湁涓€涓涓夋柟搴?br>
+鈶?src/ 涓嬬殑鍙墽琛屾枃浠堕摼鎺ユ墍鏈夊簱<br>
+鈶?缂栬瘧閫氳繃骞剁敓鎴?.bin 鏂囦欢<br>
+<strong>楠屾敹鏍囧噯锛?/strong>鑳藉湪build鐩綍涓嬫垚鍔熻繍琛?<code>cmake --build .</code> 涓旀棤璀﹀憡銆?/div>
+
+<div class="tip">馃挕 <b>缁冧範2锛欳Make鍙橀噺璋冭瘯</b><br>
+鍦ㄥ凡鏈夌殑CMakeLists.txt涓姞鍏?message() 杈撳嚭浠ヤ笅鍙橀噺鍊硷紝纭浣犵悊瑙ｄ簡姣忎釜鍙橀噺鐨勫惈涔夛細<br>
+<pre><code>message(STATUS "婧愮爜鐩綍: ${CMAKE_SOURCE_DIR}")
+message(STATUS "鏋勫缓鐩綍: ${CMAKE_BINARY_DIR}")
+message(STATUS "椤圭洰鍚? ${PROJECT_NAME}")
+message(STATUS "C缂栬瘧鍣? ${CMAKE_C_COMPILER}")
+message(STATUS "鏋勫缓绫诲瀷: ${CMAKE_BUILD_TYPE}")
+message(STATUS "宸ュ叿閾炬枃浠? ${CMAKE_TOOLCHAIN_FILE}")</code></pre>
+杩愯 cmake 閰嶇疆鍚庤瀵熻緭鍑猴紝鐒跺悗灏濊瘯淇敼 CMAKE_BUILD_TYPE 涓?Release/MinSizeRel 鐪嬪彉鍖栥€?/div>
+
+<div class="tip">馃挕 <b>缁冧範3锛欴ebug/Release鍙岄厤缃瀯寤?/b><br>
+鐢?CMake 鐢熸垚鍣ㄨ〃杈惧紡瀹炵幇锛欴ebug妯″紡缂栬瘧鏃跺畾涔?<code>DEBUG=1</code> 瀹忓苟杈撳嚭璇︾粏鏃ュ織锛孯elease妯″紡缂栬瘧鏃剁敤 <code>-O2</code> 浼樺寲涓斾笉杈撳嚭鏃ュ織銆傚垎鍒瀯寤轰袱绉嶆ā寮忓苟瀵规瘮鐢熸垚鐨?.elf 鏂囦欢澶у皬銆?/div>
+
+<h3>馃殌 杩涢樁璇濋</h3>
+
+<div class="card">
+<div class="h"><span class="name">CMake Presets锛堥璁鹃厤缃級</span><span class="tag p">杩涢樁</span></div>
+<div class="b">
+<div class="desc">CMake 3.20+鏀寔 Presets鈥斺€旀妸鍛戒护琛屽弬鏁板啓杩汮SON鏂囦欢锛屽交搴曞憡鍒?澶嶅埗绮樿创cmake鍛戒护"鐨勭棝鑻︺€俈S Code鐨凜Make Tools鎻掍欢鍘熺敓鏀寔Presets锛岀洿鎺ュ湪UI閲岄€夐厤缃€?/div>
+<pre><code>// CMakePresets.json锛堟斁鍦ㄩ」鐩牴鐩綍锛?
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "arm-debug",
+      "displayName": "STM32F103 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/debug",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/toolchain-arm.cmake",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "arm-release",
+      "displayName": "STM32F103 Release",
+      "inherits": "arm-debug",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "MinSizeRel"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "arm-debug",
+      "configurePreset": "arm-debug",
+      "jobs": 4
+    },
+    {
+      "name": "arm-release",
+      "configurePreset": "arm-release",
+      "jobs": 4
+    }
+  ]
+}</code></pre>
+<pre><code># 浣跨敤Presets锛堜笉闇€瑕?-D 鍙傛暟浜嗭紒锛?
+cmake --preset arm-debug         # 閰嶇疆锛堣嚜鍔ㄧ敤棰勮鐨勫弬鏁帮級
+cmake --build --preset arm-debug  # 鏋勫缓
+
+# VS Code涓細搴曢儴鏍忕洿鎺ラ€?Preset 鈫?鐐笲uild鎸夐挳</code></pre>
+</div></div>
+
+<div class="card">
+<div class="h"><span class="name">澶栭儴渚濊禆绠＄悊锛欶etchContent vs CPM.cmake</span><span class="tag p">杩涢樁</span></div>
+<div class="b">
+<div class="desc">浣犵殑椤圭洰闇€瑕佸紩鐢ㄧ涓夋柟搴擄紙濡?FreeRTOS銆丩VGL锛夋椂锛屾墜鍔ㄦ嫹璐濇簮鐮佸張绱張闅炬洿鏂般€侰Make鎻愪緵浜嗗嚑绉嶈嚜鍔ㄥ寲鏂规锛?/div>
+<pre><code># 鏂规1锛欶etchContent锛圕Make 3.14+鍐呯疆锛?
+include(FetchContent)
+FetchContent_Declare(
+    FreeRTOS-Kernel
+    GIT_REPOSITORY https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+    GIT_TAG V11.0.1
+)
+FetchContent_MakeAvailable(FreeRTOS-Kernel)
+# 鐜板湪鍙互鐩存帴 target_link_libraries(app.elf FreeRTOS-Kernel)
+
+# 鏂规2锛欳PM.cmake锛堟洿绠€娲侊紝涓€涓剼鏈枃浠舵悶瀹氾級
+# 涓嬭浇 CPM.cmake 鍒伴」鐩牴鐩綍锛岀劧鍚庯細
+include(cmake/CPM.cmake)
+CPMAddPackage(
+    NAME tinyprintf
+    GITHUB_REPOSITORY ccochard/tinyprintf
+    VERSION 1.0
+)
+
+# 鏂规3锛氭墜鍔ㄧ鐞?git submodule锛堣€佹淳鍋氭硶锛?
+git submodule add https://github.com/FreeRTOS/FreeRTOS-Kernel.git lib/FreeRTOS
+git submodule update --init --recursive
+# 鐒跺悗鍦–MakeLists.txt閲?add_subdirectory(lib/FreeRTOS)</code></pre>
+<div class="note">馃挕 <b>鎺ㄨ崘绛栫暐锛?/b>灏忓瀷椤圭洰鐢?<code>FetchContent</code>锛堥浂渚濊禆锛夛紝鍥㈤槦椤圭洰鐢?<code>git submodule</code>锛堢増鏈攣瀹氾級锛屽鏉傞」鐩敤 <code>CPM.cmake</code>锛堟敮鎸佺紦瀛樸€佺绾挎ā寮忥級銆?/div>
+</div></div>
+
+<div class="card">
+<div class="h"><span class="name">CMake涓嶯inja锛氭洿蹇瀯寤?/span><span class="tag p">杩涢樁</span></div>
+<div class="b">
+<div class="desc">Ninja鏄瘮Make鏇村揩鐨勬瀯寤哄伐鍏封€斺€斿苟琛屽害鏇撮珮銆佸閲忕紪璇戝垽鏂洿绮剧‘銆傚湪Windows涓婇厤鍚圕Make浣跨敤浣撻獙寰堝ソ銆?/div>
+<pre><code># 瀹夎 Ninja锛堜笁閫変竴锛?
+winget install Ninja-build.Ninja    # winget
+choco install ninja                  # Chocolatey
+# 鎴栦粠 github.com/ninja-build/ninja/releases 涓嬭浇
+
+# 浣跨敤 Ninja 鏋勫缓锛堟寚瀹?-G 鐢熸垚鍣級
+cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake ..
+cmake --build .          # Ninja鑷姩骞惰锛屼笉闇€瑕?-j4
+
+# 瀵规瘮锛堝疄娴?鏍?绾跨▼Windows PC锛宻tm32-blink椤圭洰锛?
+# Make:    3.2绉? (cmake --build . -j4)
+# Ninja:   1.4绉? (ninja)
+# 鍘熷洜锛歂inja鍘熺敓骞惰+绮剧‘渚濊禆杩借釜</code></pre>
+<div class="note">馃挕 <b>鏄惁鍊煎緱鎹inja锛?/b>椤圭洰澶т簬20涓簮鏂囦欢鏃禢inja鐨勪紭鍔垮氨鏄庢樉浜嗭紱10涓枃浠朵互涓婱ake鍜孨inja宸笉澶氥€傚缓璁紑鍙戞湡鐢∟inja锛孋I/CD鐢∕ake锛堝吋瀹规€уソ锛夈€?/div>
+</div></div>
+
+<h3>馃搵 鐭ヨ瘑鐐瑰洖椤?/h3>
+
+<div class="summary">
+<b>馃幆 鏈珷鏍稿績瑕佺偣锛?/b><br><br>
+<b>1. CMake鏈川锛?/b>鏋勫缓鏂囦欢鐢熸垚鍣ㄢ€斺€斾綘鍐機MakeLists.txt锛屽畠鐢熸垚Makefile/Ninja鏂囦欢銆?br><br>
+<b>2. 鏈€灏忛」鐩笁瑕佺礌锛?/b><br>
+鈥?<code>cmake_minimum_required(VERSION 3.20)</code> 鈥?CMake鐗堟湰<br>
+鈥?<code>project(xxx)</code> 鈥?椤圭洰鍚?br>
+鈥?<code>add_executable(xxx.elf main.c)</code> 鈥?鐢熸垚鐩爣<br><br>
+<b>3. 浜ゅ弶缂栬瘧鍏抽敭锛?/b>蹇呴』鎸囧畾 toolchain-arm.cmake锛屽憡璇塁Make鐢?arm-none-eabi-gcc 鑰岄潪 x86 gcc銆?br><br>
+<b>4. 鏋勫缓鍛戒护涓夋璧帮細</b><br>
+鈥?<code>mkdir build && cd build</code> 鈥?闅旂鏋勫缓浜х墿<br>
+鈥?<code>cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake ..</code> 鈥?閰嶇疆<br>
+鈥?<code>cmake --build . -j4</code> 鈥?缂栬瘧<br><br>
+<b>5. 澶氱洰褰曠鐞嗭細</b>鐢?<code>add_subdirectory()</code> 缁勭粐浠ｇ爜锛岄┍鍔ㄥ眰鍋氭垚 STATIC 搴擄紝涓荤▼搴忛摼鎺ュ簱銆?br><br>
+<b>6. 鍙橀噺浣滅敤鍩燂細</b>function()鏈夌嫭绔嬩綔鐢ㄥ煙 鈫?set()瑕佸姞PARENT_SCOPE锛沵acro()鏃犵嫭绔嬩綔鐢ㄥ煙 鈫?鏇寸伒娲讳絾鏄撴薄鏌撱€?br><br>
+<b>7. 鐢熸垚鍣ㄨ〃杈惧紡锛?/b><code>$&lt;$&lt;CONFIG:Debug&gt;:-O0&gt;</code> 鍦ㄧ敓鎴愭瀯寤烘枃浠舵椂姹傚€硷紝瀹炵幇Debug/Release鍙岄厤缃€?br>
+</div>
+
+<!-- ====== 绗?绔?====== -->
 <a id="ch3"></a>
-<div class="summary">📖 <b>第3章学完你能干啥：</b>能读懂和编写Makefile，理解规则/变量/自动变量/模式规则，能写完整STM32 Makefile。</div>
+<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>鑳借鎳傚拰缂栧啓Makefile锛岀悊瑙ｈ鍒?鍙橀噺/鑷姩鍙橀噺/妯″紡瑙勫垯锛岃兘鍐欏畬鏁碨TM32 Makefile銆?/div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch01')">← 第1章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
-<a onclick="window.parent.loadPage('guide-ch03')">第3章 →</a>
+<a onclick="window.parent.loadPage('guide-ch01')">鈫?绗?绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
+<a onclick="window.parent.loadPage('guide-ch03')">绗?绔?鈫?/a>
 </div>
 
 <script>
@@ -308,9 +715,9 @@ document.querySelectorAll('pre').forEach(pre => {
 });
 </script>
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch01')">◀ 上一章：ARM GCC</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
-  <a onclick="window.parent.loadPage('guide-ch03')">Makefile ：下一章 ▶</a>
+  <a onclick="window.parent.loadPage('guide-ch01')">鈼€ 涓婁竴绔狅細ARM GCC</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
+  <a onclick="window.parent.loadPage('guide-ch03')">Makefile 锛氫笅涓€绔?鈻?/a>
 </div>
 </body>
 </html>
