@@ -1,6 +1,6 @@
 """
 Embedded Dev Tutorials - FastAPI Backend
-v1.6.2
+v1.6.4
 """
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
