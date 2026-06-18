@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第11章：调试技巧大全 - 嵌入式小白完全指南</title>
+<title>绗?1绔狅細璋冭瘯鎶€宸уぇ鍏?- 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,16 +57,16 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第11章：调试技巧大全</h1>
-<div class="summary"><b>📖 小白完全指南 · 11/14</b> | 阅读时间约3分钟</div>
+<h1>绗?1绔狅細璋冭瘯鎶€宸уぇ鍏?/h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 11/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
 
-<p>写代码的时间占30%，调试的时间占70%。掌握高效的调试方法，是嵌入式工程师最重要的技能。</p>
+<p>鍐欎唬鐮佺殑鏃堕棿鍗?0%锛岃皟璇曠殑鏃堕棿鍗?0%銆傛帉鎻￠珮鏁堢殑璋冭瘯鏂规硶锛屾槸宓屽叆寮忓伐绋嬪笀鏈€閲嶈鐨勬妧鑳姐€?/p>
 
-<div class="analogy">💡 <b>类比：</b>调试就像<strong>破案</strong>——printf=监控摄像头（全局观察），GDB=现场勘查（停下来仔细看），HardFault分析=验尸报告（分析死因），SWO=实时监控（不间断观察）。</div>
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>璋冭瘯灏卞儚<strong>鐮存</strong>鈥斺€攑rintf=鐩戞帶鎽勫儚澶达紙鍏ㄥ眬瑙傚療锛夛紝GDB=鐜板満鍕樻煡锛堝仠涓嬫潵浠旂粏鐪嬶級锛孒ardFault鍒嗘瀽=楠屽案鎶ュ憡锛堝垎鏋愭鍥狅級锛孲WO=瀹炴椂鐩戞帶锛堜笉闂存柇瑙傚療锛夈€?/div>
 
-<h3>printf调试 — 最简单最常用</h3>
+<h3>printf璋冭瘯 鈥?鏈€绠€鍗曟渶甯哥敤</h3>
 
-<pre><code>// 重定向printf到UART
+<pre><code>// 閲嶅畾鍚憄rintf鍒癠ART
 #include &lt;stdio.h&gt;
 
 int fputc(int ch, FILE *f) {
@@ -74,50 +74,48 @@ int fputc(int ch, FILE *f) {
     return ch;
 }
 
-// 使用ITM（SWO引脚）重定向——比UART快100倍！
+// 浣跨敤ITM锛圫WO寮曡剼锛夐噸瀹氬悜鈥斺€旀瘮UART蹇?00鍊嶏紒
 int fputc(int ch, FILE *f) {
     ITM_SendChar(ch);
     return ch;
 }
 
-// 调试宏
-#define DEBUG_PRINT(fmt, ...) printf("[%lu] " fmt "
+// 璋冭瘯瀹?#define DEBUG_PRINT(fmt, ...) printf("[%lu] " fmt "
 ", HAL_GetTick(), ##__VA_ARGS__)
-// 使用：DEBUG_PRINT("ADC value: %d", adc_val);
-// 输出：[12345] ADC value: 2048</code></pre>
+// 浣跨敤锛欴EBUG_PRINT("ADC value: %d", adc_val);
+// 杈撳嚭锛歔12345] ADC value: 2048</code></pre>
 
-<h3>SWO/ITM 输出</h3>
+<h3>SWO/ITM 杈撳嚭</h3>
 
-<p>ITM(Instrumentation Trace Macrocell)是Cortex-M内置的调试输出通道，通过SWO引脚输出数据，比UART快得多且不占用串口资源。</p>
+<p>ITM(Instrumentation Trace Macrocell)鏄疌ortex-M鍐呯疆鐨勮皟璇曡緭鍑洪€氶亾锛岄€氳繃SWO寮曡剼杈撳嚭鏁版嵁锛屾瘮UART蹇緱澶氫笖涓嶅崰鐢ㄤ覆鍙ｈ祫婧愩€?/p>
 
-<pre><code>// 在OpenOCD配置中启用SWO
+<pre><code>// 鍦∣penOCD閰嶇疆涓惎鐢⊿WO
 # openocd.cfg
 swj_newdap $_CHIPNAME cpu -irlen 4 -ircapture 0x1 -irmask 0xf -expected-id $_CPUTAPID
 $_TARGETNAME configure -event gdb-attach {
     itm port 0 on
 }
 
-// GDB中查看ITM输出
+// GDB涓煡鐪婭TM杈撳嚭
 (gdb) monitor tpiu config internal /tmp/itm.log uart off 72000000
 (gdb) monitor itm port 0 on</code></pre>
 
-<h3>HardFault分析 — 程序崩溃急救</h3>
+<h3>HardFault鍒嗘瀽 鈥?绋嬪簭宕╂簝鎬ユ晳</h3>
 
-<div class="note">⚠️ <b>注意：</b>下面的汇编代码使用了Thumb-2指令（<code>ITE EQ</code>），仅适用于Cortex-M3/M4/M7。Cortex-M0/M0+不支持，如STM32F0/G0系列需改用条件分支写法。</div>
+<div class="note">鈿狅笍 <b>娉ㄦ剰锛?/b>涓嬮潰鐨勬眹缂栦唬鐮佷娇鐢ㄤ簡Thumb-2鎸囦护锛?code>ITE EQ</code>锛夛紝浠呴€傜敤浜嶤ortex-M3/M4/M7銆侰ortex-M0/M0+涓嶆敮鎸侊紝濡係TM32F0/G0绯诲垪闇€鏀圭敤鏉′欢鍒嗘敮鍐欐硶銆?/div>
 
-<pre><code>// HardFault处理函数（放在main.c中）
+<pre><code>// HardFault澶勭悊鍑芥暟锛堟斁鍦╩ain.c涓級
 void HardFault_Handler(void) {
     __asm volatile (
         "TST LR, #4
-"          // 检查使用哪个栈
+"          // 妫€鏌ヤ娇鐢ㄥ摢涓爤
         "ITE EQ
 "
         "MRSEQ R0, MSP
-"       // 主栈
+"       // 涓绘爤
         "MRSNE R0, PSP
-"       // 进程栈
-        "B Hard_Fault_Handler
-" // 跳到C函数
+"       // 杩涚▼鏍?        "B Hard_Fault_Handler
+" // 璺冲埌C鍑芥暟
     );
 }
 
@@ -136,53 +134,50 @@ void Hard_Fault_Handler(uint32_t *stack_frame) {
     printf("R12 = 0x%08X
 ", stack_frame[4]);
     printf("LR  = 0x%08X
-", stack_frame[5]);   // 返回地址
+", stack_frame[5]);   // 杩斿洖鍦板潃
     printf("PC  = 0x%08X
-", stack_frame[6]);   // 崩溃地址！
-    printf("PSR = 0x%08X
+", stack_frame[6]);   // 宕╂簝鍦板潃锛?    printf("PSR = 0x%08X
 ", stack_frame[7]);
 
-    // 在.map文件或反汇编中查找PC地址对应的函数
-    volatile uint32_t fault_addr = stack_frame[6];
-    while (1);  // 停在这里，用GDB查看
+    // 鍦?map鏂囦欢鎴栧弽姹囩紪涓煡鎵綪C鍦板潃瀵瑰簲鐨勫嚱鏁?    volatile uint32_t fault_addr = stack_frame[6];
+    while (1);  // 鍋滃湪杩欓噷锛岀敤GDB鏌ョ湅
 }
 
-// GDB中查看崩溃位置
-(gdb) info line *0x08001234    // 把PC值换成实际的
-(gdb) list *0x08001234         // 显示源码</code></pre>
+// GDB涓煡鐪嬪穿婧冧綅缃?(gdb) info line *0x08001234    // 鎶奝C鍊兼崲鎴愬疄闄呯殑
+(gdb) list *0x08001234         // 鏄剧ず婧愮爜</code></pre>
 
-<h3>常见Bug模式</h3>
+<h3>甯歌Bug妯″紡</h3>
 
 <table>
-<tr><th>Bug类型</th><th>症状</th><th>特征</th><th>排查方法</th></tr>
-<tr><td>空指针</td><td>HardFault</td><td>PC在非法地址</td><td>检查指针是否为NULL</td></tr>
-<tr><td>栈溢出</td><td>变量莫名变化、HardFault</td><td>局部变量被覆盖</td><td>uxTaskGetStackHighWaterMark()</td></tr>
-<tr><td>中断竞争</td><td>数据偶发错误</td><td>中断中修改共享变量</td><td>关中断保护或用原子操作</td></tr>
-<tr><td>未初始化变量</td><td>行为随机</td><td>上电第一次不正常</td><td>开启-Wall -Wuninitialized</td></tr>
-<tr><td>看门狗复位</td><td>程序周期性重启</td><td>IWDG超时</td><td>检查长阻塞代码</td></tr>
+<tr><th>Bug绫诲瀷</th><th>鐥囩姸</th><th>鐗瑰緛</th><th>鎺掓煡鏂规硶</th></tr>
+<tr><td>绌烘寚閽?/td><td>HardFault</td><td>PC鍦ㄩ潪娉曞湴鍧€</td><td>妫€鏌ユ寚閽堟槸鍚︿负NULL</td></tr>
+<tr><td>鏍堟孩鍑?/td><td>鍙橀噺鑾悕鍙樺寲銆丠ardFault</td><td>灞€閮ㄥ彉閲忚瑕嗙洊</td><td>uxTaskGetStackHighWaterMark()</td></tr>
+<tr><td>涓柇绔炰簤</td><td>鏁版嵁鍋跺彂閿欒</td><td>涓柇涓慨鏀瑰叡浜彉閲?/td><td>鍏充腑鏂繚鎶ゆ垨鐢ㄥ師瀛愭搷浣?/td></tr>
+<tr><td>鏈垵濮嬪寲鍙橀噺</td><td>琛屼负闅忔満</td><td>涓婄數绗竴娆′笉姝ｅ父</td><td>寮€鍚?Wall -Wuninitialized</td></tr>
+<tr><td>鐪嬮棬鐙楀浣?/td><td>绋嬪簭鍛ㄦ湡鎬ч噸鍚?/td><td>IWDG瓒呮椂</td><td>妫€鏌ラ暱闃诲浠ｇ爜</td></tr>
 </table>
 
-<div class="trouble">🔍 <b>常见问题：程序偶尔跑飞，无法稳定复现</b><br>
-90%是中断竞争。排查：<br>
-1. 检查中断和主循环是否访问同一变量<br>
-2. 如果是，用 <code>__disable_irq()</code> / <code>__enable_irq()</code> 保护<br>
-3. 或用 <code>volatile</code> 关键字声明共享变量<br>
-4. 更好的方案：用FreeRTOS队列/信号量</div>
+<div class="trouble">馃攳 <b>甯歌闂锛氱▼搴忓伓灏旇窇椋烇紝鏃犳硶绋冲畾澶嶇幇</b><br>
+90%鏄腑鏂珵浜夈€傛帓鏌ワ細<br>
+1. 妫€鏌ヤ腑鏂拰涓诲惊鐜槸鍚﹁闂悓涓€鍙橀噺<br>
+2. 濡傛灉鏄紝鐢?<code>__disable_irq()</code> / <code>__enable_irq()</code> 淇濇姢<br>
+3. 鎴栫敤 <code>volatile</code> 鍏抽敭瀛楀０鏄庡叡浜彉閲?br>
+4. 鏇村ソ鐨勬柟妗堬細鐢‵reeRTOS闃熷垪/淇″彿閲?/div>
 
-<div class="tip">💡 <b>调试黄金法则：</b><br>
-① 先让Bug稳定复现（100%复现=解决了一半）<br>
-② 二分法注释代码，缩小Bug范围<br>
-③ 看.map文件确认代码/数据地址<br>
-④ 永远开启 <code>-Wall -Werror</code> 编译</div>
+<div class="tip">馃挕 <b>璋冭瘯榛勯噾娉曞垯锛?/b><br>
+鈶?鍏堣Bug绋冲畾澶嶇幇锛?00%澶嶇幇=瑙ｅ喅浜嗕竴鍗婏級<br>
+鈶?浜屽垎娉曟敞閲婁唬鐮侊紝缂╁皬Bug鑼冨洿<br>
+鈶?鐪?map鏂囦欢纭浠ｇ爜/鏁版嵁鍦板潃<br>
+鈶?姘歌繙寮€鍚?<code>-Wall -Werror</code> 缂栬瘧</div>
 
-<!-- ====== 第12章 ====== -->
+<!-- ====== 绗?2绔?====== -->
 <a id="ch12"></a>
-<div class="summary">📖 <b>第12章学完你能干啥：</b>能独立完成一个完整的嵌入式项目——从硬件接线到软件编写到烧录运行。</div>
+<div class="summary">馃摉 <b>绗?2绔犲瀹屼綘鑳藉共鍟ワ細</b>鑳界嫭绔嬪畬鎴愪竴涓畬鏁寸殑宓屽叆寮忛」鐩€斺€斾粠纭欢鎺ョ嚎鍒拌蒋浠剁紪鍐欏埌鐑у綍杩愯銆?/div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch10')">← 第10章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
-<a onclick="window.parent.loadPage('guide-ch12')">第12章 →</a>
+<a onclick="window.parent.loadPage('guide-ch10')">鈫?绗?0绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
+<a onclick="window.parent.loadPage('guide-ch12')">绗?2绔?鈫?/a>
 </div>
 
 <script>
@@ -200,10 +195,119 @@ document.querySelectorAll('pre').forEach(pre => {
   pre.appendChild(btn);
 });
 </script>
+
+<h2>馃攱 STM32浣庡姛鑰楁ā寮忚瑙?/h2>
+
+<p>鐢垫睜渚涚數璁惧鐨勬牳蹇冪珵浜夊姏灏辨槸鍔熻€椼€係TM32鎻愪緵澶氬眰鐫＄湢妯″紡锛岄€夊妯″紡鑳界渷90%浠ヤ笂鐨勭數銆?/p>
+
+<h3>涓夌鐫＄湢妯″紡瀵规瘮</h3>
+
+<table>
+<tr><th>妯″紡</th><th>鍞ら啋鏂瑰紡</th><th>鐢垫祦(F103)</th><th>鍞ら啋鏃堕棿</th><th>鍞ら啋鍚?/th></tr>
+<tr><td>Sleep</td><td>浠绘剰涓柇/浜嬩欢</td><td>~5mA</td><td>鍗虫椂</td><td>缁х画鎵ц涓嬩竴鏉?/td></tr>
+<tr><td>Stop</td><td>EXTI绾?/ RTC鍞ら啋</td><td>~20渭A</td><td>~10渭s</td><td>浠嶹FI澶勭户缁?/td></tr>
+<tr><td>Standby</td><td>WKUP寮曡剼 / RTC / NRST</td><td>~2渭A</td><td>~50渭s</td><td>鐩稿綋浜庡浣?/td></tr>
+</table>
+
+<pre><code>// Sleep妯″紡锛氭渶绠€鍗曪紝CPU鍋滀笅鏉ヤ絾澶栬缁х画杩愯
+__WFI();  // Wait For Interrupt
+// 浠绘剰涓柇鍞ら啋鍚庝粠杩欓噷缁х画鎵ц
+
+// Stop妯″紡锛氭渶甯哥敤锛屽ぇ閮ㄥ垎鏃堕挓鍋滀簡
+void enter_stop_mode(void) {
+    // 1. 鍏抽棴涓嶅繀瑕佺殑澶栬鏃堕挓
+    __HAL_RCC_GPIOA_CLK_DISABLE();
+    __HAL_RCC_USART1_CLK_DISABLE();
+    // 2. 灏嗘墍鏈塈O璁句负妯℃嫙杈撳叆锛堟渶浣庡姛鑰楋級
+    // 3. 杩涘叆Stop妯″紡
+    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+    // 鍞ら啋鍚庨渶瑕侀噸鏂伴厤缃椂閽?    SystemClock_Config();
+}
+
+// Standby妯″紡锛氱數娴佹渶浣庯紝浣嗗敜閱?澶嶄綅
+void enter_standby_mode(void) {
+    HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);  // PA0涓婂崌娌垮敜閱?    __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+    HAL_PWR_EnterSTANDBYMode();
+    // 姘歌繙涓嶄細鍒拌繖閲屸€斺€斿敜閱掑悗浠庡ご鎵ц锛?}</code></pre>
+
+<h3>浣庡姛鑰楄璁￠粍閲戞硶鍒?/h3>
+
+<div class="card">
+<div class="h"><span class="name">鍔熻€椾紭鍖栨鏌ユ竻鍗?/span><span class="tag y">杩涢樁</span></div>
+<div class="b">
+<div class="desc">
+鉁?<b>澶栬锛?/b>涓嶇敤灏卞叧鏃堕挓锛屼笉鏄?涓嶇敤灏辨斁閭?<br>
+鉁?<b>GPIO锛?/b>鎮┖寮曡剼璁句负妯℃嫙杈撳叆锛圓N妯″紡锛夛紝閬垮厤娴┖鑰楃數<br>
+鉁?<b>鏃堕挓锛?/b>闄嶉锛?2MHz 鈫?8MHz 鐢垫祦闄?0%<br>
+鉁?<b>鐪嬮棬鐙楋細</b>鐙珛鐪嬮棬鐙?IWDG)鍦⊿top妯″紡涓嬩粛杩愯锛屽姛鑰梸1渭A<br>
+鉁?<b>LED锛?/b>脳100渭A锛屼笉鐢ㄥ氨鍏?br>
+鉁?<b>ADC/DAC锛?/b>閲囨牱瀹屽氨鍏筹紝瀹冧滑鏄€楃數澶ф埛<br>
+鉁?<b>DMA锛?/b>鐢―MA鍋氭暟鎹惉杩愶紝CPU澶氱潯瑙?br>
+鉁?<b>閫氫俊锛?/b>鎵撳寘鏁版嵁鎵归噺鍙戦€侊紝鍑忓皯鏃犵嚎鐢?鏀跺彂鍣ㄥ伐浣滄椂闂?</div></div></div>
+
+<h2>鈴?RTC闂归挓鍞ら啋</h2>
+
+<pre><code>// 姣?鍒嗛挓鑷姩鍞ら啋閲囬泦涓€娆℃俯婀垮害锛屽叾浣欐椂闂碨TOP妯″紡
+// 骞冲潎鍔熻€?< 50渭A锛?
+void setup_rtc_wakeup(void) {
+    // 閰嶇疆RTC闂归挓锛?鍒嗛挓鍚庡敜閱?    RTC_AlarmTypeDef sAlarm = {0};
+    sAlarm.Alarm = RTC_ALARM_A;
+    sAlarm.AlarmTime.Hours = 0;
+    sAlarm.AlarmTime.Minutes = 5;
+    sAlarm.AlarmTime.Seconds = 0;
+    HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BIN);
+}
+
+void main_loop(void) {
+    while (1) {
+        // 1. 閲囬泦鏁版嵁锛?0ms锛?        float temp = read_temperature();
+        float hum = read_humidity();
+        
+        // 2. 鍙戦€佹暟鎹紙50ms锛?        send_data_over_ble(temp, hum);
+        
+        // 3. 璁剧疆涓嬫鍞ら啋闂归挓
+        setup_rtc_wakeup();
+        
+        // 4. 娣卞害鐫＄湢 鈫?鍔熻€楅檷鍒?0渭A锛?        enter_stop_mode();
+        // ... 5鍒嗛挓鍚嶳TC闂归挓鍞ら啋锛屽洖鍒版楠?
+    }
+}</code></pre>
+
+<h2>馃搳 鍔熻€楁祴閲忔柟娉?/h2>
+
+<div class="tip">馃挕 <b>瀹炵敤鎶€宸э細</b>鐢⊿TM32L绯诲垪锛圠0/L4/L5锛夋浛浠绯诲垪锛孲top妯″紡鍔熻€椾粠20渭A闄嶅埌&lt;1渭A銆侺绯诲垪涓撲负浣庡姛鑰楄璁°€?/div>
+
+<pre><code>// 娴嬮噺瀹為檯鍔熻€楃殑绠€鍗曟柟娉?// 1. 鏂紑寮€鍙戞澘涓婄殑VDD璺崇嚎
+// 2. 涓囩敤琛ㄤ覆鑱斿湪VDD璺緞涓婏紙mA/渭A妗ｏ級
+// 3. 鍒嗗埆娴嬮噺锛氳繍琛屾€?鈫?Sleep 鈫?Stop 鈫?Standby
+
+// 鎴栬€呯敤涓撲笟宸ュ叿锛?// - Nordic Power Profiler Kit II (PPK2): ~$100, 绮惧害1渭A
+// - Joulescope JS220: ~$800, 绮惧害nA绾?// - STM32CubeMonitor-Power: 鍏嶈垂锛屼絾鍙兘鐢ㄥ湪ST-LINK V3 + NUCLEO鏉?/code></pre>
+
+<h2>馃幆 瀹炴垬缁冧範</h2>
+
+<div class="tip">馃摑 <b>缁冧範1锛?/b>鐢≧TC闂归挓瀹炵幇姣?0绉掑敜閱掍竴娆°€佺炕杞琇ED銆佸啀杩涘叆Sleep妯″紡銆傜敤鐢佃〃娴嬮噺骞冲潎鐢垫祦銆?br><br>
+馃摑 <b>缁冧範2锛?/b>瀹炵幇涓€涓狟LE娓╂箍搴︿俊鏍囷細姣?0绉掍粠Stop妯″紡鍞ら啋鈫掕DHT11鈫払LE骞挎挱鈫掑洖鍒癝top妯″紡銆傜洰鏍囧钩鍧囧姛鑰?lt;100渭A銆?br><br>
+馃摑 <b>缁冧範3锛?/b>瀵规瘮72MHz vs 8MHz杩愯鏃剁殑鍔熻€楀樊寮傦紙HAL_Delay鐩稿悓鏃堕棿闂儊LED锛屾祴閲忕數娴侊級銆?/div>
+
+<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
+<div class="summary">
+<b>鉁?浣庡姛鑰楁牳蹇冪瓥鐣ワ細</b><br>
+鈥?Sleep: ~5mA, 浠绘剰涓柇鍞ら啋锛屽璁剧户缁繍琛?br>
+鈥?Stop: ~20渭A, EXTI/RTC鍞ら啋锛岄渶閲嶆柊閰嶆椂閽?br>
+鈥?Standby: ~2渭A, 浠匴KUP/RTC/NRST鍞ら啋锛岀瓑浜庡浣?br>
+鈥?澶栬涓嶇敤灏卞叧鏃堕挓 + GPIO鎮┖璁続N妯″紡<br>
+鈥?闄嶉鏄渶鐩存帴鐨勭渷鐢垫柟寮?br>
+鈥?RTC闂归挓鏄渶甯哥敤鐨勪綆鍔熻€楀敜閱掓簮<br>
+<b>馃洜 STM32L绯诲垪棰濆鐗规€э細</b><br>
+鈥?BAM(Batch Acquisition Mode): DMA閲囬泦鏃禖PU浼戠湢<br>
+鈥?LPUART: 浣庡姛鑰椾覆鍙ｏ紝Stop妯″紡涓嬫帴鏀舵暟鎹?br>
+鈥?LPTIM: 浣庡姛鑰楀畾鏃跺櫒锛孲top妯″紡涓嬭繍琛?</div>
+
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch10')">◀ 上一章：PCB硬件</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
-  <a onclick="window.parent.loadPage('guide-ch12')">项目实战 ：下一章 ▶</a>
+  <a onclick="window.parent.loadPage('guide-ch10')">鈼€ 涓婁竴绔狅細PCB纭欢</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
+  <a onclick="window.parent.loadPage('guide-ch12')">椤圭洰瀹炴垬 锛氫笅涓€绔?鈻?/a>
 </div>
 </body>
 </html>
