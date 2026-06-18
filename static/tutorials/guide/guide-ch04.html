@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第4章：串口通信 — 单片机与电脑对话 - 嵌入式小白完全指南</title>
+<title>绗?绔狅細涓插彛閫氫俊 鈥?鍗曠墖鏈轰笌鐢佃剳瀵硅瘽 - 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,115 +57,371 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第4章：串口通信 — 单片机与电脑对话</h1>
-<div class="summary"><b>📖 小白完全指南 · 4/14</b> | 阅读时间约3分钟</div>
+<h1>绗?绔狅細涓插彛閫氫俊 鈥?鍗曠墖鏈轰笌鐢佃剳瀵硅瘽</h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 4/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
 
-<p>串口(UART)是嵌入式开发<strong>最基础、最常用</strong>的通信方式。单片机的printf输出、调试信息、AT指令控制，全靠串口。可以说：不会串口，嵌入式寸步难行。</p>
+<p>涓插彛(UART)鏄祵鍏ュ紡寮€鍙?strong>鏈€鍩虹銆佹渶甯哥敤</strong>鐨勯€氫俊鏂瑰紡銆傚崟鐗囨満鐨刾rintf杈撳嚭銆佽皟璇曚俊鎭€丄T鎸囦护鎺у埗锛屽叏闈犱覆鍙ｃ€傚彲浠ヨ锛氫笉浼氫覆鍙ｏ紝宓屽叆寮忓姝ラ毦琛屻€?/p>
 
-<div class="analogy">💡 <b>类比：</b>串口就像<strong>两个人用对讲机通话</strong>——波特率=说话速度（必须一致才能听懂），数据位=每个词的长度，停止位=说完了喘口气，校验位=确认对方听清了。速度不一样就全是乱码，就像一个人说中文、一个说英文。</div>
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>涓插彛灏卞儚<strong>涓や釜浜虹敤瀵硅鏈洪€氳瘽</strong>鈥斺€旀尝鐗圭巼=璇磋瘽閫熷害锛堝繀椤讳竴鑷存墠鑳藉惉鎳傦級锛屾暟鎹綅=姣忎釜璇嶇殑闀垮害锛屽仠姝綅=璇村畬浜嗗枠鍙ｆ皵锛屾牎楠屼綅=纭瀵规柟鍚竻浜嗐€傞€熷害涓嶄竴鏍峰氨鍏ㄦ槸涔辩爜锛屽氨鍍忎竴涓汉璇翠腑鏂囥€佷竴涓鑻辨枃銆?/div>
 
-<h3>串口参数</h3>
+<h3>涓插彛鍙傛暟</h3>
 
 <table>
-<tr><th>参数</th><th>常见值</th><th>说明</th></tr>
-<tr><td>波特率(Baud Rate)</td><td>9600 / 115200</td><td>通信速度，双方必须一致</td></tr>
-<tr><td>数据位(Data Bits)</td><td>8</td><td>每个字节的有效位数</td></tr>
-<tr><td>停止位(Stop Bits)</td><td>1</td><td>帧结束标志</td></tr>
-<tr><td>校验位(Parity)</td><td>None</td><td>简单错误检测，通常不用</td></tr>
-<tr><td>流控(Flow Control)</td><td>None</td><td>硬件/软件流控，通常不用</td></tr>
+<tr><th>鍙傛暟</th><th>甯歌鍊?/th><th>璇存槑</th></tr>
+<tr><td>娉㈢壒鐜?Baud Rate)</td><td>9600 / 115200</td><td>閫氫俊閫熷害锛屽弻鏂瑰繀椤讳竴鑷?/td></tr>
+<tr><td>鏁版嵁浣?Data Bits)</td><td>8</td><td>姣忎釜瀛楄妭鐨勬湁鏁堜綅鏁?/td></tr>
+<tr><td>鍋滄浣?Stop Bits)</td><td>1</td><td>甯х粨鏉熸爣蹇?/td></tr>
+<tr><td>鏍￠獙浣?Parity)</td><td>None</td><td>绠€鍗曢敊璇娴嬶紝閫氬父涓嶇敤</td></tr>
+<tr><td>娴佹帶(Flow Control)</td><td>None</td><td>纭欢/杞欢娴佹帶锛岄€氬父涓嶇敤</td></tr>
 </table>
 
-<p>日常最常用的配置：<strong>115200 8N1</strong>（115200波特率，8数据位，无校验，1停止位）</p>
+<p>鏃ュ父鏈€甯哥敤鐨勯厤缃細<strong>115200 8N1</strong>锛?15200娉㈢壒鐜囷紝8鏁版嵁浣嶏紝鏃犳牎楠岋紝1鍋滄浣嶏級</p>
 
-<div class="step"><b>先确定COM口：</b>插上USB转TTL后运行：</div>
-<pre><code># 列出所有串口（python命令根据你的环境选择）
-python -m serial.tools.list_ports
-# 如果python命令不存在，试试：python3.14 -m serial.tools.list_ports
-# 如果python命令不存在，试试：
-python3.14 -m serial.tools.list_ports
-# 输出：COM3 - USB-SERIAL CH340 (COM3)
-# 记住这个COM口号，下面所有串口操作都用它</code></pre>
+<h3>涓插彛閫氫俊鍘熺悊娣卞叆</h3>
 
-<h3>pyserial：Python串口工具</h3>
+<p>UART锛圲niversal Asynchronous Receiver/Transmitter锛夋槸涓€绉?strong>寮傛涓茶</strong>閫氫俊鍗忚銆?寮傛"鐨勬剰鎬濇槸<strong>娌℃湁鏃堕挓绾?/strong>鈥斺€旀敹鍙戝弻鏂归潬绾﹀畾鐨勬尝鐗圭巼鏉ュ悓姝ャ€傝繖涓嶪2C/SPI杩欑被鏈夋椂閽熺嚎鐨勫悓姝ュ崗璁畬鍏ㄤ笉鍚屻€?/p>
+
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>寮傛閫氫俊灏卞儚涓や釜浜哄湪榛戞殫涓敤闂厜鐏氦娴佲€斺€旀病鏈?寮€濮?鐨勮瑙夌嚎绱紝鍏ㄩ潬<strong>绾﹀畾鐨勮妭濂?/strong>銆傚鏋滀竴涓汉浠ユ瘡绉?娆＄殑閫熷害闂紝鍙︿竴涓汉浠ユ瘡绉?0娆＄殑閫熷害鐪嬶紝閭ｅ氨鍍忔尝鐗圭巼涓嶅尮閰嶏紙涓€鏂?600锛屼竴鏂?15200锛夛紝鐪嬪埌鐨勫叏鏄贡鐮併€?/div>
+
+<h4>UART鏁版嵁甯х粨鏋?/h4>
+
+<p>涓€涓畬鏁寸殑UART瀛楄妭甯у寘鍚互涓嬮儴鍒嗭細</p>
+
+<table>
+<tr><th>缁勬垚閮ㄥ垎</th><th>璇存槑</th><th>浣嶆暟</th></tr>
+<tr><td>璧峰浣?Start Bit)</td><td>鎷変綆1浣嶆椂闂达紝閫氱煡鎺ユ敹鏂?鏁版嵁鏉ヤ簡"</td><td>1 bit</td></tr>
+<tr><td>鏁版嵁浣?Data Bits)</td><td>瀹為檯鏁版嵁锛孡SB鍦ㄥ墠锛堟渶浣庝綅鍏堝彂锛?/td><td>5-9 bit锛堝父鐢?锛?/td></tr>
+<tr><td>鏍￠獙浣?Parity Bit)</td><td>濂囧伓鏍￠獙锛岀敤浜庢娴嬩紶杈撻敊璇?/td><td>0-1 bit锛堥€氬父涓嶇敤锛?/td></tr>
+<tr><td>鍋滄浣?Stop Bits)</td><td>鎷夐珮锛岃〃绀鸿繖涓€甯х粨鏉?/td><td>1-2 bit锛堝父鐢?锛?/td></tr>
+</table>
+
+<div class="tip">馃挕 <b>鍏抽敭鐞嗚В锛?/b>鍙戦€佹柟鍜屾帴鏀舵柟鐨勬尝鐗圭巼璇樊蹇呴』 < 2%銆傚鏋滀竴鏂规槸115200锛屽彟涓€鏂规槸9600锛岃宸秴杩?0%锛屾敹鍒扮殑鏁版嵁瀹屽叏鏄贡鐮併€傝繖灏辨槸涓轰粈涔堜覆鍙ｉ€氫俊鐨勭涓€姝ユ案杩滄槸"瀵规尝鐗圭巼"銆?/div>
+
+<h4>娉㈢壒鐜囦笌閫氫俊璺濈</h4>
+
+<table>
+<tr><th>娉㈢壒鐜?/th><th>鏈€澶х悊璁鸿窛绂?/th><th>鎺ㄨ崘璺濈</th><th>閫傜敤鍦烘櫙</th></tr>
+<tr><td>9600</td><td>~15m</td><td>鈮?0m</td><td>闀胯窛绂汇€佹姉骞叉壈瑕佹眰楂?/td></tr>
+<tr><td>115200</td><td>~3m</td><td>鈮?m</td><td>鏃ュ父璋冭瘯銆佸紑鍙戞澘杩炴帴</td></tr>
+<tr><td>921600</td><td>~50cm</td><td>鈮?0cm</td><td>楂橀€熸暟鎹紶杈?/td></tr>
+<tr><td>2000000+</td><td>~20cm</td><td>PCB鏉垮唴</td><td>楂橀€熼渶姹傦紝闇€浼樿川绾跨紗</td></tr>
+</table>
+
+<div class="note">鈿狅笍 <b>瀹為檯缁忛獙锛?/b>USB杞琓TL妯″潡锛圕H340/CP2102锛夊湪115200涓嬮潪甯哥ǔ瀹氾紝浣?21600浠ヤ笂鍙兘鎺夋暟鎹€斺€旇繖鍜孶SB杞覆鑺墖璐ㄩ噺銆佺嚎缂嗚川閲忋€佺數鑴慤SB鍙ｄ緵鐢甸兘鏈夊叧銆傛棩甯稿紑鍙戠敤115200鏈€闈犺氨銆?/div>
 
 <div class="card">
-<div class="h"><span class="name">pyserial</span><span class="tag g">Python串口库</span><span class="tag b">pip install pyserial</span></div>
+<div class="h"><span class="name">涓插彛澶氬瓧鑺傛暟鎹抚璁捐</span><span class="tag b">杩涢樁</span></div>
 <div class="b">
-<div class="desc">Python串口库，命令行工具miniterm超级好用——比PuTTY更灵活，支持十六进制显示、时间戳、日志保存。</div>
-<pre><code># 列出所有串口
-python -m serial.tools.list_ports
+<div class="desc">涓插彛鏄瓧鑺傛祦锛屾病鏈?鍖?鐨勬蹇点€傚鏋滆鍙戦€佸瀛楄妭鏁版嵁锛堝娓╁害鍊?25.3锛屽崰4瀛楄妭float锛夛紝闇€瑕佽嚜宸辫璁?strong>甯ф牸寮?/strong>鏉ュ垎鍓叉瘡涓€甯с€備互涓嬫槸鍑犵甯哥敤鏂规锛?/div>
+<pre><code>// 鏂规1锛氬浐瀹氬抚澶?闀垮害+鏁版嵁+鏍￠獙锛堟渶鎺ㄨ崘锛?
+// 甯ф牸寮忥細[0xAA 0x55] [闀垮害N] [N瀛楄妭鏁版嵁] [CRC8鏍￠獙]
+// 绀轰緥锛氬彂閫佹俯搴?5.3掳C
+uint8_t frame[] = {
+    0xAA, 0x55,  // 甯уご锛堜袱涓瓧鑺傦紝闄嶄綆璇垽姒傜巼锛?
+    0x04,         // 鏁版嵁闀垮害=4瀛楄妭锛坒loat锛?
+    0x00, 0x00, 0xCA, 0x41,  // 25.3鐨処EEE 754琛ㄧず
+    0x00          // CRC8鏍￠獙锛堟澶勭畝鍖栵級
+};
 
-# 打开串口终端（最常用！）
-python -m serial.tools.miniterm COM3 115200
-# 如果python命令不存在，试试：python3.14 -m serial.tools.miniterm COM3 115200
+// 鏂规2锛氬浐瀹氬抚澶?鍥哄畾闀垮害锛堢畝鍗曚絾娴垂甯﹀锛?
+// 甯ф牸寮忥細[0xAA] [鍥哄畾8瀛楄妭鏁版嵁鍖匽
+// 浼樼偣锛氳В鏋愮畝鍗?缂虹偣锛氫笉澶熺伒娲?
 
-# miniterm快捷键
-# Ctrl+] 退出    Ctrl+T 菜单    Ctrl+T Ctrl+H 十六进制显示
-# Ctrl+T Ctrl+T 发送换行    Ctrl+T Ctrl+R 时间戳</code></pre>
+// 鏂规3锛氬瓧绗﹀崗璁紙浜虹被鍙锛屾渶甯哥敤锛?
+// 浠ユ崲琛岀\\n涓哄垎闅旓紝JSON鏍煎紡
+// 濡傦細{"temp":25.3,"hum":62.1}\\n
+// 鏂规4锛歁odbus-RTU锛堝伐涓氭爣鍑嗭級
+// 甯ф牸寮忥細[鍦板潃][鍔熻兘鐮乚[鏁版嵁][CRC16]
+// 甯ч棿闂撮殧鈮?.5瀛楃鏃堕棿浣滀负甯у垎闅?/code></pre>
+</div></div>
+
+<h3>Python涓插彛楂樼骇鐢ㄦ硶</h3>
+
+<div class="card">
+<div class="h"><span class="name">涓插彛鎺ユ敹锛氫笁绉嶆ā寮忓姣?/span><span class="tag b">瀹炵敤鎶€宸?/span></div>
+<div class="b">
+<div class="desc">Python pyserial鎻愪緵浜嗗绉嶆帴鏀舵暟鎹殑鏂瑰紡锛岄€夋嫨鍚堥€傜殑鏂瑰紡瀵圭▼搴忕ǔ瀹氭€ц嚦鍏抽噸瑕侊細</div>
+<pre><code>import serial
+ser = serial.Serial('COM3', 115200, timeout=0.1)
+
+# 鏂瑰紡1锛歳eadline() 鈥?鎸夎璇诲彇锛堟渶甯哥敤锛?
+# 閫傜敤锛氭暟鎹互\\n缁撳熬鐨勫満鏅?
+line = ser.readline().decode('utf-8').strip()
+print(f"琛屾暟鎹? {line}")
+
+# 鏂瑰紡2锛歳ead(size) 鈥?璇诲彇鎸囧畾瀛楄妭鏁?
+# 閫傜敤锛氬浐瀹氶暱搴︽暟鎹寘
+data = ser.read(8)  # 璇?瀛楄妭
+if len(data) == 8:
+    # 瑙ｆ瀽鏁版嵁鍖?
+    header, value = data[0], data[1:]
+    print(f"Header: {header:02X}, Value: {value.hex()}")
+
+# 鏂瑰紡3锛歩n_waiting 鈥?闈為樆濉炶鍙栨墍鏈夊彲鐢ㄦ暟鎹?
+# 閫傜敤锛氬疄鏃舵暟鎹祦
+if ser.in_waiting > 0:
+    data = ser.read(ser.in_waiting)
+    print(f"鏀跺埌 {len(data)} 瀛楄妭: {data.hex()}")
+
+# 鏂瑰紡4锛歩ter() 鈥?杩唬鍣ㄦā寮忥紙閫傚悎鎸佺画璇诲彇锛?
+# 閫傜敤锛氭寔缁洃鍚覆鍙ｆ暟鎹?
+for line in ser:
+    print(f"鏀跺埌: {line.decode('utf-8').strip()}")
+    # Ctrl+C 閫€鍑哄惊鐜?/code></pre>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">Python串口编程</span><span class="tag b">脚本化串口通信</span></div>
+<div class="h"><span class="name">涓插彛鎺ユ敹绾跨▼锛堢敓浜х骇浠ｇ爜锛?/span><span class="tag p">杩涢樁</span></div>
+<div class="b">
+<div class="desc">鍦ㄥ疄闄呴」鐩腑锛屼覆鍙ｆ帴鏀堕€氬父鏀惧湪鐙珛绾跨▼涓紝閬垮厤闃诲涓荤▼搴忋€備互涓嬫槸甯?strong>甯цВ鏋?/strong>鍜?strong>鑷姩閲嶈繛</strong>鐨勫畬鏁寸ず渚嬶細</div>
+<pre><code>import serial
+import threading
+import time
+import queue
+
+class SerialReader:
+    """涓插彛璇诲彇鍣細绾跨▼鍖栨帴鏀?甯цВ鏋?鏁版嵁闃熷垪"""
+    def __init__(self, port, baud=115200):
+        self.ser = serial.Serial(port, baud, timeout=0.5)
+        self.data_queue = queue.Queue()
+        self.running = True
+        self.buffer = b''
+        # 鍚姩鎺ユ敹绾跨▼
+        self.thread = threading.Thread(target=self._read_loop, daemon=True)
+        self.thread.start()
+
+    def _read_loop(self):
+        """鎺ユ敹绾跨▼锛氭寔缁鍙栦覆鍙ｆ暟鎹?""
+        while self.running:
+            try:
+                if self.ser.in_waiting:
+                    data = self.ser.read(self.ser.in_waiting)
+                    self.buffer += data
+                    # 鎸夋崲琛岀鍒嗗壊甯?
+                    while b'\\n' in self.buffer:
+                        line, self.buffer = self.buffer.split(b'\\n', 1)
+                        self.data_queue.put(line)
+            except serial.SerialException as e:
+                print(f"涓插彛寮傚父: {e}")
+                time.sleep(1)  # 绛夊緟閲嶈繛
+            except Exception as e:
+                print(f"鏈煡閿欒: {e}")
+                break
+
+    def get_data(self, timeout=1.0):
+        """浠庨槦鍒楄幏鍙栦竴甯ф暟鎹紙闈為樆濉烇級"""
+        try:
+            return self.data_queue.get(timeout=timeout)
+        except queue.Empty:
+            return None
+
+    def send(self, data):
+        """鍙戦€佹暟鎹?""
+        if isinstance(data, str):
+            data = data.encode('utf-8')
+        self.ser.write(data)
+
+    def close(self):
+        self.running = False
+        self.ser.close()
+
+# 浣跨敤绀轰緥
+# reader = SerialReader('COM3')
+# while True:
+#     frame = reader.get_data()
+#     if frame:
+#         print(f"鏀跺埌甯? {frame.decode('utf-8')}")</code></pre>
+</div></div>
+
+<div class="step"><b>鍏堢‘瀹欳OM鍙ｏ細</b>鎻掍笂USB杞琓TL鍚庤繍琛岋細</div>
+<pre><code># 鍒楀嚭鎵€鏈変覆鍙ｏ紙python鍛戒护鏍规嵁浣犵殑鐜閫夋嫨锛?
+python -m serial.tools.list_ports
+# 濡傛灉python鍛戒护涓嶅瓨鍦紝璇曡瘯锛歱ython3.14 -m serial.tools.list_ports
+# 濡傛灉python鍛戒护涓嶅瓨鍦紝璇曡瘯锛?
+python3.14 -m serial.tools.list_ports
+# 杈撳嚭锛欳OM3 - USB-SERIAL CH340 (COM3)
+# 璁颁綇杩欎釜COM鍙ｅ彿锛屼笅闈㈡墍鏈変覆鍙ｆ搷浣滈兘鐢ㄥ畠</code></pre>
+
+<h3>pyserial锛歅ython涓插彛宸ュ叿</h3>
+
+<div class="card">
+<div class="h"><span class="name">pyserial</span><span class="tag g">Python涓插彛搴?/span><span class="tag b">pip install pyserial</span></div>
+<div class="b">
+<div class="desc">Python涓插彛搴擄紝鍛戒护琛屽伐鍏穖initerm瓒呯骇濂界敤鈥斺€旀瘮PuTTY鏇寸伒娲伙紝鏀寔鍗佸叚杩涘埗鏄剧ず銆佹椂闂存埑銆佹棩蹇椾繚瀛樸€?/div>
+<pre><code># 鍒楀嚭鎵€鏈変覆鍙?
+python -m serial.tools.list_ports
+
+# 鎵撳紑涓插彛缁堢锛堟渶甯哥敤锛侊級
+python -m serial.tools.miniterm COM3 115200
+# 濡傛灉python鍛戒护涓嶅瓨鍦紝璇曡瘯锛歱ython3.14 -m serial.tools.miniterm COM3 115200
+
+# miniterm蹇嵎閿?
+# Ctrl+] 閫€鍑?   Ctrl+T 鑿滃崟    Ctrl+T Ctrl+H 鍗佸叚杩涘埗鏄剧ず
+# Ctrl+T Ctrl+T 鍙戦€佹崲琛?   Ctrl+T Ctrl+R 鏃堕棿鎴?/code></pre>
+</div></div>
+
+<div class="card">
+<div class="h"><span class="name">Python涓插彛缂栫▼</span><span class="tag b">鑴氭湰鍖栦覆鍙ｉ€氫俊</span></div>
 <div class="b">
 <pre><code>import serial
 import time
 
-# 打开串口
+# 鎵撳紑涓插彛
 ser = serial.Serial('COM3', 115200, timeout=1)
 
-# 发送数据
+# 鍙戦€佹暟鎹?
 ser.write(b'Hello STM32!\n')
 
-# 接收数据（按行读取）
+# 鎺ユ敹鏁版嵁锛堟寜琛岃鍙栵級
 line = ser.readline().decode('utf-8').strip()
 print(f"Received: {line}")
 
-# 接收指定字节数
-data = ser.read(10)  # 读10字节
+# 鎺ユ敹鎸囧畾瀛楄妭鏁?
+data = ser.read(10)  # 璇?0瀛楄妭
 print(f"Hex: {data.hex()}")
 
-# 关闭
+# 鍏抽棴
 ser.close()</code></pre>
 </div></div>
 
-<h3>PuTTY串口配置</h3>
+<h3>PuTTY涓插彛閰嶇疆</h3>
 
-<div class="step"><b>步骤1：</b>打开PuTTY → 选择"Serial"连接类型</div>
-<div class="step"><b>步骤2：</b>Serial line填 <code>COM3</code>，Speed填 <code>115200</code></div>
-<div class="step"><b>步骤3：</b>左侧菜单 → Connection → Serial → 确认 8 data bits, 1 stop bits, None parity</div>
-<div class="step"><b>步骤4：</b>点Open连接</div>
+<div class="step"><b>姝ラ1锛?/b>鎵撳紑PuTTY 鈫?閫夋嫨"Serial"杩炴帴绫诲瀷</div>
+<div class="step"><b>姝ラ2锛?/b>Serial line濉?<code>COM3</code>锛孲peed濉?<code>115200</code></div>
+<div class="step"><b>姝ラ3锛?/b>宸︿晶鑿滃崟 鈫?Connection 鈫?Serial 鈫?纭 8 data bits, 1 stop bits, None parity</div>
+<div class="step"><b>姝ラ4锛?/b>鐐筄pen杩炴帴</div>
 
-<div class="tip">💡 <b>小技巧：</b>PuTTY的串口窗口看不到输入的字符？正常——STM32通常只发不收。如果想看到本地回显：Terminal → Features → 勾选"Local echo"。</div>
+<div class="tip">馃挕 <b>灏忔妧宸э細</b>PuTTY鐨勪覆鍙ｇ獥鍙ｇ湅涓嶅埌杈撳叆鐨勫瓧绗︼紵姝ｅ父鈥斺€擲TM32閫氬父鍙彂涓嶆敹銆傚鏋滄兂鐪嬪埌鏈湴鍥炴樉锛歍erminal 鈫?Features 鈫?鍕鹃€?Local echo"銆?/div>
 
-<h3>USB转TTL驱动</h3>
+<h3>USB杞琓TL椹卞姩</h3>
 
 <table>
-<tr><th>芯片</th><th>驱动</th><th>识别方法</th></tr>
-<tr><td>CH340/CH341</td><td>www.wch.cn 下载CH340驱动</td><td>设备管理器→端口→"USB-SERIAL CH340"</td></tr>
-<tr><td>CP2102</td><td>silabs.com 下载CP210x驱动</td><td>"Silicon Labs CP210x"</td></tr>
-<tr><td>FT232</td><td>ftdichip.com 下载VCP驱动</td><td>"USB Serial Port"</td></tr>
-<tr><td>PL2303</td><td>Prolific官网</td><td>Win10自带驱动</td></tr>
+<tr><th>鑺墖</th><th>椹卞姩</th><th>璇嗗埆鏂规硶</th></tr>
+<tr><td>CH340/CH341</td><td>www.wch.cn 涓嬭浇CH340椹卞姩</td><td>璁惧绠＄悊鍣ㄢ啋绔彛鈫?USB-SERIAL CH340"</td></tr>
+<tr><td>CP2102</td><td>silabs.com 涓嬭浇CP210x椹卞姩</td><td>"Silicon Labs CP210x"</td></tr>
+<tr><td>FT232</td><td>ftdichip.com 涓嬭浇VCP椹卞姩</td><td>"USB Serial Port"</td></tr>
+<tr><td>PL2303</td><td>Prolific瀹樼綉</td><td>Win10鑷甫椹卞姩</td></tr>
 </table>
 
-<div class="trouble">🔍 <b>常见问题：设备管理器看不到COM口</b><br>
-1. 检查USB线是否插好（有的线只能充电不能传数据！）<br>
-2. 检查驱动是否安装（设备管理器里黄色感叹号=驱动未装）<br>
-3. CH340在Win10/11有时不需要额外驱动，直接识别<br>
-4. 查看COM口号：<code>python -m serial.tools.list_ports</code>（如果python命令不存在，试试python3.14）</div>
+<div class="card">
+<div class="h"><span class="name">涓插彛DMA鏀跺彂锛圫TM32杩涢樁锛?/span><span class="tag p">杩涢樁</span></div>
+<div class="b">
+<div class="desc">杞鏂瑰紡姣忔敹鍙戜竴涓瓧鑺傞兘瑕佸崰鐢–PU锛屽ぇ娴侀噺鏃禖PU鍏ㄥ繖鍦ㄤ覆鍙ｄ笂銆侱MA锛圖irect Memory Access锛夊彲浠ュ湪<strong>涓嶅崰鐢–PU</strong>鐨勬儏鍐典笅瀹屾垚鏁版嵁鎼繍锛孋PU鍙渶鍦ㄤ紶杈撳畬鎴愭椂澶勭悊涓€娆′腑鏂細</div>
+<pre><code>// STM32 HAL搴?DMA涓插彛鍙戦€侊紙涓嶉樆濉濩PU锛?
+// 鍓嶆彁锛欳ubeMX宸插惎鐢║SART1_TX鐨凞MA閫氶亾
+// 鐗圭偣锛氳皟鐢ㄥ悗绔嬪嵆杩斿洖锛孋PU鍙仛鍏朵粬浜?
+
+uint8_t tx_buf[256];
+
+// 鍙戦€佹暟鎹紙DMA鑷姩瀹屾垚锛屽嚱鏁扮珛鍗宠繑鍥烇級
+sprintf((char*)tx_buf, "Temp: %.1f\\r\\n", temperature);
+HAL_UART_Transmit_DMA(&huart1, tx_buf, strlen((char*)tx_buf));
+// CPU涓嶉渶瑕佺瓑寰咃紒鍙互绔嬪嵆鎵ц鍏朵粬浠ｇ爜
+
+// DMA鍙戦€佸畬鎴愬洖璋?
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart->Instance == USART1) {
+        // 鍙戦€佸畬鎴愶紝鍙互鍑嗗涓嬩竴娆″彂閫?
+        tx_ready = 1;
+    }
+}
+
+// DMA寰幆鎺ユ敹锛堢┖闂蹭腑鏂細妫€娴嬪抚闂撮殧锛?
+// 缁撳悎DMA+UART_IDLE涓柇锛屽疄鐜颁笉瀹氶暱鏁版嵁鎺ユ敹
+uint8_t rx_dma_buf[256];
+
+// 鍒濆鍖栵細鍚姩DMA鎺ユ敹锛堝湪main鍒濆鍖栦腑璋冪敤涓€娆★級
+HAL_UART_Receive_DMA(&huart1, rx_dma_buf, sizeof(rx_dma_buf));
+
+// UART绌洪棽涓柇鍥炶皟锛堜竴甯ф帴鏀跺畬鎴愶級
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
+    if (huart->Instance == USART1) {
+        // Size = 鏈抚瀹為檯鎺ユ敹鐨勫瓧鑺傛暟
+        printf("鏀跺埌 %d 瀛楄妭: ", Size);
+        for (int i = 0; i < Size; i++) {
+            printf("%02X ", rx_dma_buf[i]);
+        }
+        printf("\\r\\n");
+        // 閲嶆柊鍚姩DMA鎺ユ敹锛堥噸瑕侊紒鍚﹀垯涓嬫鏀朵笉鍒帮級
+        HAL_UART_Receive_DMA(&huart1, rx_dma_buf, sizeof(rx_dma_buf));
+    }
+}</code></pre>
+<div class="note">鈿狅笍 <b>DMA娉ㄦ剰浜嬮」锛?/b>DMA缂撳啿鍖哄繀椤绘槸<strong>鍏ㄥ眬鍙橀噺鎴栭潤鎬佸彉閲?/strong>锛堜笉鑳芥槸鏍堜笂鐨勫眬閮ㄥ彉閲忥級銆侱MA鍦ㄥ悗鍙板紓姝ュ伐浣滐紝濡傛灉缂撳啿鍖鸿閲婃斁浜嗭紝DMA浼氬啓鍏ラ噹鎸囬拡瀵艰嚧HardFault銆?/div>
+</div></div>
+
+<h3>瀹炴垬缁冧範</h3>
+
+<div class="tip">馃挕 <b>缁冧範1锛氫覆鍙ｅ洖鏄撅紙Echo锛?/b><br>
+鐩爣锛氬崟鐗囨満鏀跺埌浠€涔堝氨鍙戝洖浠€涔?br>
+瑕佹眰锛?br>
+鈶?鐢⊿TM32瀹炵幇涓插彛鎺ユ敹涓柇锛屾敹鍒颁竴涓瓧鑺傜珛鍗冲彂鍥?br>
+鈶?鐢≒ython鍐欐祴璇曡剼鏈紝鍙?Hello STM32!"锛岄獙璇佸洖鏄炬纭?br>
+鈶?杩涢樁锛氭敮鎸佷笉瀹氶暱鏁版嵁锛屾敹鍒癨\n鎵嶅洖鏄炬暣琛?br>
+鎻愮ず锛歅ython鍙互鐢?<code>ser.write(b'test\\n'); print(ser.readline())</code> 娴嬭瘯</div>
+
+<div class="tip">馃挕 <b>缁冧範2锛氭俯搴︽暟鎹噰闆嗙郴缁?/b><br>
+鐩爣锛氬崟鐗囨満姣忕閲囬泦娓╁害锛岄€氳繃涓插彛鍙戦€佺粰鐢佃剳锛孭ython绔В鏋愬苟缁樺浘<br>
+瑕佹眰锛?br>
+鈶?STM32绔細鐢ˋDC璇诲彇娓╁害浼犳劅鍣紝姣忕閫氳繃涓插彛鍙戦€?TEMP:25.3\\n"鏍煎紡鐨勬暟鎹?br>
+鈶?Python绔細鐢ㄧ嚎绋嬭鍙栦覆鍙ｏ紝瑙ｆ瀽娓╁害鍊硷紝鐢╩atplotlib瀹炴椂缁樺浘<br>
+鈶?淇濆瓨鏁版嵁鍒癈SV鏂囦欢<br>
+鈶?杩涢樁锛氭坊鍔犲懡浠ゆ帶鍒垛€斺€擯ython鍙?START"寮€濮嬮噰闆嗭紝"STOP"鍋滄<br>
+鎻愮ず锛歅ython绔敤 <code>ser.write(b'START\\n')</code> 鍙戦€佸懡浠?/div>
+
+<div class="tip">馃挕 <b>缁冧範3锛氫覆鍙ｅ崗璁垎鏋愬櫒</b><br>
+鐩爣锛氱敤Python鍐欎竴涓€氱敤涓插彛鍗忚鍒嗘瀽宸ュ叿<br>
+瑕佹眰锛?br>
+鈶?鍛戒护琛屽弬鏁版寚瀹欳OM鍙ｃ€佹尝鐗圭巼<br>
+鈶?瀹炴椂鏄剧ず鏀跺埌鐨勬暟鎹紙鍗佸叚杩涘埗+ASCII瀵圭収锛?br>
+鈶?鑷姩璇嗗埆甯уご0xAA 0x55锛岄珮浜樉绀哄畬鏁村抚<br>
+鈶?缁熻姣忕鏁版嵁閲忓拰璇爜鐜?br>
+鎻愮ず锛氬弬鑰僲initerm鐨勫崄鍏繘鍒舵樉绀烘ā寮忥紙Ctrl+T Ctrl+H锛?/div>
+
+<h3>RS-485锛氫覆鍙ｇ殑宸ヤ笟澧炲己鐗?/h3>
+
+<div class="card">
+<div class="h"><span class="name">RS-232 vs RS-485 vs TTL</span><span class="tag b">杩涢樁</span></div>
+<div class="b">
+<div class="desc">鏃ュ父璇寸殑"涓插彛"閫氬父鎸嘥TL鐢靛钩鐨刄ART銆備絾鍦ㄥ伐涓氶鍩燂紝RS-232鍜孯S-485鏇翠负甯歌銆傚畠浠娇鐢ㄧ浉鍚岀殑鍗忚锛圲ART锛夛紝浣?strong>鐢垫皵鐗规€т笉鍚?/strong>锛?/div>
+<table>
+<tr><th>鐗规€?/th><th>TTL UART</th><th>RS-232</th><th>RS-485</th></tr>
+<tr><td>鐢靛钩鏍囧噯</td><td>0V/3.3V鎴?V</td><td>卤3V~卤15V</td><td>宸垎淇″彿</td></tr>
+<tr><td>閫氫俊妯″紡</td><td>鍏ㄥ弻宸?/td><td>鍏ㄥ弻宸?/td><td>鍗婂弻宸ワ紙涓ょ嚎锛?鍏ㄥ弻宸ワ紙鍥涚嚎锛?/td></tr>
+<tr><td>鏈€澶ц窛绂?/td><td>~1m</td><td>~15m</td><td>~1200m</td></tr>
+<tr><td>鑺傜偣鏁?/td><td>1瀵?</td><td>1瀵?</td><td>鏈€澶?56涓妭鐐?/td></tr>
+<tr><td>鎶楀共鎵?/td><td>寮?/td><td>涓?/td><td>鏋佸己锛堝樊鍒嗕俊鍙凤級</td></tr>
+<tr><td>鍏稿瀷鑺墖</td><td>CH340/CP2102</td><td>MAX232</td><td>MAX485/SP3485</td></tr>
+<tr><td>鎴愭湰</td><td>楼1-5</td><td>楼2-5</td><td>楼3-8</td></tr>
+</table>
+<div class="tip">馃挕 <b>瀹為檯搴旂敤锛?/b>Modbus-RTU鍗忚搴曞眰閫氬父璧癛S-485銆傚鏋滀綘鍋氬伐涓氭帶鍒躲€佺數琛ㄨ鍙栥€丳LC閫氫俊锛岃繜鏃╄鐢≧S-485銆傜‖浠朵笂鍙渶鍦═TL涓插彛鍚庡姞涓€涓狹AX485鑺墖锛岃蒋浠跺崗璁笉鍙樸€?/div>
+</div></div>
+
+<div class="trouble">馃攳 <b>甯歌闂锛氫覆鍙ｆ敹鍒颁贡鐮?/b><br>
+1. <b>娉㈢壒鐜囦笉鍖归厤锛堟渶甯歌锛侊級</b>鈥斺€旀鏌ュ崟鐗囨満浠ｇ爜鍜屼覆鍙ｅ伐鍏锋槸鍚︿竴鑷?br>
+2. <b>鏃堕挓閰嶇疆閿欒</b>鈥斺€擲TM32鐢℉SE(8MHz)杩樻槸HSI(8MHz)锛烪SE娌¤捣鎸細瀵艰嚧娉㈢壒鐜囧亸<br>
+3. <b>鏁版嵁浣?鍋滄浣?鏍￠獙浣嶄笉涓€鑷?/b>鈥斺€旂粺涓€鐢?N1<br>
+4. <b>鐢靛钩涓嶅尮閰?/b>鈥斺€擲TM32鏄?.3V锛孉rduino UNO鏄?V锛岀洿鎺ヨ繛鍙兘鐑O锛佸姞鐢靛钩杞崲<br>
+5. <b>GND娌℃帴锛?/b>鈥斺€斾覆鍙ｉ€氫俊鑷冲皯闇€瑕?鏍圭嚎锛歍X銆丷X銆丟ND銆傚緢澶氫汉蹇樹簡鎺ND</div>
+
+<div class="trouble">馃攳 <b>甯歌闂锛氳澶囩鐞嗗櫒鐪嬩笉鍒癈OM鍙?/b><br>
+1. 妫€鏌SB绾挎槸鍚︽彃濂斤紙鏈夌殑绾垮彧鑳藉厖鐢典笉鑳戒紶鏁版嵁锛侊級<br>
+2. 妫€鏌ラ┍鍔ㄦ槸鍚﹀畨瑁咃紙璁惧绠＄悊鍣ㄩ噷榛勮壊鎰熷徆鍙?椹卞姩鏈锛?br>
+3. CH340鍦╓in10/11鏈夋椂涓嶉渶瑕侀澶栭┍鍔紝鐩存帴璇嗗埆<br>
+4. 鏌ョ湅COM鍙ｅ彿锛?code>python -m serial.tools.list_ports</code>锛堝鏋減ython鍛戒护涓嶅瓨鍦紝璇曡瘯python3.14锛?/div>
 
 <div class="example-block">
-<div class="ex-title">📝 完整示例：Python串口通信</div>
-<div class="ex-input">安装并检测串口：</div>
+<div class="ex-title">馃摑 瀹屾暣绀轰緥锛歅ython涓插彛閫氫俊</div>
+<div class="ex-input">瀹夎骞舵娴嬩覆鍙ｏ細</div>
 <pre><code>pip install pyserial
 python -m serial.tools.list_ports
-# 如果python命令不存在，试试：python3.14 -m serial.tools.list_ports</code></pre>
-<div class="ex-output">输出结果：</div>
+# 濡傛灉python鍛戒护涓嶅瓨鍦紝璇曡瘯锛歱ython3.14 -m serial.tools.list_ports</code></pre>
+<div class="ex-output">杈撳嚭缁撴灉锛?/div>
 <pre><code>COM3 - USB-SERIAL CH340 (COM3)
 1 port found</code></pre>
-<div class="ex-input">打开串口终端（STM32已运行，每秒发送温度数据）：</div>
+<div class="ex-input">鎵撳紑涓插彛缁堢锛圫TM32宸茶繍琛岋紝姣忕鍙戦€佹俯搴︽暟鎹級锛?/div>
 <pre><code>python -m serial.tools.miniterm COM3 115200
-# 如果python命令不存在：python3.14 -m serial.tools.miniterm COM3 115200</code></pre>
-<div class="ex-output">串口输出：</div>
+# 濡傛灉python鍛戒护涓嶅瓨鍦細python3.14 -m serial.tools.miniterm COM3 115200</code></pre>
+<div class="ex-output">涓插彛杈撳嚭锛?/div>
 <pre><code>--- Miniterm on COM3  115200,8,N,1 ---
 --- Quit: Ctrl+] | Menu: Ctrl+T ---
 [1234] Temperature: 25.3 C
@@ -174,14 +430,42 @@ python -m serial.tools.list_ports
 ^C--- exit ---</pre>
 </div>
 
-<!-- ====== 第5章 ====== -->
+<div class="summary" style="margin-top:24px">
+<b>馃摎 绗?绔犵煡璇嗙偣鍥為【</b><br><br>
+<b>鉁?涓插彛閫氫俊鍩虹锛?/b><br>
+鈥?UART = 閫氱敤寮傛鏀跺彂鍣紝<strong>寮傛</strong>鎰忓懗鐫€娌℃湁鏃堕挓绾匡紝闈犳尝鐗圭巼鍚屾<br>
+鈥?鏈€甯哥敤閰嶇疆锛?strong>115200 8N1</strong>锛?15200娉㈢壒鐜?8鏁版嵁浣?鏃犳牎楠?1鍋滄浣嶏級<br>
+鈥?鏁版嵁甯х粨鏋勶細璧峰浣嶁啋鏁版嵁浣?LSB鍏?鈫?鍙€?鏍￠獙浣嶁啋鍋滄浣?br>
+鈥?鍙屾柟娉㈢壒鐜囪宸繀椤?< 2%锛屽惁鍒欏叏鏄贡鐮?br><br>
+<b>鉁?瀹炵敤宸ュ叿锛?/b><br>
+鈥?<strong>pyserial</strong>锛歅ython涓插彛搴擄紝<code>miniterm</code> 鏄渶甯哥敤鐨勪覆鍙ｇ粓绔?br>
+鈥?<strong>PuTTY</strong>锛歐indows閫氱敤涓插彛宸ュ叿锛屾敞鎰忓嬀閫塋ocal echo鎵嶈兘鐪嬪埌杈撳叆<br>
+鈥?<strong>USB杞琓TL鑺墖</strong>锛欳H340(鏈€渚垮疁)/CP2102(绋冲畾)/FT232(鏈€璐垫渶绋?<br><br>
+<b>鉁?缂栫▼瑕佺偣锛?/b><br>
+鈥?Python锛?code>serial.Serial()</code> 鎵撳紑涓插彛 鈫?<code>readline()</code> 鎸夎璇?鈫?<code>write()</code> 鍙戦€?br>
+鈥?鐢熶骇绾т唬鐮侊細鎺ユ敹鏀惧湪<strong>鐙珛绾跨▼</strong>涓紝鐢?strong>闃熷垪</strong>浼犻€掓暟鎹?br>
+鈥?澶氬瓧鑺傛暟鎹渶瑕佽璁?strong>甯ф牸寮?/strong>锛堝抚澶?闀垮害+鏁版嵁+鏍￠獙锛?br>
+鈥?STM32杩涢樁锛氱敤<strong>DMA+绌洪棽涓柇</strong>瀹炵幇闆禖PU寮€閿€鐨勪笉瀹氶暱鎺ユ敹<br><br>
+<b>鉁?宸ヤ笟搴旂敤锛?/b><br>
+鈥?RS-485閫傜敤浜庨暱璺濈锛?200m锛?澶氳妭鐐癸紙256涓級宸ヤ笟鍦烘櫙<br>
+鈥?Modbus-RTU鍗忚搴曞眰閫氬父璧癛S-485<br>
+鈥?TTL涓嶳S-232/485鐢靛钩涓嶅吋瀹癸紝闇€瑕佺數骞宠浆鎹㈣姱鐗?br><br>
+<b>鈿狅笍 甯歌闄烽槺锛?/b><br>
+鈥?蹇樿鎺ND绾匡紙TX+RX+GND涓夋牴绾跨己涓€涓嶅彲锛?br>
+鈥?3.3V MCU鐩磋繛5V璁惧锛岀儳IO鍙?br>
+鈥?娉㈢壒鐜囦笉鍖归厤锛堟渶鏈€甯歌鐨勯棶棰橈級<br>
+鈥?鏃堕挓婧愰厤缃敊璇鑷存尝鐗圭巼鍋忓樊<br>
+鈥?鍙戦€佺紦鍐插尯婧㈠嚭锛堝彂閫佸お蹇紝鏉ヤ笉鍙婂彂锛?
+</div>
+
+<!-- ====== 绗?绔?====== -->
 <a id="ch5"></a>
-<div class="summary">📖 <b>第5章学完你能干啥：</b>会用OpenOCD/ST-Link烧录程序，会用GDB调试（断点/单步/查看变量），能配置VS Code Cortex-Debug。</div>
+<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>浼氱敤OpenOCD/ST-Link鐑у綍绋嬪簭锛屼細鐢℅DB璋冭瘯锛堟柇鐐?鍗曟/鏌ョ湅鍙橀噺锛夛紝鑳介厤缃甐S Code Cortex-Debug銆?/div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch03')">← 第3章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
-<a onclick="window.parent.loadPage('guide-ch05')">第5章 →</a>
+<a onclick="window.parent.loadPage('guide-ch03')">鈫?绗?绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
+<a onclick="window.parent.loadPage('guide-ch05')">绗?绔?鈫?/a>
 </div>
 
 <script>
@@ -200,9 +484,9 @@ document.querySelectorAll('pre').forEach(pre => {
 });
 </script>
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch03')">◀ 上一章：Makefile</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
-  <a onclick="window.parent.loadPage('guide-ch05')">烧录调试 ：下一章 ▶</a>
+  <a onclick="window.parent.loadPage('guide-ch03')">鈼€ 涓婁竴绔狅細Makefile</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
+  <a onclick="window.parent.loadPage('guide-ch05')">鐑у綍璋冭瘯 锛氫笅涓€绔?鈻?/a>
 </div>
 </body>
 </html>
