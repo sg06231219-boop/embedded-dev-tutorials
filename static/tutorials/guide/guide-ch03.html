@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第3章：Makefile实战 - 嵌入式小白完全指南</title>
+<title>绗?绔狅細Makefile瀹炴垬 - 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,45 +57,44 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>第3章：Makefile实战</h1>
-<div class="summary"><b>📖 小白完全指南 · 3/14</b> | 阅读时间约3分钟</div>
+<h1>绗?绔狅細Makefile瀹炴垬</h1>
+<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 3/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
 
-<p>Makefile是嵌入式项目最经典的构建方式——虽然CMake更现代，但大量开源项目仍在用Makefile，<strong>必须会读会写</strong>。</p>
+<p>Makefile鏄祵鍏ュ紡椤圭洰鏈€缁忓吀鐨勬瀯寤烘柟寮忊€斺€旇櫧鐒禖Make鏇寸幇浠ｏ紝浣嗗ぇ閲忓紑婧愰」鐩粛鍦ㄧ敤Makefile锛?strong>蹇呴』浼氳浼氬啓</strong>銆?/p>
 
-<div class="analogy">💡 <b>类比：</b>Makefile就像<strong>菜谱</strong>——target=菜名（"红烧肉"），prerequisites=食材（五花肉、酱油），recipe=做法（切肉→焯水→炖煮）。make就是你雇的厨师，按菜谱一步步做。</div>
+<div class="analogy">馃挕 <b>绫绘瘮锛?/b>Makefile灏卞儚<strong>鑿滆氨</strong>鈥斺€攖arget=鑿滃悕锛?绾㈢儳鑲?锛夛紝prerequisites=椋熸潗锛堜簲鑺辫倝銆侀叡娌癸級锛宺ecipe=鍋氭硶锛堝垏鑲夆啋鐒按鈫掔倴鐓級銆俶ake灏辨槸浣犻泧鐨勫帹甯堬紝鎸夎彍璋变竴姝ユ鍋氥€?/div>
 
-<h3>Makefile基本规则</h3>
+<h3>Makefile鍩烘湰瑙勫垯</h3>
 
-<pre><code># 格式（recipe必须用TAB缩进！）
+<pre><code># 鏍煎紡锛坮ecipe蹇呴』鐢═AB缂╄繘锛侊級
 target: prerequisites
 	recipe
 
-# 例子
+# 渚嬪瓙
 main.o: main.c main.h
 	arm-none-eabi-gcc -c -mcpu=cortex-m3 -mthumb main.c -o main.o</code></pre>
 
-<h3>变量与自动变量</h3>
+<h3>鍙橀噺涓庤嚜鍔ㄥ彉閲?/h3>
 
 <pre><code>CC = arm-none-eabi-gcc
 CFLAGS = -mcpu=cortex-m3 -mthumb -Wall -O2 -g
 TARGET = myproject
 
-# 自动变量
-# $@ = 目标名    $&lt; = 第一个依赖    $^ = 所有依赖
-main.o: main.c main.h
+# 鑷姩鍙橀噺
+# $@ = 鐩爣鍚?   $&lt; = 绗竴涓緷璧?   $^ = 鎵€鏈変緷璧?main.o: main.c main.h
 	$(CC) $(CFLAGS) -c $&lt; -o $@</code></pre>
 
-<h3>模式规则</h3>
+<h3>妯″紡瑙勫垯</h3>
 
-<pre><code># 通用规则：所有.c → .o
+<pre><code># 閫氱敤瑙勫垯锛氭墍鏈?c 鈫?.o
 %.o: %.c
 	$(CC) $(CFLAGS) -c $&lt; -o $@
 
-# 链接：所有.o → .elf
+# 閾炬帴锛氭墍鏈?o 鈫?.elf
 $(TARGET).elf: $(OBJS)
 	$(CC) $(LDFLAGS) $^ -o $@</code></pre>
 
-<h3>完整STM32 Makefile模板</h3>
+<h3>瀹屾暣STM32 Makefile妯℃澘</h3>
 
 <pre><code># ====== STM32F103 Makefile ======
 CC = arm-none-eabi-gcc
@@ -137,40 +136,39 @@ $(TARGET).hex: $(TARGET).elf
 
 clean:
 	powershell -Command "Remove-Item src/*.o $(TARGET).elf $(TARGET).bin $(TARGET).hex $(TARGET).map -ErrorAction SilentlyContinue"
-# 注：嵌入式Makefile通常在Windows PowerShell环境运行
-# 如果你在Linux/WSL下，改用：
-# 	rm -f $(OBJS) $(TARGET).elf $(TARGET).bin $(TARGET).hex $(TARGET).map
+# 娉細宓屽叆寮廙akefile閫氬父鍦╓indows PowerShell鐜杩愯
+# 濡傛灉浣犲湪Linux/WSL涓嬶紝鏀圭敤锛?# 	rm -f $(OBJS) $(TARGET).elf $(TARGET).bin $(TARGET).hex $(TARGET).map
 
 flash: $(TARGET).bin
 	st-flash write $(TARGET).bin 0x08000000</code></pre>
 
-<div class="note">⚠️ <b>重要：</b>Makefile中recipe行<strong>必须用TAB缩进</strong>，不能用空格！这是最常见的坑。复制粘贴后如果报"missing separator"，把空格替换成TAB。</div>
+<div class="note">鈿狅笍 <b>閲嶈锛?/b>Makefile涓璻ecipe琛?strong>蹇呴』鐢═AB缂╄繘</strong>锛屼笉鑳界敤绌烘牸锛佽繖鏄渶甯歌鐨勫潙銆傚鍒剁矘璐村悗濡傛灉鎶?missing separator"锛屾妸绌烘牸鏇挎崲鎴怲AB銆?/div>
 
-<div class="trouble">🔍 <b>常见问题：make报"missing separator"</b><br>
-recipe行用了空格而非TAB。解决：VS Code中打开Makefile，确保右下角显示"Tabs"而非"Spaces"。</div>
+<div class="trouble">馃攳 <b>甯歌闂锛歮ake鎶?missing separator"</b><br>
+recipe琛岀敤浜嗙┖鏍艰€岄潪TAB銆傝В鍐筹細VS Code涓墦寮€Makefile锛岀‘淇濆彸涓嬭鏄剧ず"Tabs"鑰岄潪"Spaces"銆?/div>
 
-<div class="tip">💡 <b>小技巧：</b><br>
-• <code>make -n</code> 干跑（只打印不执行）<br>
-• <code>make -j4</code> 4线程并行编译<br>
-• <code>make -B</code> 强制重新编译全部<br>
-• <code>make V=1</code> 显示完整编译命令</div>
+<div class="tip">馃挕 <b>灏忔妧宸э細</b><br>
+鈥?<code>make -n</code> 骞茶窇锛堝彧鎵撳嵃涓嶆墽琛岋級<br>
+鈥?<code>make -j4</code> 4绾跨▼骞惰缂栬瘧<br>
+鈥?<code>make -B</code> 寮哄埗閲嶆柊缂栬瘧鍏ㄩ儴<br>
+鈥?<code>make V=1</code> 鏄剧ず瀹屾暣缂栬瘧鍛戒护</div>
 
 <div class="example-block">
-<div class="ex-title">📝 完整示例：用Makefile构建STM32项目</div>
-<div class="ex-input">项目目录：</div>
+<div class="ex-title">馃摑 瀹屾暣绀轰緥锛氱敤Makefile鏋勫缓STM32椤圭洰</div>
+<div class="ex-input">椤圭洰鐩綍锛?/div>
 <pre><code>stm32-blink/
-├── Makefile
-├── STM32F103C8Tx.ld
-├── inc/
-│   └── main.h
-└── src/
-    ├── main.c
-    ├── stm32f1xx_it.c
-    └── system_stm32f1xx.c</code></pre>
-<div class="ex-input">运行命令：</div>
+鈹溾攢鈹€ Makefile
+鈹溾攢鈹€ STM32F103C8Tx.ld
+鈹溾攢鈹€ inc/
+鈹?  鈹斺攢鈹€ main.h
+鈹斺攢鈹€ src/
+    鈹溾攢鈹€ main.c
+    鈹溾攢鈹€ stm32f1xx_it.c
+    鈹斺攢鈹€ system_stm32f1xx.c</code></pre>
+<div class="ex-input">杩愯鍛戒护锛?/div>
 <pre><code>cd stm32-blink
 make clean &amp;&amp; make -j4</code></pre>
-<div class="ex-output">输出结果：</div>
+<div class="ex-output">杈撳嚭缁撴灉锛?/div>
 <pre><code>arm-none-eabi-gcc -c -mcpu=cortex-m3 -mthumb -Wall -O2 -g3 ... -o src/main.o
 arm-none-eabi-gcc -c -mcpu=cortex-m3 -mthumb -Wall -O2 -g3 ... -o src/stm32f1xx_it.o
 arm-none-eabi-gcc -c -mcpu=cortex-m3 -mthumb -Wall -O2 -g3 ... -o src/system_stm32f1xx.o
@@ -183,14 +181,14 @@ arm-none-eabi-objcopy -O ihex blink.elf blink.hex
 Build complete!</pre>
 </div>
 
-<!-- ====== 第4章 ====== -->
+<!-- ====== 绗?绔?====== -->
 <a id="ch4"></a>
-<div class="summary">📖 <b>第4章学完你能干啥：</b>理解串口通信原理，会配置波特率/数据位，能用pyserial和PuTTY收发串口数据，知道USB转TTL驱动怎么装。</div>
+<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>鐞嗚В涓插彛閫氫俊鍘熺悊锛屼細閰嶇疆娉㈢壒鐜?鏁版嵁浣嶏紝鑳界敤pyserial鍜孭uTTY鏀跺彂涓插彛鏁版嵁锛岀煡閬揢SB杞琓TL椹卞姩鎬庝箞瑁呫€?/div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch02')">← 第2章</a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
-<a onclick="window.parent.loadPage('guide-ch04')">第4章 →</a>
+<a onclick="window.parent.loadPage('guide-ch02')">鈫?绗?绔?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
+<a onclick="window.parent.loadPage('guide-ch04')">绗?绔?鈫?/a>
 </div>
 
 <script>
@@ -208,10 +206,123 @@ document.querySelectorAll('pre').forEach(pre => {
   pre.appendChild(btn);
 });
 </script>
+
+<h2>馃敡 鑷姩鍙橀噺璇﹁В</h2>
+
+<p>Makefile鏈€寮哄ぇ鐨勭壒鎬т箣涓€鏄嚜鍔ㄥ彉閲忊€斺€斿畠浠湪瑙勫垯鎵ц鏃惰嚜鍔ㄦ浛鎹紝璁╀綘鍐欏嚭绠€娲併€佸彲缁存姢鐨勬瀯寤虹郴缁熴€?/p>
+
+<table>
+<tr><th>鍙橀噺</th><th>鍚箟</th><th>绀轰緥</th></tr>
+<tr><td><code>$@</code></td><td>鐩爣鏂囦欢鍚?/td><td>瑙勫垯 <code>main.o: main.c</code> 涓?@ = "main.o"</td></tr>
+<tr><td><code>$&lt;</code></td><td>绗竴涓緷璧栨枃浠跺悕</td><td>瑙勫垯涓?&lt; = "main.c"</td></tr>
+<tr><td><code>$^</code></td><td>鎵€鏈変緷璧栨枃浠讹紙鍘婚噸锛?/td><td>瑙勫垯 <code>app: a.o b.o</code> 涓?^ = "a.o b.o"</td></tr>
+<tr><td><code>$+</code></td><td>鎵€鏈変緷璧栨枃浠讹紙淇濈暀閲嶅锛?/td><td>涓?^绫讳技浣嗕笉鍘婚噸</td></tr>
+<tr><td><code>$?</code></td><td>姣旂洰鏍囨洿鏂扮殑渚濊禆</td><td>澧為噺缂栬瘧鏍稿績鍙橀噺</td></tr>
+<tr><td><code>$*</code></td><td>妯″紡鍖归厤鐨剆tem閮ㄥ垎</td><td>妯″紡 <code>%.o: %.c</code> 鍖归厤main.o鏃?* = "main"</td></tr>
+<tr><td><code>$(@D)</code></td><td>鐩爣鏂囦欢鐨勭洰褰曢儴鍒?/td><td>鐩爣 "obj/main.o" 涓?(@D) = "obj"</td></tr>
+<tr><td><code>$(@F)</code></td><td>鐩爣鏂囦欢鐨勬枃浠跺悕閮ㄥ垎</td><td>鐩爣 "obj/main.o" 涓?(@F) = "main.o"</td></tr>
+</table>
+
+<pre><code># 妯″紡瑙勫垯瀹炴垬锛氫竴鏉¤鍒欑紪璇戞墍鏈?c鏂囦欢
+# %.o: %.c  鈫?鍖归厤浠绘剰.c鏂囦欢鐢熸垚瀵瑰簲鐨?o鏂囦欢
+
+OBJ_DIR = build
+SRCS = $(wildcard src/*.c)
+OBJS = $(patsubst src/%.c,$(OBJ_DIR)/%.o,$(SRCS))
+
+# 鑷姩鍙橀噺瀵规瘮
+$(OBJ_DIR)/%.o: src/%.c
+	@echo "缂栬瘧: $< 鈫?$@"           # $< = src/main.c, $@ = build/main.o
+	arm-none-eabi-gcc -c $< -o $@
+
+# 閾炬帴姝ラ
+$(OBJ_DIR)/app.elf: $(OBJS)
+	@echo "閾炬帴 $^"                  # $^ = 鎵€鏈?o鏂囦欢
+	arm-none-eabi-gcc $^ -o $@</code></pre>
+
+<div class="tip">馃挕 <b>璁板繂鍙ｈ瘈锛?/b>$@ = 鐩爣(At)锛?&lt; = 绗竴涓緷璧?&lt;琛ㄧず杈撳叆)锛?^ = 鎵€鏈?^鍍忓眿椤剁洊浣忓叏閮?</div>
+
+<h2>馃搨 鍑芥暟涓庢枃鏈鐞?/h2>
+
+<p>Makefile鍐呯疆浜嗗ぇ閲忓嚱鏁帮紝璁╀綘鍍忓啓鑴氭湰涓€鏍峰鐞嗘枃浠跺悕銆佸瓧绗︿覆鍜屾潯浠跺垽鏂€?/p>
+
+<h3>甯哥敤鍑芥暟閫熸煡</h3>
+
+<table>
+<tr><th>鍑芥暟</th><th>鍔熻兘</th><th>绀轰緥</th></tr>
+<tr><td><code>$(wildcard pattern)</code></td><td>閫氶厤绗﹀尮閰嶆枃浠?/td><td><code>$(wildcard src/*.c)</code></td></tr>
+<tr><td><code>$(patsubst pat,rep,text)</code></td><td>妯″紡鏇挎崲</td><td><code>$(patsubst %.c,%.o,$(SRCS))</code></td></tr>
+<tr><td><code>$(notdir names)</code></td><td>鍘绘帀璺緞锛屽彧鐣欐枃浠跺悕</td><td><code>$(notdir src/main.c)</code> 鈫?main.c</td></tr>
+<tr><td><code>$(dir names)</code></td><td>鍙彇鐩綍閮ㄥ垎</td><td><code>$(dir src/main.c)</code> 鈫?src/</td></tr>
+<tr><td><code>$(addprefix pre,names)</code></td><td>鍔犲墠缂€</td><td><code>$(addprefix build/,$(OBJS))</code></td></tr>
+<tr><td><code>$(addsuffix suf,names)</code></td><td>鍔犲悗缂€</td><td><code>$(addsuffix .o,$(MODULES))</code></td></tr>
+<tr><td><code>$(shell cmd)</code></td><td>鎵цshell鍛戒护</td><td><code>GIT_HASH := $(shell git rev-parse --short HEAD)</code></td></tr>
+<tr><td><code>$(foreach var,list,text)</code></td><td>寰幆澶勭悊</td><td><code>$(foreach d,$(DIRS),build/$(d))</code></td></tr>
+<tr><td><code>$(if condition,then,else)</code></td><td>鏉′欢鍒ゆ柇</td><td><code>$(if $(DEBUG),-g,-O2)</code></td></tr>
+<tr><td><code>$(call macro,arg1,arg2)</code></td><td>璋冪敤鑷畾涔夊畯</td><td>瑙佷笅鏂圭ず渚?/td></tr>
+</table>
+
+<pre><code># 鑷畾涔夊畯锛圡akefile鐨?鍑芥暟"锛?# 瀹氫箟锛氱敓鎴愮紪璇戝懡浠ょ殑瀹?define compile_rule
+$(1)/%.o: $(2)/%.c
+	@echo "[CC] $$<"
+	arm-none-eabi-gcc -c $$< -o $$@ $(CFLAGS)
+endef
+
+# 璋冪敤锛氫负婧愮洰褰曞拰鐩爣鐩綍鐢熸垚瑙勫垯
+$(eval $(call compile_rule,build,src))
+
+# 鎵归噺鐢熸垚鐩綍
+DIRS = src/main src/driver src/hal
+BUILD_DIRS = $(addprefix build/,$(DIRS))
+$(BUILD_DIRS):
+	mkdir -p $@</code></pre>
+
+<h2>馃悰 Makefile鎺掗敊瀹炴垬</h2>
+
+<div class="trouble">馃攳 <b>閿欒锛歁akefile:2: *** missing separator. Stop.</b><br>
+鏈€甯歌鐨凪akefile閿欒锛佽鍒欎笅鐨勫懡浠よ蹇呴』鐢?b>TAB閿?/b>锛堜笉鏄┖鏍硷級寮€澶淬€傛鏌ヤ綘鐨勭紪杈戝櫒鏄惁鎶奣AB鑷姩杞崲鎴愪簡绌烘牸銆?br>
+<pre><code># 姝ｇ‘ 鉁?(鍓嶉潰鏄疶AB)
+target:
+&#9;command
+
+# 閿欒 鉁?(鍓嶉潰鏄┖鏍?
+target:
+    command</code></pre>
+<b>瑙ｅ喅锛?/b>鍦╒S Code涓寜 <code>Ctrl+Shift+P</code> 鈫?"Convert Indentation to Tabs"</div>
+
+<div class="trouble">馃攳 <b>閿欒锛歂o rule to make target 'xxx.o'</b><br>
+Make鎵句笉鍒板浣曠敓鎴恱xx.o鐨勮鍒欍€傚彲鑳藉師鍥狅細鈶?c鏂囦欢涓嶅瓨鍦ㄦ垨璺緞鎷奸敊 鈶℃ā寮忚鍒欐病鍐欏 鈶㈡枃浠跺悕澶у皬鍐欎笉鍖归厤銆?/div>
+
+<div class="trouble">馃攳 <b>閿欒锛歰verriding recipe for target / warning: ignoring old recipe</b><br>
+鍚屼竴涓洰鏍囪瀹氫箟浜嗕袱娆°€傛鏌ユ槸鍚︽湁閲嶅鐨勮鍒欐垨include浜嗛噸澶嶇殑.mk鏂囦欢銆?/div>
+
+<h2>馃幆 瀹炴垬缁冧範</h2>
+
+<div class="tip">馃摑 <b>缁冧範1锛?/b>鍐欎竴涓狹akefile锛屾敮鎸?<code>make debug</code> 缂栬瘧璋冭瘯鐗堟湰锛?O0 -g3锛夊拰 <code>make release</code> 缂栬瘧鍙戝竷鐗堟湰锛?O2 -DNDEBUG锛夈€傝姹傞粯璁ょ洰鏍囨槸debug銆?br><br>
+馃摑 <b>缁冧範2锛?/b>鍦ㄤ笂闈㈢殑Makefile涓坊鍔?<code>make flash</code> 鐩爣锛岃嚜鍔ㄨ皟鐢∣penOCD鐑у綍鐢熸垚鐨?elf鏂囦欢銆?br><br>
+馃摑 <b>缁冧範3锛?/b>娣诲姞 <code>make size</code> 鐩爣锛岀紪璇戝悗鑷姩杩愯arm-none-eabi-size鏄剧ず鍐呭瓨鍗犵敤銆?/div>
+
+<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
+<div class="summary">
+<b>鉁?Makefile鏍稿績姒傚康锛?/b><br>
+鈥?瑙勫垯 = 鐩爣 + 渚濊禆 + 鍛戒护锛堝懡浠ゅ墠蹇呴』鏄疶AB锛?br>
+鈥?鑷姩鍙橀噺锛?@(鐩爣)銆?&lt;(绗竴涓緷璧?銆?^(鎵€鏈変緷璧?<br>
+鈥?妯″紡瑙勫垯锛?.o: %.c 涓€鏉¤鍒欏鐞嗘墍鏈夊悓绫绘枃浠?br>
+鈥?鍙橀噺璧嬪€硷細=(閫掑綊)銆?=(绔嬪嵆)銆?=(鏉′欢)銆?=(杩藉姞)<br>
+鈥?鍑芥暟锛歸ildcard/patsubst/foreach/shell/if/call<br>
+鈥?浼洰鏍囷細.PHONY澹版槑闈炴枃浠剁洰鏍?clean/flash/all)<br>
+鈥?鏉′欢缂栬瘧锛歩feq/ifneq/ifdef瀹炵幇Debug/Release鍒囨崲<br>
+<b>馃洜 甯哥敤鎶€宸э細</b><br>
+鈥?make -n 绌鸿窇鏌ョ湅鍛戒护涓嶆墽琛岋紙璋冭瘯绁炲櫒锛?br>
+鈥?make -j4 4绾跨▼骞惰缂栬瘧锛堝揩4鍊嶏級<br>
+鈥?make V=1 鏄剧ず璇︾粏缂栬瘧鍛戒护<br>
+鈥?鍠勭敤$(info ...)鍜?(warning ...)鎵撳嵃璋冭瘯淇℃伅
+</div>
+
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch02')">◀ 上一章：CMake</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
-  <a onclick="window.parent.loadPage('guide-ch04')">串口通信 ：下一章 ▶</a>
+  <a onclick="window.parent.loadPage('guide-ch02')">鈼€ 涓婁竴绔狅細CMake</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
+  <a onclick="window.parent.loadPage('guide-ch04')">涓插彛閫氫俊 锛氫笅涓€绔?鈻?/a>
 </div>
 </body>
 </html>
