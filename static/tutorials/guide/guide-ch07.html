@@ -186,6 +186,189 @@ void loop() {
 <a id="ch8"></a>
 <div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>鐞嗚ВRTOS姒傚康锛屼細鍒涘缓浠诲姟/闃熷垪/淇″彿閲?浜掓枼閲忥紝鑳芥妸FreeRTOS绉绘鍒癝TM32涓娿€?/div>
 
+
+<h2>馃摗 ESP-IDF娣卞害閰嶇疆</h2>
+
+<p>Arduino妗嗘灦閫傚悎蹇€熷師鍨嬶紝浣嗗埌浜у搧闃舵蹇呴』鐢‥SP-IDF銆傝繖閲岃ˉ鍏匢DF鐙湁鐨勯珮绾ц兘鍔涖€?/p>
+
+<h3>menuconfig閰嶇疆绯荤粺</h3>
+
+<pre><code># ESP-IDF浣跨敤Kconfig閰嶇疆绯荤粺锛圠inux鍐呮牳鍚屾锛?# 杩愯 idf.py menuconfig 杩涘叆鍥惧舰鍖栭厤缃晫闈?
+# 鍏抽敭閰嶇疆椤归€熸煡锛?
+# 1. 鍒嗗尯琛?(Partition Table)
+#    鈫?Partition Table 鈫?Custom partition table CSV
+#    鑷畾涔夊垎鍖烘墠鑳藉仛OTA
+
+# 2. FreeRTOS閰嶇疆
+#    鈫?Component config 鈫?FreeRTOS
+#    鈫?鍕鹃€?"Run FreeRTOS only on first core"
+#    鈫?璁剧疆浠诲姟鏍堝ぇ灏?榛樿3584鈫掑缓璁敼2048鑺俁AM)
+
+# 3. WiFi閰嶇疆
+#    鈫?Component config 鈫?Wi-Fi
+#    鈫?WiFi RX buffer: 榛樿8鈫掓敼16(楂樺悶鍚愬満鏅?
+#    鈫?WiFi IRAM optimization: 鍕鹃€?鍑忓皯寤惰繜)
+
+# 4. 璋冭瘯閰嶇疆
+#    鈫?Component config 鈫?Log output
+#    鈫?Default log verbosity: Info (鍙戝竷鐗堟敼Warning)
+#    鈫?寮€鍚?"Enable GDBStub" (涓嶉渶瑕丣TAG涔熻兘璋冭瘯)
+
+# 5. 鍒嗗尯琛?#    鈫?Partition Table 鈫?Custom
+#    # partitions_ota.csv:
+#    nvs,      data, nvs,     0x9000,  0x6000
+#    otadata,  data, ota,     0xf000,  0x2000
+#    phy_init, data, phy,     0x11000, 0x1000
+#    factory,  app,  factory, 0x12000, 0x1E0000
+#    ota_0,    app,  ota_0,   ,        0x1E0000
+#    ota_1,    app,  ota_1,   ,        0x1E0000
+#    storage,  data, spiffs,  ,        0x80000  # 鏂囦欢绯荤粺</code></pre>
+
+<h2>馃寪 MQTT鐗╄仈缃戦€氫俊</h2>
+
+<p>MQTT鏄疘oT棰嗗煙鐨凥TTP鈥斺€旀墍鏈変簯骞冲彴閮芥敮鎸佸畠銆傛瘮HTTP杞?00鍊嶏紝閫傚悎MCU銆?/p>
+
+<pre><code>#include "mqtt_client.h"
+
+static esp_mqtt_client_handle_t mqtt_client;
+
+static void mqtt_event_handler(void* arg, esp_event_base_t base,
+    int32_t id, void* event_data) {
+    esp_mqtt_event_handle_t ev = event_data;
+    switch (ev->event_id) {
+    case MQTT_EVENT_CONNECTED:
+        ESP_LOGI("MQTT", "宸茶繛鎺?");
+        // 璁㈤槄涓婚
+        esp_mqtt_client_subscribe(mqtt_client, "device/cmd", 1);
+        // 鍙戝竷涓婄嚎娑堟伅
+        esp_mqtt_client_publish(mqtt_client, "device/status", 
+            "online", 0, 1, 0);
+        break;
+    
+    case MQTT_EVENT_DATA:
+        ESP_LOGI("MQTT", "鏀跺埌: topic=%.*s data=%.*s",
+            ev->topic_len, ev->topic,
+            ev->data_len, ev->data);
+        // 澶勭悊浜戠涓嬪彂鐨勫懡浠?        if (strncmp(ev->data, "reboot", ev->data_len) == 0) {
+            esp_restart();
+        }
+        break;
+    
+    case MQTT_EVENT_DISCONNECTED:
+        ESP_LOGW("MQTT", "鏂紑杩炴帴锛岃嚜鍔ㄩ噸杩炰腑...");
+        break;
+    }
+}
+
+void mqtt_init(void) {
+    esp_mqtt_client_config_t cfg = {
+        .broker.address.uri = "mqtt://broker.emqx.io:1883",  // 鍏嶈垂娴嬭瘯MQTT Broker
+        .credentials = {
+            .username = "esp32-device-01",
+            .client_id = "esp32-sensor-001"
+        }
+    };
+    mqtt_client = esp_mqtt_client_init(&cfg);
+    esp_mqtt_client_register_event(mqtt_client, ESP_EVENT_ANY_ID,
+        mqtt_event_handler, NULL);
+    esp_mqtt_client_start(mqtt_client);
+}
+
+// 瀹氭椂涓婃姤鏁版嵁
+void publish_sensor_data(float temp, float hum) {
+    char payload[128];
+    snprintf(payload, sizeof(payload),
+        "{\"temp\":%.1f,\"hum\":%.1f,\"ts\":%lld}",
+        temp, hum, esp_timer_get_time());
+    // QoS 1 = 鑷冲皯涓€娆￠€佽揪
+    esp_mqtt_client_publish(mqtt_client, "sensor/data",
+        payload, 0, 1, 0);
+}</code></pre>
+
+<h2>馃搨 SPIFFS鏂囦欢绯荤粺</h2>
+
+<pre><code>#include "esp_spiffs.h"
+
+void mount_spiffs(void) {
+    esp_vfs_spiffs_conf_t cfg = {
+        .base_path = "/spiffs",          // 鎸傝浇鐐?        .partition_label = "storage",    // 鍒嗗尯鏍囩
+        .max_files = 5,                  // 鍚屾椂鎵撳紑鏈€澶ф枃浠舵暟
+        .format_if_mount_failed = true   // 鎸傝浇澶辫触灏辨牸寮忓寲
+    };
+    esp_err_t ret = esp_vfs_spiffs_register(&cfg);
+    
+    if (ret == ESP_OK) {
+        size_t total = 0, used = 0;
+        esp_spiffs_info("storage", &total, &used);
+        printf("SPIFFS: %d/%d KB 鍙敤\n", (total-used)/1024, total/1024);
+    }
+}
+
+void spiffs_example(void) {
+    // 鍐欏叆閰嶇疆鏂囦欢
+    FILE* f = fopen("/spiffs/config.json", "w");
+    fprintf(f, "{\"wifi_ssid\":\"MyWiFi\",\"interval\":30}\n");
+    fclose(f);
+    
+    // 璇诲彇閰嶇疆
+    char buf[256];
+    f = fopen("/spiffs/config.json", "r");
+    fread(buf, 1, sizeof(buf)-1, f);
+    buf[sizeof(buf)-1] = 0;
+    printf("閰嶇疆: %s\n", buf);
+    fclose(f);
+    
+    // 鍒楀嚭鎵€鏈夋枃浠?    DIR* dir = opendir("/spiffs");
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != NULL) {
+        printf("  %s (%d bytes)\n", entry->d_name, entry->d_type);
+    }
+    closedir(dir);
+}</code></pre>
+
+<h2>鈿?ESP32-S3/P4鏂扮壒鎬ч€熻</h2>
+
+<div class="card">
+<div class="h"><span class="name">ESP32瀹舵棌杩涘寲</span><span class="tag p">杩涢樁</span></div>
+<div class="b">
+<div class="desc">
+<table>
+<tr><th>鍨嬪彿</th><th>CPU</th><th>鐗圭偣</th><th>鍏稿瀷搴旂敤</th></tr>
+<tr><td>ESP32 (缁忓吀)</td><td>Xtensa LX6 脳2, 240MHz</td><td>WiFi+BLE4.2</td><td>閫氱敤IoT</td></tr>
+<tr><td>ESP32-S2</td><td>Xtensa LX7 脳1, 240MHz</td><td>WiFi(鏃犺摑鐗?, USB OTG</td><td>WiFi澶栬</td></tr>
+<tr><td>ESP32-S3</td><td>Xtensa LX7 脳2, 240MHz</td><td>WiFi+BLE5, AI鍔犻€熷櫒, USB OTG</td><td>AIoT/璇煶/瑙嗚</td></tr>
+<tr><td>ESP32-C3</td><td>RISC-V 32, 160MHz</td><td>WiFi+BLE5, 浣庢垚鏈?/td><td>鏇夸唬ESP8266</td></tr>
+<tr><td>ESP32-C6</td><td>RISC-V 32, 160MHz</td><td>WiFi6+BLE5+802.15.4</td><td>Matter/Thread</td></tr>
+<tr><td>ESP32-P4</td><td>RISC-V 脳2, 400MHz</td><td>鏃犳棤绾? MIPI/LVDS, H264缂栫爜</td><td>HMI/杈圭紭AI</td></tr>
+</table>
+<br>
+<b>閫夊瀷寤鸿锛?/b>鏂版墜鍏ラ棬鐢‥SP32(缁忓吀/DevKitC)銆佷綆鎴愭湰鏂规鐢–3銆丄IoT椤圭洰鐢⊿3銆丠MI/UI椤圭洰鐢≒4
+</div></div></div>
+
+<h2>馃幆 瀹炴垬缁冧範</h2>
+
+<div class="tip">馃摑 <b>缁冧範1锛?/b>鐢‥SP32 + MQTT(鍏嶈垂broker.emqx.io)瀹炵幇娓╂箍搴﹀畾鏃朵笂鎶?30s/娆?銆傜敤MQTTX妗岄潰瀹㈡埛绔闃呴獙璇佹暟鎹埌杈俱€?br><br>
+馃摑 <b>缁冧範2锛?/b>瀹炵幇WiFi閰嶇疆WebServer锛圗SP32浣滀负AP锛屾墜鏈鸿繛涓婂悗鎵撳紑192.168.4.1閰嶇疆WiFi SSID/瀵嗙爜锛屼繚瀛樺埌SPIFFS锛夈€?br><br>
+馃摑 <b>缁冧範3锛?/b>鎼缓OTA鍗囩骇绯荤粺锛欵SP32鍚姩鏃舵鏌ュ浐浠剁増鏈紝濡傛湁鏂扮増鏈嚜鍔ㄤ粠HTTP鏈嶅姟鍣ㄤ笅杞藉苟鏇存柊銆?/div>
+
+<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
+<div class="summary">
+<b>鉁?ESP32楂樼骇鑳藉姏锛?/b><br>
+鈥?ESP-IDF menuconfig锛氬浘褰㈠寲閰嶇疆(鍒嗗尯/FreeRTOS/WiFi/鏃ュ織)<br>
+鈥?MQTT锛欼oT鏍囧噯鍗忚锛孮oS 0/1/2锛屾墍鏈変簯骞冲彴閫氱敤<br>
+鈥?SPIFFS锛氳交閲忔枃浠剁郴缁?閰嶇疆/璇佷功/OTA鍥轰欢瀛樺偍)<br>
+鈥?OTA鍙屽垎鍖猴細factory/ota_0/ota_1锛屽崌绾уけ璐ヨ嚜鍔ㄥ洖婊?br>
+<b>馃洜 ESP-IDF鏍稿績鍛戒护锛?/b><br>
+鈥?idf.py set-target esp32s3 鈥?鍒囨崲鑺墖鍨嬪彿<br>
+鈥?idf.py menuconfig 鈥?鍥惧舰鍖栭厤缃?br>
+鈥?idf.py build flash monitor 鈥?涓€閿紪璇戠儳褰曟煡鐪嬫棩蹇?br>
+鈥?idf.py size-components 鈥?鏌ョ湅鍚勭粍浠禙lash/RAM鍗犵敤<br>
+<b>鈿?鏂版墜鐥涚偣锛?/b><br>
+鈥?GPIO寮曡剼瀹氫箟鍥犺姱鐗囪€屽紓锛屽姟蹇呮煡datasheet<br>
+鈥?WiFi鍜孉DC2鍐茬獊鈥斺€旂敤WiFi鏃禔DC鍙兘鐢ˋDC1鐨勫紩鑴?br>
+鈥?缂栬瘧鎱紵鐢╥df.py -j8 骞惰缂栬瘧(Ctrl+T,Ctrl+E鍦╩onitor涓?
+</div>
+
 <div class="chnav">
 <a onclick="window.parent.loadPage('guide-ch06')">鈫?绗?绔?/a>
 <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
