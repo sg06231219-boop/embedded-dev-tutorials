@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>宓屽叆寮忔湳璇瘝鍏?/title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:0;background:var(--bg,#0d1117);color:var(--t,#e6edf3);line-height:1.7}
+.glossary-page{max-width:960px;margin:0 auto;padding:32px 24px}
+h1{font-size:1.8em;margin-bottom:8px}
+h1 small{font-size:.5em;color:var(--t2,#8b949e);font-weight:400}
+.glossary-intro{color:var(--t2,#8b949e);font-size:.9em;margin-bottom:24px}
+.glossary-search{width:100%;padding:12px 16px;font-size:1em;border:1px solid var(--br,#30363d);border-radius:8px;background:var(--bg2,#161b22);color:var(--t,#e6edf3);margin-bottom:24px;box-sizing:border-box}
+.glossary-search:focus{outline:none;border-color:var(--a,#58a6ff)}
+.glossary-nav{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:20px}
+.glossary-nav a{display:inline-block;padding:4px 10px;border:1px solid var(--br,#30363d);border-radius:6px;font-size:.82em;color:var(--a,#58a6ff);text-decoration:none;cursor:pointer}
+.glossary-nav a:hover{background:var(--bg2,#161b22)}
+.glossary-nav a.active{background:var(--a,#58a6ff);color:#fff;border-color:var(--a,#58a6ff)}
+.term-block{margin-bottom:24px;scroll-margin-top:80px}
+.term-block .term-name{font-size:1.15em;font-weight:700;color:var(--a,#58a6ff)}
+.term-block .term-en{font-size:.82em;color:var(--t2,#8b949e);margin-left:8px;font-style:italic}
+.term-block .term-cat{display:inline-block;font-size:.68em;padding:1px 6px;border-radius:4px;background:var(--bg3,#21262d);color:var(--t2,#8b949e);margin-left:8px}
+.term-block .term-def{margin-top:4px;color:var(--t,#e6edf3);font-size:.95em}
+.term-block .term-see{font-size:.82em;color:var(--t2,#8b949e);margin-top:2px}
+.term-block .term-see a{color:var(--a,#58a6ff)}
+@media(max-width:600px){.glossary-page{padding:16px 12px}}
+</style></head>
+<body>
+<div class="glossary-page">
+<h1>馃摉 宓屽叆寮忔湳璇瘝鍏?<small>Embedded Systems Glossary</small></h1>
+<p class="glossary-intro">娑电洊宓屽叆寮忓紑鍙戝父鐢ㄧ殑纭欢銆佽蒋浠躲€侀€氫俊鍗忚銆佸疄鏃舵搷浣滅郴缁熺瓑鏍稿績鏈銆傜偣鍑诲瓧姣嶅鑸揩閫熻烦杞紝鎴栨悳绱㈣繃婊ゃ€?/p>
+
+<input type="text" class="glossary-search" id="glossarySearch" placeholder="鎼滅储鏈锛堝: DMA, FreeRTOS, SPI锛?.." oninput="filterTerms()">
+
+<div class="glossary-nav" id="glossaryNav"></div>
+<div id="glossaryContent"></div>
+</div>
+
+<script>
+const TERMS = [
+  // A
+  {name:'ADC', en:'Analog-to-Digital Converter', cat:'纭欢', def:'灏嗘ā鎷熶俊鍙凤紙濡傛俯搴︿紶鎰熷櫒鐨勭數鍘嬶級杞崲涓烘暟瀛楀€肩殑鐢佃矾銆係TM32 鐨?ADC 閫氬父涓?12 浣嶅垎杈ㄧ巼锛岄噰鏍风巼鍙揪鏁?MSPS銆傚父瑙佺敤娉曪細ADC_ChannelConfig() 閰嶇疆閫氶亾锛孉DC_GetConversionValue() 璇诲彇缁撴灉銆?},
+  {name:'ARM Cortex-M', en:'ARM Cortex-M series', cat:'鏋舵瀯', def:'ARM 鍏徃璁捐鐨?32 浣嶅井鎺у埗鍣ㄥ唴鏍哥郴鍒椼€侻0/M0+ 涓鸿秴浣庡姛鑰楀叆闂ㄧ骇锛孧3 涓洪€氱敤鍨嬶紝M4 甯?DSP+FPU锛孧7 涓洪珮鎬ц兘鍏骇娴佹按绾裤€係TM32 绯诲垪鍩轰簬 Cortex-M 鍐呮牳銆?},
+  {name:'APB', en:'Advanced Peripheral Bus', cat:'鎬荤嚎', def:'ARM AMBA 鎬荤嚎瑙勮寖涓殑浣庨€熷璁炬€荤嚎锛岀敤浜庤繛鎺?UART銆丼PI銆両2C銆佸畾鏃跺櫒绛夊璁俱€傚垎涓?APB1锛堜綆閫燂紝鈮?2MHz锛夊拰 APB2锛堥珮閫燂紝鈮?4MHz锛夈€?},
+
+  // B
+  {name:'BSP', en:'Board Support Package', cat:'杞欢', def:'鏉跨骇鏀寔鍖咃紝鎻愪緵鐗瑰畾纭欢骞冲彴鐨勫簳灞傞┍鍔ㄥ拰鍒濆鍖栦唬鐮併€係TM32Cube 绯诲垪鏄?ST 瀹樻柟鎻愪緵鐨?BSP锛屽寘鍚?HAL 搴撱€丆MSIS 鍜屼腑闂翠欢銆?},
+  {name:'Bootloader', en:'Bootloader', cat:'杞欢', def:'寮曞鍔犺浇绋嬪簭锛屽湪鑺墖涓婄數鍚庨鍏堣繍琛岀殑涓€灏忔浠ｇ爜锛岃礋璐ｅ垵濮嬪寲纭欢鍜屽姞杞戒富绋嬪簭銆係TM32 鐨?System Memory 鍐呯疆涓插彛/USB Bootloader銆侷AP锛圛n-Application Programming锛夊厑璁哥敤鎴疯嚜瀹氫箟 Bootloader 瀹炵幇鍥轰欢鍗囩骇銆?},
+
+  // C
+  {name:'CMSIS', en:'Cortex Microcontroller Software Interface Standard', cat:'杞欢', def:'ARM 鍒跺畾鐨?Cortex-M 杞欢鎺ュ彛鏍囧噯锛屽寘鍚牳蹇冨璁捐闂眰銆丏SP 搴撳拰 RTOS API銆侰MSIS-DAP 鏄皟璇曢€傞厤鍣ㄥ浐浠舵爣鍑嗐€?},
+  {name:'CRC', en:'Cyclic Redundancy Check', cat:'绠楁硶', def:'寰幆鍐椾綑鏍￠獙锛岀敤浜庢娴嬫暟鎹紶杈撴垨瀛樺偍涓殑閿欒銆係TM32 鍐呯疆纭欢 CRC 璁＄畻鍗曞厓锛屼娇鐢?CRC-32锛堜互澶綉澶氶」寮忥級銆侱MA+CRC 鍙疄鐜伴浂 CPU 寮€閿€鐨勬暟鎹畬鏁存€ф牎楠屻€?},
+  {name:'Crystal Oscillator', en:'鏅舵尟', cat:'纭欢', def:'鐭宠嫳鏅朵綋鎸崱鍣紝涓哄井鎺у埗鍣ㄦ彁渚涚簿纭殑鏃堕挓淇″彿銆傚閮ㄩ珮閫熸櫠鎸紙HSE锛夐€氬父涓?8MHz 鎴?25MHz锛屽閮ㄤ綆閫熸櫠鎸紙LSE锛変负 32.768kHz锛堢敤浜?RTC锛夈€係TM32 閫氳繃 PLL 灏?HSE 鍊嶉鑷崇郴缁熸椂閽燂紙濡?72MHz/168MHz锛夈€?},
+
+  // D
+  {name:'DAC', en:'Digital-to-Analog Converter', cat:'纭欢', def:'鏁版ā杞崲鍣紝灏嗘暟瀛楀€艰浆鎹负妯℃嫙鐢靛帇杈撳嚭銆傚父鐢ㄤ簬闊抽鐢熸垚銆佹尝褰㈠彂鐢熷櫒鍜屾ā鎷熸帶鍒朵俊鍙枫€?},
+  {name:'DMA', en:'Direct Memory Access', cat:'鎬荤嚎', def:'鐩存帴瀛樺偍鍣ㄨ闂紝鍏佽澶栬鐩存帴涓庡唴瀛樹氦鎹㈡暟鎹€屼笉缁忚繃 CPU銆傚ぇ骞呴檷浣庡ぇ鏁版嵁浼犺緭鏃剁殑 CPU 鍗犵敤鐜囥€係TM32 鏈?2 涓?DMA 鎺у埗鍣紝姣忎釜鏈?8 涓€氶亾銆傚吀鍨嬪簲鐢細ADC 杩炵画閲囨牱鈫扗MA鈫掑唴瀛樼幆褰㈢紦鍐插尯銆?},
+  {name:'DTCM / ITCM', en:'Data/Instruction Tightly Coupled Memory', cat:'鏋舵瀯', def:'Cortex-M7 鐗规湁鐨勭揣鑰﹀悎鍐呭瓨銆侷TCM锛堟寚浠?TCM锛夊瓨鏀炬€ц兘鍏抽敭浠ｇ爜锛岄浂绛夊緟锛汥TCM锛堟暟鎹?TCM锛夊瓨鏀惧叧閿暟鎹€傝闂€熷害杩滆秴 AXI SRAM銆?},
+
+  // E
+  {name:'EEPROM', en:'Electrically Erasable Programmable ROM', cat:'纭欢', def:'鐢靛彲鎿﹂櫎鍙紪绋嬪彧璇诲瓨鍌ㄥ櫒锛屾敮鎸佹寜瀛楄妭鎿﹀啓锛屾帀鐢靛悗鏁版嵁涓嶄涪澶便€係TM32 鏃犵墖鍐?EEPROM锛岄€氬父鐢?Flash 妯℃嫙鎴栧鎸?AT24Cxx 鑺墖銆?},
+  {name:'Embedded Linux', en:'Embedded Linux', cat:'杞欢', def:'杩愯 Linux 鐨勫祵鍏ュ紡绯荤粺锛岄€傜敤浜庨渶瑕佺綉缁滄爤銆佹枃浠剁郴缁熴€佸杩涚▼鐨勫鏉傚簲鐢紙濡傝矾鐢卞櫒銆佹櫤鑳藉灞呯綉鍏筹級銆備娇鐢?Buildroot 鎴?Yocto 鏋勫缓銆備笌瑁告満/RTOS 涓嶅悓锛屽祵鍏ュ紡 Linux 鍚姩鎱絾鐏垫椿鎬ч珮銆?},
+  {name:'EXTI', en:'External Interrupt / Event Controller', cat:'纭欢', def:'澶栭儴涓柇/浜嬩欢鎺у埗鍣紝浣?GPIO 寮曡剼鍙Е鍙戜腑鏂€係TM32 姣忎釜 GPIO 寮曡剼鍙厤缃负涓婂崌娌裤€佷笅闄嶆部鎴栧弻杈规部瑙﹀彂锛屽叡 23 鏉′腑鏂嚎锛圗XTI0~EXTI15 瀵瑰簲绔彛浣嶏紝澶栧姞 RTC銆丳VD 绛夛級銆?},
+
+  // F
+  {name:'Flash Memory', en:'Flash 闂瓨', cat:'纭欢', def:'闈炴槗澶辨€у瓨鍌ㄥ櫒锛岀敤浜庡瓨鍌ㄧ▼搴忎唬鐮佸拰甯搁噺鏁版嵁銆係TM32 鐗囧唴 Flash 鍏稿瀷 64KB~2MB锛屾敮鎸侀〉鎿﹂櫎鍜屽瓧缂栫▼銆侳lash 绛夊緟鍛ㄦ湡鍐冲畾鍙栨寚閫熷害锛孉RT Accelerator 鍙秷闄ょ瓑寰呫€?},
+  {name:'FPU', en:'Floating Point Unit', cat:'鏋舵瀯', def:'娴偣杩愮畻鍗曞厓锛岀‖浠跺姞閫熸诞鐐瑰姞鍑忎箻闄ゅ拰涔樺姞杩愮畻銆侰ortex-M4F/M7 闆嗘垚鍗曠簿搴?FPUv4銆傚惎鐢?FPU 鍚庢诞鐐硅繍绠楅€熷害鎻愬崌 10~100 鍊嶃€傜紪璇戦渶娣诲姞 -mfloat-abi=hard銆?},
+  {name:'FreeRTOS', en:'Free Real-Time Operating System', cat:'RTOS', def:'寮€婧愮殑杞婚噺绾у疄鏃舵搷浣滅郴缁熷唴鏍革紝STM32Cube 榛樿闆嗘垚銆傛牳蹇冪粍浠讹細浠诲姟璋冨害鍣ㄣ€侀槦鍒椼€佷俊鍙烽噺銆佷簰鏂ラ攣銆佽蒋浠跺畾鏃跺櫒銆佷簨浠剁粍銆佷换鍔￠€氱煡銆侰MSIS-RTOS v2 灏佽鎻愪緵缁熶竴 API銆傜壒鐐癸細鎶㈠崰寮?鏃堕棿鐗囪疆杞皟搴︼紝鏈€灏?ROM 鍗犵敤绾?6KB銆?},
+
+  // G
+  {name:'GPIO', en:'General Purpose Input/Output', cat:'纭欢', def:'閫氱敤杈撳叆杈撳嚭寮曡剼锛屽井鎺у埗鍣ㄦ渶鍩烘湰鐨勫璁俱€傚彲閰嶇疆涓鸿緭鍏ワ紙娴┖/涓婃媺/涓嬫媺/妯℃嫙锛夈€佽緭鍑猴紙鎺ㄦ尳/寮€婕忥級銆佸鐢ㄥ姛鑳芥垨妯℃嫙妯″紡銆侶AL 搴撶敤 HAL_GPIO_WritePin()/ReadPin() 鎿嶄綔銆?},
+  {name:'GCC', en:'GNU Compiler Collection', cat:'宸ュ叿閾?, def:'GNU 缂栬瘧鍣ㄥ浠讹紝宓屽叆寮?ARM 寮€鍙戞渶甯哥敤鐨勭紪璇戝櫒銆俛rm-none-eabi-gcc 缂栬瘧瑁告満/RTOS 绋嬪簭锛岃緭鍑?ELF 鏍煎紡銆傚叧閿€夐」锛?mcpu銆?mthumb銆?O2銆?g3銆?},
+
+  // H
+  {name:'HAL', en:'Hardware Abstraction Layer', cat:'杞欢', def:'纭欢鎶借薄灞傦紝ST 鎻愪緵鐨勫璁鹃┍鍔ㄥ簱銆侶AL 灏佽浜嗗瘎瀛樺櫒鎿嶄綔锛屾彁渚涚粺涓€鐨?API锛堝 HAL_UART_Transmit()锛夈€備笌 LL锛圠ow Layer锛夊簱鐩告瘮锛孒AL 鏇存槗鐢ㄤ絾寮€閿€绋嶅ぇ銆?},
+  {name:'HSI / HSE', en:'High-Speed Internal/External clock', cat:'纭欢', def:'楂橀€熷唴閮?澶栭儴鏃堕挓銆侶SI 涓虹墖鍐?16MHz RC 鎸崱鍣紙绮惧害 卤1%锛夛紝涓婄數榛樿浣跨敤銆侶SE 涓哄閮ㄦ櫠鎸紙4~26MHz锛夛紝绮惧害杩滈珮浜?HSI銆傜郴缁熸椂閽?= HSE 鈫?PLL 鍊嶉銆?},
+
+  // I
+  {name:'I2C', en:'Inter-Integrated Circuit', cat:'鍗忚', def:'鍙岀嚎涓茶閫氫俊鎬荤嚎锛圫CL 鏃堕挓 + SDA 鏁版嵁锛夛紝鏀寔澶氫富澶氫粠銆傛爣鍑嗘ā寮?100kHz锛屽揩閫熸ā寮?400kHz锛岄珮閫熸ā寮?3.4MHz銆傚父鐢ㄤ簬杩炴帴浼犳劅鍣紙娓╂箍搴︺€佸姞閫熷害璁★級銆丒EPROM 鍜屾樉绀哄睆銆? 浣嶅湴鍧€鏈€澶?127 涓澶囥€?},
+  {name:'IAP', en:'In-Application Programming', cat:'杞欢', def:'鍦ㄥ簲鐢ㄤ腑缂栫▼锛屽厑璁稿浐浠跺湪杩愯涓洿鏂拌嚜韬€傚疄鐜版柟寮忥細Bootloader 鎺ユ敹鏂板浐浠讹紙閫氳繃涓插彛/U鐩?OTA锛夆啋鍐欏叆 Flash 鎸囧畾鍖哄煙鈫掕烦杞埌鏂板浐浠躲€傞渶娉ㄦ剰 Flash 鍙屽尯澶囦唤鍜屽洖婊氭満鍒躲€?},
+  {name:'Interrupt / NVIC', en:'Nested Vectored Interrupt Controller', cat:'鏋舵瀯', def:'宓屽鍚戦噺涓柇鎺у埗鍣紝Cortex-M 鐨勬牳蹇冧腑鏂鐞嗗崟鍏冦€傛敮鎸?240 涓腑鏂簮銆?56 绾ф姠鍗犱紭鍏堢骇銆備腑鏂欢杩熶粎 12 涓椂閽熷懆鏈燂紙灏鹃摼浼樺寲鍚?6 涓懆鏈燂級銆侼VIC_SetPriority() 璁剧疆浼樺厛绾с€?},
+  {name:'ISP', en:'In-System Programming', cat:'宸ュ叿', def:'鍦ㄧ郴缁熺紪绋嬶紝閫氳繃涓插彛/USB/SWD 绛夋帴鍙ｅ宸茬剨鎺ュ湪 PCB 涓婄殑鑺墖杩涜缂栫▼銆係TM32 鐨?System Memory Bootloader 閫氳繃 USART1/USB/SPI 瀹炵幇 ISP銆?},
+
+  // J
+  {name:'JTAG / SWD', en:'JTAG / Serial Wire Debug', cat:'宸ュ叿', def:'璋冭瘯鍜岀紪绋嬫帴鍙ｃ€侸TAG 鐢?4~5 鏍逛俊鍙风嚎锛圱DI/TDO/TMS/TCK/TRST锛夛紝SWD 鐢?2 鏍癸紙SWDIO/SWCLK锛夈€係WD 鏄?ARM 涓撴湁鐨勪袱绾胯皟璇曞崗璁紝鎬ц兘涓嶈緭 JTAG 涓斿崰鐢ㄥ紩鑴氭洿灏戙€係T-Link/J-Link 鍧囨敮鎸?SWD銆?},
+  {name:'JSON', en:'JavaScript Object Notation', cat:'鏁版嵁', def:'杞婚噺绾ф暟鎹氦鎹㈡牸寮忥紝甯哥敤浜庡祵鍏ュ紡璁惧鐨勯厤缃枃浠跺瓨鍌ㄥ拰缃戠粶閫氫俊銆俢JSON 鏄祵鍏ュ紡 C 璇█鏈€娴佽鐨?JSON 瑙ｆ瀽搴擄紙绾?1KB ROM锛夈€?},
+
+  // K
+  {name:'Kconfig', en:'Kernel Configuration', cat:'宸ュ叿', def:'Linux 鍐呮牳鍜?Zephyr RTOS 浣跨敤鐨勯厤缃郴缁燂紝閫氳繃 Kconfig 鏂囦欢瀹氫箟閰嶇疆閫夐」锛岀敓鎴?.config 鏂囦欢銆侲SP-IDF 涔熺敤 Kconfig锛坢enuconfig 鍛戒护锛夈€?},
+
+  // L
+  {name:'LDO', en:'Low Dropout Regulator', cat:'纭欢', def:'浣庡帇宸嚎鎬хǔ鍘嬪櫒锛屽皢杈冮珮杈撳叆鐢靛帇杞崲涓虹ǔ瀹氱殑杈冧綆杈撳嚭鐢靛帇锛屽帇宸彲浣庤嚦鍑犲崄 mV銆傜浉姣?DC-DC 绾规尝鏇村皬銆佺數璺洿绠€鍗曪紝浣嗘晥鐜囦綆锛堢儹鑳芥崯鑰楋級銆侫MS1117-3.3 鏄渶甯歌鐨?3.3V LDO銆?},
+  {name:'Linker Script', en:'閾炬帴鑴氭湰 (.ld)', cat:'宸ュ叿閾?, def:'瀹氫箟绋嬪簭鍚勬锛?text /.data /.bss /.rodata锛夊湪鍐呭瓨涓殑甯冨眬銆傛寚瀹?Flash 璧峰鍦板潃锛堝 0x08000000锛夈€丷AM 璧峰鍦板潃锛堝 0x20000000锛夈€佹爤椤跺湴鍧€銆侴CC 鐢?-T 閫夐」鎸囧畾閾炬帴鑴氭湰銆?},
+
+  // M
+  {name:'MCU / MPU', en:'Microcontroller / Microprocessor', cat:'纭欢', def:'MCU锛堝井鎺у埗鍣級闆嗘垚 CPU+RAM+Flash+澶栬浜庡崟鑺墖锛屼綆鍔熻€椾綆鎴愭湰锛屽 STM32銆侻PU锛堝井澶勭悊鍣級閫氬父鍙湁 CPU 鏍革紝闇€澶栨寕 RAM 鍜?Flash锛屾€ц兘鏇村己锛屽 Cortex-A 绯诲垪銆?},
+  {name:'MPU (Memory)', en:'Memory Protection Unit', cat:'鏋舵瀯', def:'鍐呭瓨淇濇姢鍗曞厓锛岄槻姝换鍔¤闂湭鎺堟潈鐨勫唴瀛樺尯鍩熴€俁TOS 浣跨敤 MPU 瀹炵幇浠诲姟闅旂锛屽寮虹郴缁熷畨鍏ㄦ€с€備笌 MMU锛堝唴瀛樼鐞嗗崟鍏冿級涓嶅悓锛孧PU 涓嶆彁渚涜櫄鎷熷唴瀛樸€傛敞鎰忎笌 Microprocessor 鐨?MPU 鍖哄垎銆?},
+  {name:'Makefile', en:'Makefile', cat:'宸ュ叿閾?, def:'GNU Make 鐨勬瀯寤鸿剼鏈紝瀹氫箟缂栬瘧瑙勫垯鍜屼緷璧栧叧绯汇€傚祵鍏ュ紡 Makefile 閫氬父鎸囧畾浜ゅ弶缂栬瘧鍣紙CC=arm-none-eabi-gcc锛夈€佺紪璇戦€夐」锛圕FLAGS锛夈€侀摼鎺ラ€夐」锛圠DFLAGS锛夊拰鐩爣锛坅ll/clean/flash锛夈€?},
+
+  // O
+  {name:'OpenOCD', en:'Open On-Chip Debugger', cat:'宸ュ叿', def:'寮€婧愯皟璇曞櫒杞欢锛岄€氳繃璋冭瘯閫傞厤鍣紙ST-Link/J-Link锛変笌鐩爣鑺墖閫氫俊銆傛敮鎸?GDB 杩滅▼璋冭瘯銆丗lash 缂栫▼鍜岃竟鐣屾壂鎻忋€傚父鐢ㄥ懡浠わ細openocd -f interface/stlink.cfg -f target/stm32f1x.cfg銆?},
+  {name:'OTA', en:'Over-The-Air Update', cat:'杞欢', def:'鏃犵嚎鍥轰欢鍗囩骇锛岄€氳繃 Wi-Fi/BLE/LoRa 绛夋棤绾挎柟寮忔洿鏂拌澶囧浐浠躲€侲SP32 鐨?OTA 鏈哄埗锛氫笅杞芥柊鍥轰欢鍒?OTA 鍒嗗尯鈫掗獙璇佸畬鏁存€р啋璁剧疆鍚姩鍒嗗尯鈫掗噸鍚垏鎹€?},
+
+  // P
+  {name:'PWM', en:'Pulse Width Modulation', cat:'纭欢', def:'鑴夊啿瀹藉害璋冨埗锛岄€氳繃璋冩暣鏂规尝鐨勫崰绌烘瘮鏉ユā鎷熶笉鍚岀數鍘嬭緭鍑恒€傜敤浜庣數鏈鸿皟閫熴€丩ED 璋冨厜銆佽埖鏈烘帶鍒躲€係TM32 瀹氭椂鍣ㄨ緭鍑?PWM锛欰RR 鍐冲畾鍛ㄦ湡锛孋CRx 鍐冲畾鍗犵┖姣旓紝鍗犵┖姣?= CCRx/(ARR+1)銆?},
+  {name:'PLL', en:'Phase-Locked Loop', cat:'纭欢', def:'閿佺浉鐜紝灏嗚緭鍏ユ椂閽熼鐜囧€嶉鍒版洿楂橀鐜囥€係TM32 鐨?PLL 灏?HSI/HSE 鍊嶉鍒扮郴缁熸椂閽熴€備緥濡?HSE=8MHz 脳 PLLM / PLLN 脳 PLLP = 168MHz銆傞渶閰嶇疆 PLLM銆丳LLN銆丳LLP銆丳LLQ 鍥涗釜鍒嗛绯绘暟銆?},
+  {name:'POSIX', en:'Portable Operating System Interface', cat:'鏍囧噯', def:'鍙Щ妞嶆搷浣滅郴缁熸帴鍙ｆ爣鍑嗐€侳reeRTOS+POSIX 涓?FreeRTOS 鎻愪緵 pthread 鍏煎灞傦紝鏂逛究绉绘 Linux 搴旂敤绋嬪簭銆侰MSIS-RTOS v2 涔熼儴鍒嗗吋瀹?POSIX 璇箟銆?},
+
+  // R
+  {name:'RAM / SRAM', en:'Static Random Access Memory', cat:'纭欢', def:'闈欐€侀殢鏈哄瓨鍙栧瓨鍌ㄥ櫒锛岀敤浜庡瓨鏀捐繍琛屾椂鐨勫彉閲忋€佹爤鍜屽爢銆係TM32F103C8T6 鏈?20KB SRAM锛孲TM32H743 鏈?1MB SRAM锛堝惈 DTCM/ITCM/AXI SRAM 绛夊鍖哄煙锛夈€傛帀鐢垫暟鎹涪澶便€?},
+  {name:'RCC', en:'Reset and Clock Control', cat:'纭欢', def:'澶嶄綅鍜屾椂閽熸帶鍒跺櫒锛孲TM32 涓渶鍏堥渶瑕侀厤缃殑澶栬銆傛帶鍒跺悇鎬荤嚎锛圓HB/APB1/APB2锛夋椂閽熶娇鑳藉拰鍒嗛銆傚叧閿嚱鏁帮細HAL_RCC_OscConfig() 閰嶇疆鏃堕挓婧愶紝HAL_RCC_ClockConfig() 璁剧疆绯荤粺鏃堕挓銆?},
+  {name:'RTOS', en:'Real-Time Operating System', cat:'RTOS', def:'瀹炴椂鎿嶄綔绯荤粺锛屼繚璇佷换鍔″湪纭畾鐨勬椂闂村唴瀹屾垚銆傚叧閿寚鏍囷細浠诲姟鍒囨崲鏃堕棿锛團reeRTOS 绾?100~200 涓?CPU 鍛ㄦ湡锛夈€佷腑鏂欢杩熴€傚父瑙?RTOS锛欶reeRTOS銆丷T-Thread銆乽c/OS-III銆乑ephyr銆乀hreadX銆?},
+  {name:'RTC', en:'Real-Time Clock', cat:'纭欢', def:'瀹炴椂鏃堕挓锛屾彁渚涙棩鍘嗗拰鏃堕棿鍔熻兘銆係TM32 鐨?RTC 浣跨敤 LSE锛?2.768kHz 鏅舵尟锛変綔涓烘椂閽熸簮锛岄厤澶囧悗澶囧瘎瀛樺櫒锛圔KP锛夊拰 Tamper 妫€娴嬪紩鑴氥€俈BAT 寮曡剼鍙帴鐢垫睜淇濇寔 RTC 鍦ㄦ柇鐢垫椂缁х画杩愯銆?},
+
+  // S
+  {name:'SPI', en:'Serial Peripheral Interface', cat:'鍗忚', def:'鍥涚嚎涓茶鍚屾閫氫俊鎬荤嚎锛圫CK/MOSI/MISO/NSS锛夈€傚叏鍙屽伐锛岄€熺巼鍙揪鏁板崄 MHz銆傛ā寮?0~3 鐢?CPOL锛堟椂閽熸瀬鎬э級鍜?CPHA锛堟椂閽熺浉浣嶏級鍐冲畾銆傚父鐢ㄤ簬 Flash 鑺墖锛圵25Qxx锛夈€佹樉绀哄睆鍜?SD 鍗°€?},
+  {name:'Stack & Heap', en:'鏍堝拰鍫?, cat:'鏋舵瀯', def:'鏍堬紙Stack锛夊瓨鏀惧眬閮ㄥ彉閲忓拰鍑芥暟杩斿洖鍦板潃锛屼粠楂樺湴鍧€鍚戜綆鍦板潃澧為暱锛孲P 鎸囬拡鎸囧悜鏍堥《銆傚爢锛圚eap锛夌敤浜庡姩鎬佸唴瀛樺垎閰嶏紙malloc/free锛夛紝浠庝綆鍦板潃鍚戦珮鍦板潃澧為暱銆傚祵鍏ュ紡鏍堟孩鍑烘槸甯歌 Bug锛圚ardFault锛夈€?},
+  {name:'SysTick', en:'System Tick Timer', cat:'鏋舵瀯', def:'Cortex-M 鍐呮牳鍐呯疆鐨?24 浣嶉€掑噺瀹氭椂鍣紝閫氬父閰嶇疆涓?1ms 涓柇涓€娆°€侳reeRTOS 浣跨敤 SysTick 浣滀负浠诲姟璋冨害鐨勬椂鍩猴紙configTICK_RATE_HZ=1000锛夈€侶AL_Delay() 涔熶緷璧?SysTick銆?},
+  {name:'Semaphore / Mutex', en:'淇″彿閲?/ 浜掓枼閿?, cat:'RTOS', def:'RTOS 涓殑鍚屾鏈哄埗銆備俊鍙烽噺鐢ㄤ簬浠诲姟闂村悓姝ュ拰璧勬簮璁℃暟锛堜簩鍊?璁℃暟鍨嬶級锛涗簰鏂ラ攣鐢ㄤ簬淇濇姢鍏变韩璧勬簮锛屽甫浼樺厛绾х户鎵块槻姝紭鍏堢骇鍙嶈浆銆侳reeRTOS 涓細xSemaphoreCreateBinary()銆亁SemaphoreCreateMutex()銆?},
+
+  // T
+  {name:'TIM (Timer)', en:'Timer 瀹氭椂鍣?, cat:'纭欢', def:'STM32 鐨勫璁惧畾鏃跺櫒銆傚熀鏈畾鏃跺櫒锛圱IM6/7锛変粎璁℃暟锛涢€氱敤瀹氭椂鍣紙TIM2~5锛夋敮鎸佽緭鍏ユ崟鑾枫€佽緭鍑烘瘮杈冦€丳WM锛涢珮绾у畾鏃跺櫒锛圱IM1/8锛夋敮鎸佷簰琛ヨ緭鍑哄拰姝诲尯鎺у埗锛岀敤浜庣數鏈烘帶鍒躲€?},
+  {name:'Tickless Idle', en:'Tickless Idle 妯″紡', cat:'RTOS', def:'FreeRTOS 浣庡姛鑰楃壒鎬с€傚綋鎵€鏈変换鍔￠樆濉炴椂锛岀鐢?SysTick 骞惰繘鍏ユ繁搴︾潯鐪狅紝鐢卞閮ㄤ簨浠跺敜閱掋€傚敜閱掑悗鏍″噯鏃堕棿琛ュ伩鐫＄湢鏈熼棿鐨勬椂閽熷亸绉汇€俢onfigUSE_TICKLESS_IDLE 瀹忓惎鐢ㄣ€?},
+
+  // U
+  {name:'UART / USART', en:'Universal (Synchronous) Asynchronous Receiver Transmitter', cat:'鍗忚', def:'寮傛涓茶閫氫俊鎺ュ彛锛屼粎闇€ TX/RX 涓ゆ牴绾裤€傛渶甯哥敤鐨勮皟璇曡緭鍑烘帴鍙ｏ紙printf 閲嶅畾鍚戝埌 UART锛夈€傛尝鐗圭巼甯哥敤 115200銆?21600銆俇SART 棰濆鏀寔鍚屾妯″紡鍜?SPI 鍏煎妯″紡銆?},
+  {name:'USB CDC', en:'USB Communications Device Class', cat:'鍗忚', def:'USB 铏氭嫙涓插彛锛屼娇 USB 璁惧鍦ㄤ富鏈轰笂鏄剧ず涓?COM 绔彛銆係TM32 鍐呯疆 USB 澶栬閰嶅悎 CubeMX 鍙揩閫熷疄鐜般€傛棤闇€瀹夎椹卞姩锛圵indows 10+ 鍐呯疆锛夛紝鏄浛浠ｇ墿鐞嗕覆鍙ｇ殑甯哥敤鏂规銆?},
+  {name:'USB HID', en:'USB Human Interface Device', cat:'鍗忚', def:'USB 浜烘満鎺ュ彛璁惧绫伙紝鐢ㄤ簬閿洏銆侀紶鏍囥€佹父鎴忔墜鏌勭瓑銆傛渶澶т紭鍔匡細鍏嶉┍锛堟墍鏈夋搷浣滅郴缁熷師鐢熸敮鎸侊級锛屼絾閫熺巼鍙楅檺浜庤疆璇㈤棿闅旓紙鏈€澶?64KB/s锛夈€?},
+  {name:'UUID', en:'Universally Unique Identifier', cat:'鏁版嵁', def:'閫氱敤鍞竴鏍囪瘑绗︼紝128 浣嶆暟瀛椼€係TM32 鏈?96 浣嶅敮涓€ ID锛圲ID锛屼綅浜?0x1FFF7A10锛夛紝鐢ㄤ簬璁惧搴忓垪鍙枫€佸姞瀵嗗瘑閽ユ淳鐢熷拰闃插厠闅嗐€?},
+
+  // V
+  {name:'Vector Table', en:'涓柇鍚戦噺琛?, cat:'鏋舵瀯', def:'瀛樻斁涓柇鏈嶅姟渚嬬▼锛圛SR锛夊叆鍙ｅ湴鍧€鐨勬暟缁勩€侰ortex-M 鐨勫悜閲忚〃榛樿浣嶄簬 Flash 璧峰鍦板潃锛?x08000000锛夛紝鍙€氳繃 VTOR 瀵勫瓨鍣ㄩ噸瀹氫綅鍒?RAM銆傚墠 16 椤逛负绯荤粺寮傚父锛圧eset/NMI/HardFault 绛夛級锛屼箣鍚庝负澶栬涓柇銆?},
+  {name:'Vref / Vrefint', en:'鍙傝€冪數鍘?, cat:'纭欢', def:'ADC 鐨勫熀鍑嗙數鍘嬨€俈ref+ 鍐冲畾 ADC 鐨勬弧閲忕▼锛堥€氬父涓?VDDA 鎴栧閮?2.5V/3.0V 鍩哄噯婧愶級銆係TM32 鍐呴儴 Vrefint=1.2V锛岀敤浣?ADC 鑷牎鍑嗐€侫DC 璇绘暟 = (Vin/Vref) 脳 4095銆?},
+
+  // W
+  {name:'WDT / IWDG / WWDG', en:'Watchdog Timer', cat:'纭欢', def:'鐪嬮棬鐙楀畾鏃跺櫒锛岄槻姝㈢▼搴忚窇椋炪€傜嫭绔嬬湅闂ㄧ嫍锛圛WDG锛変娇鐢?LSI锛?0kHz锛夌嫭绔嬫椂閽燂紝纭欢浣胯兘鍚庝笉鍙蒋浠跺叧闂紱绐楀彛鐪嬮棬鐙楋紙WWDG锛夊彲鍦ㄧ獥鍙ｆ椂闂村唴鍠傜嫍銆備簩鑰呭彲鍚屾椂浣跨敤銆?},
+  {name:'Wi-Fi / BLE', en:'Wireless Communication', cat:'鍗忚', def:'鏃犵嚎閫氫俊銆侲SP32 闆嗘垚 2.4GHz Wi-Fi锛?02.11 b/g/n锛夊拰 BLE 4.2/5.0銆俉i-Fi 鐢ㄤ簬楂樺甫瀹界綉缁滃簲鐢紙MQTT/HTTP锛夛紝BLE 鐢ㄤ簬浣庡姛鑰楀璁鹃€氫俊锛堜紶鎰熷櫒/绌挎埓璁惧锛夈€?},
+
+  // X
+  {name:'XIP', en:'eXecute In Place', cat:'鏋舵瀯', def:'灏卞湴鎵ц锛屼粠澶栭儴 Flash 鐩存帴鎵ц浠ｇ爜鑰屾棤闇€鍏堝姞杞藉埌 RAM銆俀SPI Flash 鏄犲皠鍒板唴瀛樺湴鍧€绌洪棿鍚庢敮鎸?XIP銆傝妭鐪?RAM 浣嗛€熷害鍙楅檺浜?Flash 璇诲彇閫熺巼銆侰ortex-M7 鐨?QSPI 鎺ュ彛鏀寔鍐呭瓨鏄犲皠 XIP銆?},
+
+  // Z
+  {name:'Zephyr', en:'Zephyr RTOS', cat:'RTOS', def:'Linux 鍩洪噾浼氭墭绠＄殑寮€婧?RTOS锛屾敮鎸?500+ 寮€鍙戞澘銆傜壒鐐癸細璁惧鏍戯紙DeviceTree锛夐厤缃‖浠躲€並config 閰嶇疆绯荤粺銆佸畬鏁寸綉缁滃崗璁爤銆傞€傜敤鍦烘櫙锛氱墿鑱旂綉璁惧銆佸彲绌挎埓銆佸伐涓氳嚜鍔ㄥ寲銆?},
+];
+
+// Build nav
+(function(){
+  var letters = [];
+  TERMS.forEach(function(t){
+    var l = t.name.charAt(0).toUpperCase();
+    if (letters.indexOf(l) < 0) letters.push(l);
+  });
+  var nav = document.getElementById('glossaryNav');
+  nav.innerHTML = '<a class="active" onclick="showAll()" id="nav-all">All</a>' + letters.map(function(l){
+    return '<a onclick="filterByLetter(\'' + l + '\')" id="nav-' + l + '">' + l + '</a>';
+  }).join('');
+
+  // Render all terms
+  renderTerms(TERMS);
+})();
+
+function renderTerms(terms) {
+  var html = '';
+  var lastLetter = '';
+  terms.forEach(function(t) {
+    var l = t.name.charAt(0);
+    if (l !== lastLetter) {
+      html += '<h2 id="sec-' + l + '" style="color:var(--a,#58a6ff);border-bottom:1px solid var(--br,#30363d);padding-bottom:4px;margin:28px 0 12px">' + l + '</h2>';
+      lastLetter = l;
+    }
+    html += '<div class="term-block" id="term-' + t.name.replace(/\s+/g,'-').replace(/[^\w-]/g,'') + '">';
+    html += '<div class="term-name">' + t.name + '<span class="term-en">' + t.en + '</span><span class="term-cat">' + t.cat + '</span></div>';
+    html += '<div class="term-def">' + t.def + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('glossaryContent').innerHTML = html || '<p style="color:var(--t2,#8b949e)">鏈壘鍒板尮閰嶇殑鏈銆?/p>';
+}
+
+function filterTerms() {
+  var q = document.getElementById('glossarySearch').value.toLowerCase().trim();
+  if (!q) { renderTerms(TERMS); resetNavActive(); document.getElementById('nav-all').classList.add('active'); return; }
+  var filtered = TERMS.filter(function(t){
+    return t.name.toLowerCase().indexOf(q) >= 0 || t.en.toLowerCase().indexOf(q) >= 0 || t.def.toLowerCase().indexOf(q) >= 0 || t.cat.toLowerCase().indexOf(q) >= 0;
+  });
+  renderTerms(filtered);
+  resetNavActive();
+}
+
+function filterByLetter(l) {
+  document.getElementById('glossarySearch').value = '';
+  var filtered = TERMS.filter(function(t){ return t.name.toUpperCase().startsWith(l); });
+  renderTerms(filtered);
+  resetNavActive();
+  document.getElementById('nav-' + l).classList.add('active');
+}
+
+function showAll() {
+  document.getElementById('glossarySearch').value = '';
+  renderTerms(TERMS);
+  resetNavActive();
+  document.getElementById('nav-all').classList.add('active');
+}
+
+function resetNavActive() {
+  document.querySelectorAll('#glossaryNav a').forEach(function(a){ a.classList.remove('active'); });
+}
+</script>
+</body>
+</html>
