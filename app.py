@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 
-app = FastAPI(title="Embedded Dev Tutorials", version="1.6.3")
+app = FastAPI(title="Embedded Dev Tutorials", version="1.7.0")
 
 # Static files
 static_dir = os.path.join(os.path.dirname(__file__), "static")
