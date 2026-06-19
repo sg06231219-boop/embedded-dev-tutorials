@@ -410,6 +410,7 @@ body.focus-mode .topbar .focus-indicator{display:inline-block;font-size:.75em;co
       <div class="nav-group-title">馃殌 瀹炴垬涓庡墠娌?/div>
       <a class="nav-item" data-page="practice-projects" onclick="loadPage('practice-projects')">缁冩墜鏂瑰悜 <span class="badge badge-new">鏂?/span></a>
       <a class="nav-item" data-page="bci-2026" onclick="loadPage('bci-2026')">鑴戞満鎺ュ彛2026 <span class="badge badge-hot">鐑偣</span></a>
+      <a class="nav-item" data-page="glossary" onclick="loadPage('glossary')">馃摉 鏈璇嶅吀 <span class="badge badge-new">鏂?/span></a>
     </div>
     <div class="nav-group collapsible">
       <div class="nav-group-title" onclick="toggleNavGroup(this)">馃煝 鍏ラ棬椤圭洰 <span class="toggle-icon">鈻?/span></div>
@@ -449,7 +450,7 @@ body.focus-mode .topbar .focus-indicator{display:inline-block;font-size:.75em;co
     <div id="bookmarkList"></div>
   </div>
   <div class="sidebar-footer">
-    v1.8.0 路 2026-06-19 路 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="鍒囨崲浜壊/鏆楄壊">馃寵</button> 路 鈱笍 <span class="kbd">/</span> 鎼滅储
+    v1.9.0 路 2026-06-19 路 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="鍒囨崲浜壊/鏆楄壊">馃寵</button> 路 鈱笍 <span class="kbd">/</span> 鎼滅储
   </div>
 </nav>
 
@@ -512,6 +513,7 @@ const PAGES = {
   protocols: { title: '閫氫俊鍗忚', breadcrumb: '馃搻 棣栭〉 / 馃攲 閫氫俊鍗忚', type: 'tutorial', file: 'tutorials/protocols.html' },
   'practice-projects': { title: '缁冩墜鏂瑰悜澶у叏', breadcrumb: '馃搻 棣栭〉 / 馃敩 缁冩墜鏂瑰悜', type: 'tutorial', file: 'tutorials/practice-projects.html' },
   'bci-2026': { title: '鑴戞満鎺ュ彛2026鍏ㄧ悆杩涘睍', breadcrumb: '馃搻 棣栭〉 / 馃 鑴戞満鎺ュ彛2026', type: 'tutorial', file: 'tutorials/bci-2026.html' },
+  glossary: { title: '宓屽叆寮忔湳璇瘝鍏?, breadcrumb: '馃搻 棣栭〉 / 馃摉 鏈璇嶅吀', type: 'tutorial', file: 'tutorials/glossary.html' },
   'proj-led-button': { title: 'LED璺戦┈鐏?鎸夐敭鎺у埗', breadcrumb: '馃搻 棣栭〉 / 馃煝 LED+鎸夐敭', type: 'tutorial', file: 'tutorials/proj-led-button.html' },
   'proj-uart-hello': { title: '涓插彛Hello World', breadcrumb: '馃搻 棣栭〉 / 馃煝 涓插彛Hello', type: 'tutorial', file: 'tutorials/proj-uart-hello.html' },
   'proj-oled-display': { title: 'OLED鏄剧ず', breadcrumb: '馃搻 棣栭〉 / 馃煝 OLED鏄剧ず', type: 'tutorial', file: 'tutorials/proj-oled-display.html' },
@@ -553,6 +555,7 @@ const cardsData = [
     { page:'protocols', icon:'馃攲', title:'閫氫俊鍗忚', desc:'I2C/SPI/UART/CAN鍗忚鍘熺悊锛岀‖浠舵帴绾匡紝HAL浠ｇ爜锛岄€昏緫鍒嗘瀽浠?, tags:['杩涢樁','閫氫俊'], time:'~20鍒嗛挓', size:'29KB', time:'20鍒嗛挓', diff:2 },
     { page:'practice-projects', icon:'馃敩', title:'缁冩墜鏂瑰悜澶у叏', desc:'20涓垎绾ч」鐩細LED璺戦┈鐏啋FreeRTOS澶氫换鍔♀啋鏅鸿兘灏忚溅鈫払ootloader鈫扷SB寮€鍙?, tags:['瀹炴垬','蹇呯湅'], time:'~10鍒嗛挓', size:'28KB', time:'15鍒嗛挓', hot:true, diff:0 },
     { page:'bci-2026', icon:'馃', title:'鑴戞満鎺ュ彛2026鍏ㄧ悆杩涘睍', desc:'Neuralink/Synchron/鍗氱澘搴锋渶鏂扮獊鐮达紝涓夋槦4nm鑺墖锛屽ぇ妯″瀷+BCI铻嶅悎鏋舵瀯', tags:['鍓嶆部','鐑偣'], time:'~15鍒嗛挓', size:'46KB', time:'25鍒嗛挓', hot:true, diff:0 },
+    { page:'glossary', icon:'馃摉', title:'宓屽叆寮忔湳璇瘝鍏?, desc:'ADC/DMA/FreeRTOS/SPI绛?0+鏍稿績鏈璇﹁В锛屾嫾闊虫绱?鍒嗙被娴忚锛屾柊鎵嬪繀澶囧弬鑰?, tags:['宸ュ叿','鍙傝€?], time:'~15鍒嗛挓', size:'16KB', diff:1 },
     { page:'proj-led-button', icon:'馃挕', title:'LED璺戦┈鐏?鎸夐敭鎺у埗', desc:'GPIO杈撳嚭娴佹按鐏紝鎸夐敭杈撳叆锛屽閮ㄤ腑鏂紝杞欢/纭欢娑堟姈锛岀涓€涓畬鏁撮」鐩?, tags:['鍏ラ棬','GPIO'], time:'~15鍒嗛挓', size:'25KB', diff:1 },
     { page:'proj-uart-hello', icon:'馃枼锔?, title:'涓插彛Hello World', desc:'UART閰嶇疆锛宲rintf閲嶅畾鍚戯紝涓柇鎺ユ敹锛屽懡浠よВ鏋愭帶鍒禠ED锛孌MA鎺ユ敹', tags:['鍏ラ棬','UART'], time:'~15鍒嗛挓', size:'28KB', diff:1 },
     { page:'proj-oled-display', icon:'馃摫', title:'OLED鏄剧ず灞忛┍鍔?, desc:'I2C閫氫俊锛孲SD1306椹卞姩锛屽瓧绗?鏁板瓧/鍥惧舰鏄剧ず锛屽瓧搴撳彇妯★紝婊氬姩鏁堟灉', tags:['鍏ラ棬','I2C'], time:'~15鍒嗛挓', size:'30KB', diff:1 },
@@ -818,7 +821,7 @@ async function loadPage(pageId) {
       }
     }, 100);
 
-    // 娣诲姞涓?涓嬬瘒瀵艰埅锛堟寜瀛︿範璺嚎鎺掑簭锛?    const pageOrder = ['overview','guide','guide-ch00','guide-ch01','guide-ch02','guide-ch03','guide-ch04','guide-ch05','guide-ch06','guide-ch07','guide-ch08','guide-ch09','guide-ch10','guide-ch11','guide-ch12','guide-ch13','arm-gcc','cmake','makefile','serial','flash-debug','stm32','esp32','freertos','protocols','practice-projects','proj-led-button','proj-uart-hello','proj-oled-display','proj-dht11-monitor','proj-pwm-motor','proj-servo-control','proj-ir-remote','proj-ultrasonic','proj-stepper-motor','proj-freertos-station','proj-smart-car','proj-can-bus','proj-sd-logger','proj-esp32-iot','proj-low-power','proj-bootloader-iap','proj-dma-adc','proj-usb-hid','proj-s32k144-auto','proj-oscilloscope-debug','bci-2026'];
+    // 娣诲姞涓?涓嬬瘒瀵艰埅锛堟寜瀛︿範璺嚎鎺掑簭锛?    const pageOrder = ['overview','guide','guide-ch00','guide-ch01','guide-ch02','guide-ch03','guide-ch04','guide-ch05','guide-ch06','guide-ch07','guide-ch08','guide-ch09','guide-ch10','guide-ch11','guide-ch12','guide-ch13','arm-gcc','cmake','makefile','serial','flash-debug','stm32','esp32','freertos','protocols','practice-projects','proj-led-button','proj-uart-hello','proj-oled-display','proj-dht11-monitor','proj-pwm-motor','proj-servo-control','proj-ir-remote','proj-ultrasonic','proj-stepper-motor','proj-freertos-station','proj-smart-car','proj-can-bus','proj-sd-logger','proj-esp32-iot','proj-low-power','proj-bootloader-iap','proj-dma-adc','proj-usb-hid','proj-s32k144-auto','proj-oscilloscope-debug','bci-2026','glossary'];
     const idx = pageOrder.indexOf(pageId);
     if (idx >= 0) {
       const navHtml = document.createElement('div');
@@ -1021,7 +1024,7 @@ const RELATED_TAGS = {
   'proj-freertos-station': ['guide-ch08','freertos'],
   'proj-smart-car': ['guide-ch13','proj-pwm-motor'],
   'proj-esp32-iot': ['guide-ch07','bci-2026'],
-  'bci-2026': ['guide-ch07','practice-projects'],
+  'bci-2026': ['guide-ch07','practice-projects','glossary'],
 };
 function renderRelated(pageId) {
   const ids = RELATED_TAGS[pageId];
