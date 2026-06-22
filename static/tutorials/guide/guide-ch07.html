@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>绗?绔狅細ESP32寮€鍙戝疄鎴?- 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
+<title>第7章：ESP32开发实战 - 嵌入式小白完全指南</title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,216 +57,463 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>绗?绔狅細ESP32寮€鍙戝疄鎴?/h1>
-<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 7/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
+<h1>第7章：ESP32开发实战</h1>
+<div class="summary"><b>📖 小白完全指南 · 7/14</b> | 阅读时间约22分钟</div>
 
-<p>ESP32=鍗曠墖鏈虹晫鐨?strong>鐟炲＋鍐涘垁</strong>鈥斺€旇嚜甯iFi+钃濈墮锛屽弻鏍?40MHz锛?20KB RAM锛屄?0涓€鐗囥€傚仛鐗╄仈缃戦」鐩閫夈€?/p>
+<p>ESP32=单片机界的<strong>瑞士军刀</strong>——自带WiFi+蓝牙，双核240MHz，520KB RAM，¥10一片。做物联网项目首选。这一章从esptool到MQTT，从WiFi到OTA，带你全面掌握ESP32开发。</p>
 
-<div class="analogy">馃挕 <b>绫绘瘮锛?/b>濡傛灉STM32鏄簿宸ユ墜琛紙绮惧噯銆佷綆鍔熻€楋級锛孍SP32灏辨槸鏅鸿兘鎵嬫満锛堝姛鑳藉叏闈€佽仈缃戙€佹€ц兘寮猴級銆傚仛绮剧‘鎺у埗鐢⊿TM32锛屽仛鑱旂綉搴旂敤鐢‥SP32銆?/div>
+<div class="analogy">💡 <b>类比：</b>如果STM32是精工手表（精准、低功耗），ESP32就是智能手机（功能全面、联网、性能强）。做精确控制用STM32，做联网应用用ESP32。</div>
 
-<h3>esptool 鐑у綍</h3>
+<h2>🔌 esptool 烧录</h2>
 
-<pre><code># 鏌ョ湅ESP32淇℃伅
+<pre><code># esptool.py — ESP32/ESP8266通用烧录工具
+# 安装：pip install esptool（通常随ESP-IDF或PlatformIO自动安装）
+
+# 查看芯片信息
 esptool.py --chip esp32 -p COM3 chip_id
+esptool.py --chip esp32 -p COM3 flash_id
 
-# 鐑у綍鍥轰欢
-esptool.py --chip esp32 -p COM3 -b 460800     write_flash -z 0x1000 bootloader.bin     0x8000 partitions.bin     0x10000 firmware.bin
+# 烧录完整固件（bootloader + 分区表 + 应用）
+esptool.py --chip esp32 -p COM3 -b 460800 \
+    write_flash -z \
+    0x1000 bootloader.bin \
+    0x8000 partitions.bin \
+    0x10000 firmware.bin
 
-# 鎿﹂櫎Flash
-esptool.py --chip esp32 -p COM3 erase_flash
+# 常用操作
+esptool.py --chip esp32 -p COM3 erase_flash              # 擦除全部Flash
+esptool.py --chip esp32 -p COM3 read_flash 0 0x400000 dump.bin  # 备份固件
+esptool.py --chip esp32 -p COM3 erase_region 0x10000 0x100000   # 擦除指定区域
 
-# 璇诲彇Flash
-esptool.py --chip esp32 -p COM3 read_flash 0 0x400000 flash_dump.bin</code></pre>
+# 单文件烧录（适用于单分区固件）
+esptool.py --chip esp32 -p COM3 write_flash 0x0 merged_firmware.bin</code></pre>
 
-<h3>ESP-IDF 鍩虹锛堝畼鏂瑰紑鍙戞鏋讹級</h3>
+<h2>⚡ 5分钟快速上手（Arduino/PlatformIO）</h2>
 
-<div class="warn">鈿狅笍 <b>鍓嶆彁鏉′欢锛?/b>ESP-IDF闇€瑕佸畬鏁村畨瑁咃紙绾?-3GB锛夛紝<strong>鍒濆鑰呭彲鍏堣烦杩?/strong>锛岀敤Arduino妗嗘灦涔熻兘璺慐SP32銆?br><br>
-<strong>Windows瀹夎姝ラ锛?/strong><br>
-鈶?涓嬭浇绂荤嚎瀹夎鍖咃細<a href="https://dl.espressif.com/dl/esp-idf/" style="color:var(--a)">dl.espressif.com/dl/esp-idf/</a>锛堟帹鑽愶紝鍖呭惈鎵€鏈変緷璧栵級<br>
-鈶?鍙屽嚮瀹夎锛岄€夋嫨榛樿璺緞 <code>C:\Espressif</code>锛屽嬀閫?娣诲姞鍒癙ATH"<br>
-鈶?瀹夎绾﹂渶10-20鍒嗛挓锛屽彇鍐充簬缃戦€?br>
-鈶?瀹夎瀹屾垚鍚庯紝鎵撳紑"ESP-IDF 5.x CMD"蹇嵎鏂瑰紡锛堝畨瑁呭櫒鍒涘缓鐨勶級<br>
-鈶?楠岃瘉锛?code>idf.py --version</code> 鈫?杈撳嚭鐗堟湰鍙峰嵆鎴愬姛<br><br>
-<strong>濡傛灉绂荤嚎鍖呬笅杞芥參锛?/strong><br>
-鈥?鐢ㄦ墜鏈虹儹鐐硅瘯璇曪紙鏈夋椂姣擶iFi蹇級<br>
-鈥?鍦ㄦ湁VPN鐨勭幆澧冧笅杞藉悗鎷疯礉杩囨潵<br>
-鈥?鐢≒latformIO鎻掍欢锛圴S Code閲岃浜嗭級鍒涘缓ESP32椤圭洰锛屾棤闇€鍗曠嫭瑁匛SP-IDF</div>
+<div class="note">⚠️ <b>最快上手方式：</b>用PlatformIO创建ESP32 Arduino项目，无需单独装ESP-IDF（约3GB）！</div>
 
-<pre><code>// WiFi鎵弿绀轰緥
+<div class="step"><b>步骤1：</b>VS Code → PlatformIO → New Project → Board: ESP32 Dev Module → Framework: Arduino</div>
+<div class="step"><b>步骤2：</b>把下面的代码粘贴到 <code>src/main.cpp</code></div>
+<pre><code>// ESP32 LED闪烁 + 串口输出（Arduino框架，5分钟跑通）
+// 大多数ESP32开发板的LED在GPIO2（内置LED）
+
+void setup() {
+    Serial.begin(115200);  // 初始化串口
+    pinMode(2, OUTPUT);     // GPIO2设为输出
+    Serial.println("ESP32 Started! Chip: " + String(ESP.getChipModel()));
+    Serial.printf("Free heap: %d bytes\n", ESP.getFreeHeap());
+}
+
+void loop() {
+    digitalWrite(2, HIGH);   // LED亮
+    Serial.println("LED ON");
+    delay(500);
+    digitalWrite(2, LOW);    // LED灭
+    Serial.println("LED OFF");
+    delay(500);
+}</code></pre>
+<div class="step"><b>步骤3：</b>连接ESP32 → 点击PlatformIO的→箭头按钮（Upload） → 自动编译+烧录</div>
+<div class="step"><b>步骤4：</b>打开串口监视器（PlatformIO插头图标），看到"LED ON/OFF"交替输出就成功了！</div>
+
+<div class="trouble">🔍 <b>常见问题：esptool连接失败</b><br>
+❌ <b>现象：</b><code>A fatal error occurred: Failed to connect to ESP32</code><br>
+✅ <b>解决步骤：</b><br>
+1. 按住<b>BOOT</b>键不放，再按一下<b>EN</b>(RST)键，松开BOOT键 → 进入下载模式<br>
+2. 检查COM口号：设备管理器 → 端口 → 找"Silicon Labs CP210x"或"CH340"<br>
+3. USB驱动确认：CP2102驱动 → <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers" style="color:var(--a)">Silabs官网下载</a>；CH340驱动 → 搜"CH340 driver"<br>
+4. 换一根数据线（某些充电线没有数据功能！）<br>
+5. 降低波特率：<code>esptool.py -b 115200</code></div>
+
+<h2>🔄 Arduino vs ESP-IDF：选哪个？</h2>
+
+<table>
+<tr><th>特性</th><th>Arduino框架</th><th>ESP-IDF</th></tr>
+<tr><td>上手难度</td><td>极低（setup/loop模型）</td><td>中等（需要理解FreeRTOS）</td></tr>
+<tr><td>灵活性</td><td>受限（API封装固定）</td><td>完全控制</td></tr>
+<tr><td>性能优化</td><td>一般</td><td>极致（IRAM加速、cache控制）</td></tr>
+<tr><td>FreeRTOS</td><td>隐藏使用（单核loop）</td><td>显式使用（多任务、多核）</td></tr>
+<tr><td>menuconfig</td><td>不支持</td><td>完整的Kconfig配置系统</td></tr>
+<tr><td>适合</td><td>原型验证/初学者/快速demo</td><td>产品开发/性能要求/进阶用户</td></tr>
+<tr><td>PlatformIO</td><td>✅ 支持</td><td>✅ 支持（framework=espidf）</td></tr>
+</table>
+
+<div class="tip">💡 <b>建议：</b>Arduino快速验证想法（1小时出原型），ESP-IDF做正式产品（功能全、性能好）。PlatformIO支持两种框架一键切换，非常方便。</div>
+
+<h2>📶 WiFi开发实战</h2>
+
+<h3>WiFi Station模式（连接路由器）</h3>
+
+<pre><code>// ESP-IDF WiFi Station 完整示例
 #include "esp_wifi.h"
 #include "esp_event.h"
+#include "nvs_flash.h"
+#include "esp_log.h"
 
-void wifi_scan(void) {
-    wifi_scan_config_t scan_config = {
-        .ssid = NULL,
-        .bssid = NULL,
-        .channel = 0,
-        .show_hidden = true
+#define WIFI_SSID "YourWiFi"
+#define WIFI_PASS "YourPassword"
+#define TAG "WiFi"
+
+static void wifi_event_handler(void* arg, esp_event_base_t base,
+    int32_t id, void* data) {
+    if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
+        esp_wifi_connect();
+    } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
+        ESP_LOGW(TAG, "WiFi断开，尝试重连...");
+        esp_wifi_connect();
+    } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
+        ip_event_got_ip_t* ev = (ip_event_got_ip_t*)data;
+        ESP_LOGI(TAG, "获取IP: " IPSTR, IP2STR(&ev->ip_info.ip));
+    }
+}
+
+void wifi_init_sta(void) {
+    // 1. 初始化NVS（WiFi配置存储）
+    nvs_flash_init();
+    
+    // 2. 初始化TCP/IP协议栈
+    esp_netif_init();
+    esp_event_loop_create_default();
+    esp_netif_create_default_wifi_sta();
+    
+    // 3. 初始化WiFi驱动
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    esp_wifi_init(&cfg);
+    
+    // 4. 注册事件处理
+    esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
+        &wifi_event_handler, NULL);
+    esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP,
+        &wifi_event_handler, NULL);
+    
+    // 5. 配置并连接
+    wifi_config_t wifi_cfg = {
+        .sta = {
+            .ssid = WIFI_SSID,
+            .password = WIFI_PASS,
+            .threshold.authmode = WIFI_AUTH_WPA2_PSK,  // 最低安全要求
+        }
     };
+    esp_wifi_set_mode(WIFI_MODE_STA);
+    esp_wifi_set_config(WIFI_IF_STA, &wifi_cfg);
+    esp_wifi_start();
+}</code></pre>
 
+<h3>WiFi扫描器</h3>
+
+<pre><code>// 扫描周围WiFi热点
+void wifi_scan(void) {
     esp_wifi_set_mode(WIFI_MODE_STA);
     esp_wifi_start();
-    esp_wifi_scan_start(&amp;scan_config, true);  // 闃诲鎵弿
-
+    
+    wifi_scan_config_t scan_cfg = {
+        .ssid = NULL,
+        .bssid = NULL,
+        .channel = 0,              // 全信道扫描
+        .show_hidden = true,       // 显示隐藏网络
+        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
+    };
+    
+    esp_wifi_scan_start(&scan_cfg, true);  // true=阻塞等待完成
+    
     uint16_t ap_count = 0;
-    esp_wifi_scan_get_ap_num(&amp;ap_count);
-
+    esp_wifi_scan_get_ap_num(&ap_count);
+    
     wifi_ap_record_t *ap_list = malloc(sizeof(wifi_ap_record_t) * ap_count);
-    esp_wifi_scan_get_ap_records(&amp;ap_count, ap_list);
-
-    for (int i = 0; i &lt; ap_count; i++) {
-        printf("%-32s RSSI: %d Ch: %d
-",
-            ap_list[i].ssid, ap_list[i].rssi, ap_list[i].primary);
+    esp_wifi_scan_get_ap_records(&ap_count, ap_list);
+    
+    printf("\n=== WiFi Scan Results (%d APs) ===\n", ap_count);
+    printf("%-32s %6s %3s %s\n", "SSID", "RSSI", "Ch", "Auth");
+    printf("--------------------------------------\n");
+    
+    for (int i = 0; i < ap_count; i++) {
+        printf("%-32s %6d %3d %s\n",
+            ap_list[i].ssid,
+            ap_list[i].rssi,
+            ap_list[i].primary,
+            ap_list[i].authmode == WIFI_AUTH_OPEN ? "Open" : "****");
     }
     free(ap_list);
 }</code></pre>
 
-<h3>WiFi杩炴帴</h3>
+<h3>SmartConfig智能配网</h3>
 
-<pre><code>// 杩炴帴WiFi
-void wifi_connect(const char *ssid, const char *password) {
-    wifi_config_t wifi_config = {0};
-    strncpy((char *)wifi_config.sta.ssid, ssid, 31);
-    strncpy((char *)wifi_config.sta.password, password, 63);
-
+<pre><code>// 用手机APP一键配网（免输入SSID/密码）
+// 手机APP：Espressif Esptouch (Android) 或 Espressif Esptouch (iOS)
+void smartconfig_start(void) {
     esp_wifi_set_mode(WIFI_MODE_STA);
-    esp_wifi_set_config(WIFI_IF_STA, &amp;wifi_config);
     esp_wifi_start();
-    esp_wifi_connect();
+    esp_smartconfig_set_type(SC_TYPE_ESPTOUCH);
+    esp_smartconfig_start(smartconfig_callback);
+    printf("SmartConfig started. Use Esptouch APP to configure.\n");
+}
 
-    // 绛夊緟杩炴帴鎴愬姛浜嬩欢
-    // 鍦ㄤ簨浠跺鐞嗗嚱鏁颁腑澶勭悊 WIFI_EVENT_STA_CONNECTED
+static void smartconfig_callback(smartconfig_status_t status, void *pdata) {
+    switch (status) {
+    case SC_STATUS_LINK:
+        printf("SmartConfig: Got SSID/Password, connecting...\n");
+        break;
+    case SC_STATUS_LINK_OVER:
+        printf("SmartConfig: WiFi connected!\n");
+        // 保存WiFi凭据到NVS
+        wifi_config_t cfg;
+        esp_wifi_get_config(WIFI_IF_STA, &cfg);
+        // nvs_save_wifi((char*)cfg.sta.ssid, (char*)cfg.sta.password);
+        esp_smartconfig_stop();
+        break;
+    case SC_STATUS_FIND_CHANNEL:
+        printf("SmartConfig: Found channel.\n");
+        break;
+    }
 }</code></pre>
 
-<h3>Arduino vs ESP-IDF</h3>
+<h2>🌐 HTTP通信</h2>
 
+<h3>HTTP GET请求</h3>
+
+<pre><code>// ESP-IDF HTTP客户端
+#include "esp_http_client.h"
+
+void http_get_example(void) {
+    char response[1024] = {0};
+    
+    esp_http_client_config_t cfg = {
+        .url = "http://api.openweathermap.org/data/2.5/weather?q=Beijing&appid=YOUR_KEY",
+        .method = HTTP_METHOD_GET,
+        .timeout_ms = 5000,
+        .user_agent = "ESP32/1.0",
+    };
+    
+    esp_http_client_handle_t client = esp_http_client_init(&cfg);
+    esp_err_t err = esp_http_client_perform(client);
+    
+    if (err == ESP_OK) {
+        int status = esp_http_client_get_status_code(client);
+        int read_len = esp_http_client_read(client, response, sizeof(response)-1);
+        response[read_len] = 0;
+        printf("HTTP %d, Response: %s\n", status, response);
+    } else {
+        printf("HTTP GET failed: %s\n", esp_err_to_name(err));
+    }
+    esp_http_client_cleanup(client);
+}</code></pre>
+
+<h3>HTTP服务器（Web配网页）</h3>
+
+<pre><code>// ESP32作为Web服务器，提供配网页面
+#include "esp_http_server.h"
+
+// HTML页面（存在Flash中）
+static const char *index_html = 
+"<!DOCTYPE html><html><head><meta charset='utf-8'>"
+"<meta name='viewport' content='width=device-width,initial-scale=1'>"
+"<title>ESP32配网</title></head><body>"
+"<h1>ESP32 WiFi配置</h1>"
+"<form action='/save' method='POST'>"
+"<label>SSID: <input name='ssid'></label><br>"
+"<label>密码: <input name='pass' type='password'></label><br>"
+"<button type='submit'>保存并连接</button></form></body></html>";
+
+static esp_err_t root_handler(httpd_req_t *req) {
+    httpd_resp_set_type(req, "text/html");
+    httpd_resp_send(req, index_html, strlen(index_html));
+    return ESP_OK;
+}
+
+static esp_err_t save_handler(httpd_req_t *req) {
+    char buf[128];
+    int len = httpd_req_recv(req, buf, sizeof(buf)-1);
+    buf[len] = 0;
+    
+    // 解析POST数据：ssid=XXX&pass=YYY
+    char ssid[33] = {0}, pass[65] = {0};
+    // 简化解析（生产代码用URL decode）
+    sscanf(buf, "ssid=%32[^&]&pass=%64s", ssid, pass);
+    
+    printf("WiFi配置: SSID=%s PASS=%s\n", ssid, pass);
+    // TODO: 保存到NVS，然后连接WiFi + 重启
+    
+    httpd_resp_sendstr(req, "OK! Rebooting...");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    esp_restart();
+    return ESP_OK;
+}
+
+void start_webserver(void) {
+    httpd_config_t cfg = HTTPD_DEFAULT_CONFIG();
+    httpd_handle_t server = NULL;
+    httpd_start(&server, &cfg);
+    
+    httpd_uri_t root = {.uri="/", .method=HTTP_GET, .handler=root_handler};
+    httpd_uri_t save = {.uri="/save", .method=HTTP_POST, .handler=save_handler};
+    httpd_register_uri_handler(server, &root);
+    httpd_register_uri_handler(server, &save);
+    
+    printf("WebServer started on http://%s\n", "192.168.4.1");
+}</code></pre>
+
+<h2>📂 SPIFFS文件系统</h2>
+
+<pre><code>// ESP-IDF SPIFFS操作
+#include "esp_spiffs.h"
+
+void mount_spiffs(void) {
+    esp_vfs_spiffs_conf_t cfg = {
+        .base_path = "/spiffs",
+        .partition_label = "storage",
+        .max_files = 5,
+        .format_if_mount_failed = true
+    };
+    
+    esp_err_t ret = esp_vfs_spiffs_register(&cfg);
+    if (ret == ESP_OK) {
+        size_t total = 0, used = 0;
+        esp_spiffs_info("storage", &total, &used);
+        printf("SPIFFS: %d/%d KB used\n", used/1024, total/1024);
+    }
+}
+
+void spiffs_example(void) {
+    // 写入文件
+    FILE* f = fopen("/spiffs/config.txt", "w");
+    if (f) {
+        fprintf(f, "wifi_ssid=MyWiFi\n");
+        fprintf(f, "interval=30\n");
+        fprintf(f, "server=mqtt://broker.emqx.io:1883\n");
+        fclose(f);
+        printf("Config written.\n");
+    }
+    
+    // 读取文件
+    f = fopen("/spiffs/config.txt", "r");
+    if (f) {
+        char line[128];
+        while (fgets(line, sizeof(line), f)) {
+            printf("Config: %s", line);
+        }
+        fclose(f);
+    }
+    
+    // 列出目录
+    DIR* dir = opendir("/spiffs");
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != NULL) {
+        printf("  %s (%d)\n", entry->d_name, entry->d_type);
+    }
+    closedir(dir);
+}</code></pre>
+
+<h2>🔷 蓝牙BLE实战</h2>
+
+<div class="card">
+<div class="h"><span class="name">BLE核心概念</span><span class="tag g">必须理解</span></div>
+<div class="b">
+<div class="desc">BLE不是传统蓝牙！理解这些概念是入门关键：</div>
 <table>
-<tr><th>鐗规€?/th><th>Arduino</th><th>ESP-IDF</th></tr>
-<tr><td>涓婃墜闅惧害</td><td>鏋佷綆</td><td>涓瓑</td></tr>
-<tr><td>鐏垫椿鎬?/td><td>鍙楅檺</td><td>瀹屽叏鎺у埗</td></tr>
-<tr><td>鎬ц兘浼樺寲</td><td>涓€鑸?/td><td>鏋佽嚧</td></tr>
-<tr><td>FreeRTOS</td><td>闅愯棌浣跨敤</td><td>鏄惧紡浣跨敤</td></tr>
-<tr><td>閫傚悎</td><td>鍘熷瀷楠岃瘉/鍒濆鑰?/td><td>浜у搧寮€鍙?杩涢樁</td></tr>
+<tr><th>概念</th><th>说明</th><th>类比</th></tr>
+<tr><td>GAP</td><td>设备发现与连接</td><td>握手和交换名片</td></tr>
+<tr><td>GATT</td><td>数据传输协议</td><td>谈话的内容和格式</td></tr>
+<tr><td>Service</td><td>功能集合（UUID标识）</td><td>一个"部门"</td></tr>
+<tr><td>Characteristic</td><td>具体数据点</td><td>部门里的"办公桌"</td></tr>
+<tr><td>Descriptor</td><td>Characteristic的元数据</td><td>桌上的"标签说明"</td></tr>
 </table>
+</div></div>
 
-<div class="tip">馃挕 <b>寤鸿锛?/b>Arduino蹇€熼獙璇佹兂娉曪紝ESP-IDF鍋氭寮忎骇鍝併€侾latformIO鏀寔涓ょ妗嗘灦鍒囨崲銆?/div>
+<pre><code>// BLE温度计服务（ESP-IDF GATT Server）
+// 手机用 nRF Connect APP 扫描连接查看
 
-<h3>鈿?ESP32 5鍒嗛挓蹇€熶笂鎵嬶紙Arduino妗嗘灦锛?/h3>
+#include "esp_gatts_api.h"
+#include "esp_gap_ble_api.h"
 
-<div class="note">鈿狅笍 <b>鏈€蹇殑鏂瑰紡锛?/b>鐢≒latformIO鍒涘缓ESP32 Arduino椤圭洰锛屾棤闇€鍗曠嫭瑁匛SP-IDF锛?/div>
+#define GATTS_SERVICE_UUID   0x00FF
+#define GATTS_CHAR_UUID_TEMP 0xFF01
+#define PROFILE_APP_ID       0
 
-<div class="step"><b>姝ラ1锛?/b>VS Code 鈫?PlatformIO 鈫?New Project 鈫?Board: ESP32 Dev Module 鈫?Framework: Arduino</div>
-<div class="step"><b>姝ラ2锛?/b>鎶婁笅闈㈢殑浠ｇ爜绮樿创鍒?<code>src/main.cpp</code></div>
-<pre><code>// ESP32 LED闂儊 + 涓插彛杈撳嚭锛圓rduino妗嗘灦锛?鍒嗛挓璺戦€氾級
-// 澶у鏁癊SP32寮€鍙戞澘鐨凩ED鍦℅PIO2
+// 广播参数
+static esp_ble_adv_params_t adv_params = {
+    .adv_int_min = 0x20,
+    .adv_int_max = 0x40,
+    .adv_type = ADV_TYPE_IND,
+    .own_addr_type = BLE_ADDR_TYPE_PUBLIC,
+    .channel_map = ADV_CHNL_ALL,
+    .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
+};
 
-void setup() {
-    Serial.begin(115200);  // 鍒濆鍖栦覆鍙?    pinMode(2, OUTPUT);     // GPIO2璁句负杈撳嚭
-    Serial.println("ESP32 Started!");
+// 更新温度值并通知客户端
+void ble_update_temperature(float temp_c) {
+    int16_t temp_x100 = (int16_t)(temp_c * 100);
+    // 通过GATT Notify发送给已连接的手机
+    esp_ble_gatts_send_indicate(gatts_if, conn_id, 
+        temp_char_handle, sizeof(temp_x100), (uint8_t*)&temp_x100, false);
 }
 
-void loop() {
-    digitalWrite(2, HIGH);   // LED浜?    Serial.println("LED ON");
-    delay(500);
-    digitalWrite(2, LOW);    // LED鐏?    Serial.println("LED OFF");
-    delay(500);
+// 广播数据设置
+static uint8_t adv_data[] = {
+    0x02, 0x01, 0x06,                          // Flags
+    0x09, 0x09, 'E','S','P','3','2','-','T','M', // Device Name
+    0x03, 0x03, 0xFF, 0x00,                     // 16bit Service UUID
+};
+
+void ble_init(void) {
+    esp_ble_gatts_app_register(PROFILE_APP_ID);
+    esp_ble_gap_set_device_name("ESP32-TEMP");
+    esp_ble_gap_config_adv_data_raw(adv_data, sizeof(adv_data));
+    esp_ble_gap_start_advertising(&adv_params);
 }
-</code></pre>
-<div class="step"><b>姝ラ3锛?/b>杩炴帴ESP32 鈫?鐐瑰嚮PlatformIO鐨勨啋绠ご鎸夐挳锛圲pload锛?鈫?鑷姩缂栬瘧+鐑у綍</div>
-<div class="step"><b>姝ラ4锛?/b>鎵撳紑涓插彛鐩戣鍣紙PlatformIO鎻掑ご鍥炬爣锛夛紝鐪嬪埌"LED ON/OFF"浜ゆ浛杈撳嚭灏辨垚鍔熶簡锛?/div>
 
-<div class="trouble">馃攳 <b>甯歌闂锛歟sptool杩炴帴澶辫触</b><br>
-1. 鎸変綇BOOT閿啀鐐筊ST閿紝杩涘叆涓嬭浇妯″紡<br>
-2. 妫€鏌OM鍙ｅ彿鏄惁姝ｇ‘<br>
-3. 鏌愪簺ESP32鏉块渶瑕佹墜鍔ㄦ寜BOOT杩涘叆涓嬭浇妯″紡<br>
-4. USB椹卞姩锛欳P2102/CH340纭宸插畨瑁?/div>
+// GATT事件处理（注册Service/Characteristic）
+// ... GATT数据库创建逻辑（因篇幅限制，完整代码见ESP-IDF示例 gatt_server）</code></pre>
 
-<!-- ====== 绗?绔?====== -->
-<a id="ch8"></a>
-<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>鐞嗚ВRTOS姒傚康锛屼細鍒涘缓浠诲姟/闃熷垪/淇″彿閲?浜掓枼閲忥紝鑳芥妸FreeRTOS绉绘鍒癝TM32涓娿€?/div>
+<h2>🌐 MQTT物联网通信</h2>
 
+<p>MQTT是IoT领域的HTTP——所有云平台都支持它。比HTTP轻100倍，适合MCU。</p>
 
-<h2>馃摗 ESP-IDF娣卞害閰嶇疆</h2>
-
-<p>Arduino妗嗘灦閫傚悎蹇€熷師鍨嬶紝浣嗗埌浜у搧闃舵蹇呴』鐢‥SP-IDF銆傝繖閲岃ˉ鍏匢DF鐙湁鐨勯珮绾ц兘鍔涖€?/p>
-
-<h3>menuconfig閰嶇疆绯荤粺</h3>
-
-<pre><code># ESP-IDF浣跨敤Kconfig閰嶇疆绯荤粺锛圠inux鍐呮牳鍚屾锛?# 杩愯 idf.py menuconfig 杩涘叆鍥惧舰鍖栭厤缃晫闈?
-# 鍏抽敭閰嶇疆椤归€熸煡锛?
-# 1. 鍒嗗尯琛?(Partition Table)
-#    鈫?Partition Table 鈫?Custom partition table CSV
-#    鑷畾涔夊垎鍖烘墠鑳藉仛OTA
-
-# 2. FreeRTOS閰嶇疆
-#    鈫?Component config 鈫?FreeRTOS
-#    鈫?鍕鹃€?"Run FreeRTOS only on first core"
-#    鈫?璁剧疆浠诲姟鏍堝ぇ灏?榛樿3584鈫掑缓璁敼2048鑺俁AM)
-
-# 3. WiFi閰嶇疆
-#    鈫?Component config 鈫?Wi-Fi
-#    鈫?WiFi RX buffer: 榛樿8鈫掓敼16(楂樺悶鍚愬満鏅?
-#    鈫?WiFi IRAM optimization: 鍕鹃€?鍑忓皯寤惰繜)
-
-# 4. 璋冭瘯閰嶇疆
-#    鈫?Component config 鈫?Log output
-#    鈫?Default log verbosity: Info (鍙戝竷鐗堟敼Warning)
-#    鈫?寮€鍚?"Enable GDBStub" (涓嶉渶瑕丣TAG涔熻兘璋冭瘯)
-
-# 5. 鍒嗗尯琛?#    鈫?Partition Table 鈫?Custom
-#    # partitions_ota.csv:
-#    nvs,      data, nvs,     0x9000,  0x6000
-#    otadata,  data, ota,     0xf000,  0x2000
-#    phy_init, data, phy,     0x11000, 0x1000
-#    factory,  app,  factory, 0x12000, 0x1E0000
-#    ota_0,    app,  ota_0,   ,        0x1E0000
-#    ota_1,    app,  ota_1,   ,        0x1E0000
-#    storage,  data, spiffs,  ,        0x80000  # 鏂囦欢绯荤粺</code></pre>
-
-<h2>馃寪 MQTT鐗╄仈缃戦€氫俊</h2>
-
-<p>MQTT鏄疘oT棰嗗煙鐨凥TTP鈥斺€旀墍鏈変簯骞冲彴閮芥敮鎸佸畠銆傛瘮HTTP杞?00鍊嶏紝閫傚悎MCU銆?/p>
-
-<pre><code>#include "mqtt_client.h"
+<pre><code>// ESP-IDF MQTT客户端完整示例
+#include "mqtt_client.h"
 
 static esp_mqtt_client_handle_t mqtt_client;
 
 static void mqtt_event_handler(void* arg, esp_event_base_t base,
     int32_t id, void* event_data) {
     esp_mqtt_event_handle_t ev = event_data;
+    
     switch (ev->event_id) {
     case MQTT_EVENT_CONNECTED:
-        ESP_LOGI("MQTT", "宸茶繛鎺?");
-        // 璁㈤槄涓婚
+        ESP_LOGI("MQTT", "已连接!");
         esp_mqtt_client_subscribe(mqtt_client, "device/cmd", 1);
-        // 鍙戝竷涓婄嚎娑堟伅
         esp_mqtt_client_publish(mqtt_client, "device/status", 
             "online", 0, 1, 0);
         break;
     
     case MQTT_EVENT_DATA:
-        ESP_LOGI("MQTT", "鏀跺埌: topic=%.*s data=%.*s",
-            ev->topic_len, ev->topic,
-            ev->data_len, ev->data);
-        // 澶勭悊浜戠涓嬪彂鐨勫懡浠?        if (strncmp(ev->data, "reboot", ev->data_len) == 0) {
+        ESP_LOGI("MQTT", "收到: topic=%.*s data=%.*s",
+            ev->topic_len, ev->topic, ev->data_len, ev->data);
+        // 处理云端命令
+        if (strncmp(ev->data, "reboot", 6) == 0) {
             esp_restart();
+        } else if (strncmp(ev->data, "status", 6) == 0) {
+            char buf[64];
+            snprintf(buf, sizeof(buf),
+                "{\"uptime\":%lld,\"free_heap\":%d}",
+                esp_timer_get_time()/1000000, esp_get_free_heap_size());
+            esp_mqtt_client_publish(mqtt_client, "device/status", 
+                buf, 0, 1, 0);
         }
         break;
     
     case MQTT_EVENT_DISCONNECTED:
-        ESP_LOGW("MQTT", "鏂紑杩炴帴锛岃嚜鍔ㄩ噸杩炰腑...");
+        ESP_LOGW("MQTT", "断开，自动重连...");
         break;
     }
 }
 
 void mqtt_init(void) {
     esp_mqtt_client_config_t cfg = {
-        .broker.address.uri = "mqtt://broker.emqx.io:1883",  // 鍏嶈垂娴嬭瘯MQTT Broker
+        .broker.address.uri = "mqtt://broker.emqx.io:1883",  // 免费测试
         .credentials = {
-            .username = "esp32-device-01",
-            .client_id = "esp32-sensor-001"
-        }
+            .username = "esp32-001",
+            .client_id = "esp32-sensor-001",
+        },
+        .session.keepalive = 60,
     };
     mqtt_client = esp_mqtt_client_init(&cfg);
     esp_mqtt_client_register_event(mqtt_client, ESP_EVENT_ANY_ID,
@@ -274,105 +521,808 @@ void mqtt_init(void) {
     esp_mqtt_client_start(mqtt_client);
 }
 
-// 瀹氭椂涓婃姤鏁版嵁
+// 定时上报传感器数据（JSON格式）
 void publish_sensor_data(float temp, float hum) {
     char payload[128];
     snprintf(payload, sizeof(payload),
-        "{\"temp\":%.1f,\"hum\":%.1f,\"ts\":%lld}",
-        temp, hum, esp_timer_get_time());
-    // QoS 1 = 鑷冲皯涓€娆￠€佽揪
+        "{\"temp\":%.1f,\"hum\":%.1f,\"ts\":%lld,\"rssi\":%d}",
+        temp, hum, esp_timer_get_time()/1000000, get_wifi_rssi());
     esp_mqtt_client_publish(mqtt_client, "sensor/data",
-        payload, 0, 1, 0);
+        payload, 0, 1, 0);  // QoS 1 = 至少送达一次
 }</code></pre>
 
-<h2>馃搨 SPIFFS鏂囦欢绯荤粺</h2>
+<h2>⚡ 双核编程</h2>
 
-<pre><code>#include "esp_spiffs.h"
+<p>ESP32有<strong>两个Xtensa LX6核心</strong>。默认情况下，Arduino的loop()只跑在Core1，ESP-IDF让你自由分配任务到两个核心。</p>
 
-void mount_spiffs(void) {
-    esp_vfs_spiffs_conf_t cfg = {
-        .base_path = "/spiffs",          // 鎸傝浇鐐?        .partition_label = "storage",    // 鍒嗗尯鏍囩
-        .max_files = 5,                  // 鍚屾椂鎵撳紑鏈€澶ф枃浠舵暟
-        .format_if_mount_failed = true   // 鎸傝浇澶辫触灏辨牸寮忓寲
-    };
-    esp_err_t ret = esp_vfs_spiffs_register(&cfg);
-    
-    if (ret == ESP_OK) {
-        size_t total = 0, used = 0;
-        esp_spiffs_info("storage", &total, &used);
-        printf("SPIFFS: %d/%d KB 鍙敤\n", (total-used)/1024, total/1024);
+<pre><code>// ESP-IDF双核任务
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+// 任务1：传感器采集（Core 0）
+void sensor_task(void *pv) {
+    while (1) {
+        float temp = read_temperature();
+        float hum = read_humidity();
+        ESP_LOGI("Sensor", "Temp=%.1f Hum=%.1f", temp, hum);
+        
+        // 通过队列发送给Core 1处理
+        sensor_data_t data = {.temp=temp, .hum=hum};
+        xQueueSend(sensor_queue, &data, portMAX_DELAY);
+        
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
 
-void spiffs_example(void) {
-    // 鍐欏叆閰嶇疆鏂囦欢
-    FILE* f = fopen("/spiffs/config.json", "w");
-    fprintf(f, "{\"wifi_ssid\":\"MyWiFi\",\"interval\":30}\n");
-    fclose(f);
-    
-    // 璇诲彇閰嶇疆
-    char buf[256];
-    f = fopen("/spiffs/config.json", "r");
-    fread(buf, 1, sizeof(buf)-1, f);
-    buf[sizeof(buf)-1] = 0;
-    printf("閰嶇疆: %s\n", buf);
-    fclose(f);
-    
-    // 鍒楀嚭鎵€鏈夋枃浠?    DIR* dir = opendir("/spiffs");
-    struct dirent* entry;
-    while ((entry = readdir(dir)) != NULL) {
-        printf("  %s (%d bytes)\n", entry->d_name, entry->d_type);
+// 任务2：网络上报（Core 1）
+void network_task(void *pv) {
+    sensor_data_t data;
+    while (1) {
+        if (xQueueReceive(sensor_queue, &data, portMAX_DELAY) == pdTRUE) {
+            publish_sensor_data(data.temp, data.hum);
+            ESP_LOGI("Net", "Published: %.1f, %.1f", data.temp, data.hum);
+        }
     }
-    closedir(dir);
+}
+
+// 任务3：LED闪烁（Core 1）
+void led_task(void *pv) {
+    while (1) {
+        gpio_set_level(GPIO_NUM_2, 1);
+        vTaskDelay(pdMS_TO_TICKS(500));
+        gpio_set_level(GPIO_NUM_2, 0);
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}
+
+void app_main(void) {
+    sensor_queue = xQueueCreate(10, sizeof(sensor_data_t));
+    
+    // 创建任务并指定核心
+    xTaskCreatePinnedToCore(sensor_task,  "sensor", 4096, NULL, 1, NULL, 0);  // Core 0
+    xTaskCreatePinnedToCore(network_task, "net",    4096, NULL, 2, NULL, 1);  // Core 1
+    xTaskCreatePinnedToCore(led_task,     "led",    2048, NULL, 1, NULL, 1);  // Core 1
+    
+    // Core 0 跑传感器，Core 1 跑网络+LED
+    // 两核通过队列通信，共享内存互不干扰
 }</code></pre>
 
-<h2>鈿?ESP32-S3/P4鏂扮壒鎬ч€熻</h2>
+<div class="card">
+<div class="h"><span class="name">双核任务分配建议</span><span class="tag b">最佳实践</span></div>
+<div class="b">
+<div class="desc">
+<b>Core 0（Protocol Core）:</b> 协议栈（WiFi/BLE/PHY）默认在这，适合：<br>
+• 传感器采集（定时、低CPU占用）<br>
+• 协议处理（WiFi事件、BLE事件）<br>
+• 中断服务函数<br><br>
+<b>Core 1（Application Core）:</b> 应用逻辑跑这，适合：<br>
+• 数据处理与计算<br>
+• HTTP/MQTT客户端<br>
+• LED显示、UI更新<br>
+• 文件系统操作<br><br>
+<b>⚠ 不指定核心时（xTaskCreate）：</b>FreeRTOS会自动分配到负载较轻的核心
+</div></div>
+
+<h2>🖥 GPIO与外设控制</h2>
+
+<h3>GPIO基础操作</h3>
+
+<pre><code>// ESP-IDF GPIO API
+#include "driver/gpio.h"
+
+void gpio_example(void) {
+    // 配置GPIO2为输出
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL << GPIO_NUM_2),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    gpio_config(&io_conf);
+    
+    // 控制输出
+    gpio_set_level(GPIO_NUM_2, 1);  // 高电平
+    gpio_set_level(GPIO_NUM_2, 0);  // 低电平
+    
+    // 配置GPIO0为输入（带按键中断）
+    io_conf.pin_bit_mask = (1ULL << GPIO_NUM_0);
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;  // 内部上拉
+    io_conf.intr_type = GPIO_INTR_NEGEDGE;    // 下降沿触发
+    gpio_config(&io_conf);
+    
+    // 安装GPIO中断服务
+    gpio_install_isr_service(0);
+    gpio_isr_handler_add(GPIO_NUM_0, button_isr_handler, NULL);
+}
+
+// 按键中断处理
+static void IRAM_ATTR button_isr_handler(void *arg) {
+    // ISR中不要做耗时操作，给任务发信号
+    xTaskNotifyFromISR(task_handle, 0, eNoAction, NULL);
+}</code></pre>
+
+<h3>ADC读取</h3>
+
+<pre><code>// ESP32有两个12位SAR ADC（ADC1: 8通道, ADC2: 10通道）
+// ⚠ WiFi使用时会占用ADC2！需要WiFi时只能用ADC1
+#include "esp_adc/adc_oneshot.h"
+
+adc_oneshot_unit_handle_t adc_handle;
+
+void adc_init(void) {
+    adc_oneshot_unit_init_cfg_t init_cfg = {
+        .unit_id = ADC_UNIT_1,  // ADC1（WiFi时唯一可用）
+    };
+    adc_oneshot_new_unit(&init_cfg, &adc_handle);
+    
+    adc_oneshot_chan_cfg_t chan_cfg = {
+        .atten = ADC_ATTEN_DB_11,    // 0~3.3V量程
+        .bitwidth = ADC_BITWIDTH_12, // 12位精度
+    };
+    adc_oneshot_config_channel(adc_handle, ADC_CHANNEL_0, &chan_cfg);  // GPIO36
+}
+
+int read_adc_mv(void) {
+    int raw;
+    adc_oneshot_read(adc_handle, ADC_CHANNEL_0, &raw);
+    // 使用校准后的电压值
+    int voltage;
+    adc_cali_raw_to_voltage(cali_handle, raw, &voltage);
+    return voltage;  // mV
+}</code></pre>
+
+<h3>LEDC PWM（呼吸灯+舵机）</h3>
+
+<pre><code>// ESP32 LEDC = 8路独立PWM控制器
+#include "driver/ledc.h"
+
+void pwm_servo_init(void) {
+    ledc_timer_config_t timer = {
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .timer_num = LEDC_TIMER_0,
+        .duty_resolution = LEDC_TIMER_16_BIT,  // 16位精度(0-65535)
+        .freq_hz = 50,                          // 50Hz（舵机标准频率）
+        .clk_cfg = LEDC_AUTO_CLK,
+    };
+    ledc_timer_config(&timer);
+    
+    ledc_channel_config_t channel = {
+        .channel = LEDC_CHANNEL_0,
+        .gpio_num = GPIO_NUM_5,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .timer_sel = LEDC_TIMER_0,
+        .duty = 0,
+        .hpoint = 0,
+    };
+    ledc_channel_config(&channel);
+}
+
+// 舵机控制（0°~180°对应 2.5%~12.5%占空比）
+void servo_set_angle(int angle) {
+    // 50Hz → 周期20ms, 0°=0.5ms(2.5%), 180°=2.5ms(12.5%)
+    uint32_t duty = (angle * (65535/20) + 65535*0.5/20);  // 简化公式
+    ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
+    ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+}
+
+// 呼吸灯效果（LED PWM）
+void breathe_led(void) {
+    static int dir = 1;
+    static uint32_t duty = 0;
+    duty += dir * 500;
+    if (duty >= 65535) dir = -1;
+    if (duty == 0) dir = 1;
+    ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
+    ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+    vTaskDelay(pdMS_TO_TICKS(10));
+}</code></pre>
+
+<h2>💤 深度睡眠与低功耗</h2>
 
 <div class="card">
-<div class="h"><span class="name">ESP32瀹舵棌杩涘寲</span><span class="tag p">杩涢樁</span></div>
+<div class="h"><span class="name">ESP32低功耗模式</span><span class="tag y">重要</span></div>
 <div class="b">
 <div class="desc">
 <table>
-<tr><th>鍨嬪彿</th><th>CPU</th><th>鐗圭偣</th><th>鍏稿瀷搴旂敤</th></tr>
-<tr><td>ESP32 (缁忓吀)</td><td>Xtensa LX6 脳2, 240MHz</td><td>WiFi+BLE4.2</td><td>閫氱敤IoT</td></tr>
-<tr><td>ESP32-S2</td><td>Xtensa LX7 脳1, 240MHz</td><td>WiFi(鏃犺摑鐗?, USB OTG</td><td>WiFi澶栬</td></tr>
-<tr><td>ESP32-S3</td><td>Xtensa LX7 脳2, 240MHz</td><td>WiFi+BLE5, AI鍔犻€熷櫒, USB OTG</td><td>AIoT/璇煶/瑙嗚</td></tr>
-<tr><td>ESP32-C3</td><td>RISC-V 32, 160MHz</td><td>WiFi+BLE5, 浣庢垚鏈?/td><td>鏇夸唬ESP8266</td></tr>
-<tr><td>ESP32-C6</td><td>RISC-V 32, 160MHz</td><td>WiFi6+BLE5+802.15.4</td><td>Matter/Thread</td></tr>
-<tr><td>ESP32-P4</td><td>RISC-V 脳2, 400MHz</td><td>鏃犳棤绾? MIPI/LVDS, H264缂栫爜</td><td>HMI/杈圭紭AI</td></tr>
+<tr><th>模式</th><th>功耗</th><th>唤醒方式</th><th>唤醒后</th></tr>
+<tr><td>Modem Sleep</td><td>~3mA</td><td>WiFi/BLE自动管理</td><td>继续运行</td></tr>
+<tr><td>Light Sleep</td><td>~0.8mA</td><td>定时器/GPIO/UART</td><td>继续运行</td></tr>
+<tr><td>Deep Sleep</td><td>~5μA</td><td>定时器/触摸/GPIO(仅RTC引脚)</td><td>重启（类似复位）</td></tr>
+<tr><td>Hibernation</td><td>~2.5μA</td><td>仅RTC定时器或部分GPIO</td><td>重启</td></tr>
+</table>
+</div></div>
+
+<pre><code>// 深度睡眠示例（电池供电设备的核心）
+#include "esp_sleep.h"
+
+// 定时唤醒（每60秒醒来上报一次数据然后继续睡）
+void deep_sleep_timer(void) {
+    // 准备工作：保存数据、关闭外设
+    printf("Going to deep sleep for 60 seconds...\n");
+    
+    // 配置唤醒定时器（微秒）
+    esp_sleep_enable_timer_wakeup(60 * 1000000ULL);
+    
+    // 进入深度睡眠
+    esp_deep_sleep_start();
+    // ⚠ 永远不会执行到这里！
+}
+
+// GPIO唤醒（按键唤醒）
+void deep_sleep_gpio(void) {
+    // 配置GPIO唤醒（仅RTC GPIO可用：0/2/4/12-15/25-27/32-39）
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, 0);  // GPIO0低电平唤醒
+    esp_deep_sleep_start();
+}
+
+// 唤醒原因检测（main函数开头调用）
+void check_wakeup_cause(void) {
+    esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+    switch (cause) {
+    case ESP_SLEEP_WAKEUP_TIMER:
+        printf("Woken by timer\n");
+        break;
+    case ESP_SLEEP_WAKEUP_EXT0:
+        printf("Woken by GPIO (RTC_IO)\n");
+        break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD:
+        printf("Woken by touch pad\n");
+        break;
+    default:
+        printf("Woken by reset/power-on\n");
+        break;
+    }
+}</code></pre>
+
+<h2>🔄 OTA远程升级</h2>
+
+<div class="warn">⚠ <b>OTA是ESP32最具商业价值的特性。</b>有了它，部署后的设备可以远程更新固件，无需物理接触。</div>
+
+<pre><code>// OTA升级 — 从HTTP服务器下载固件
+#include "esp_https_ota.h"
+
+void do_ota_update(const char* url) {
+    esp_http_client_config_t http_cfg = {
+        .url = url,
+        .timeout_ms = 30000,  // OTA固件较大，给30秒
+        .keep_alive_enable = true,
+    };
+    
+    esp_https_ota_config_t ota_cfg = {
+        .http_config = &http_cfg,
+        .partial_http_download = false,
+    };
+    
+    printf("开始OTA升级: %s\n", url);
+    esp_err_t ret = esp_https_ota(&ota_cfg);
+    
+    if (ret == ESP_OK) {
+        printf("OTA成功！3秒后重启...\n");
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        esp_restart();
+    } else {
+        printf("OTA失败: %s\n", esp_err_to_name(ret));
+    }
+}
+
+// OTA关键配置：分区表
+// partitions_ota.csv:
+// # Name,   Type, SubType, Offset,  Size
+// nvs,      data, nvs,     0x9000,  0x6000
+// otadata,  data, ota,     0xf000,  0x2000
+// phy_init, data, phy,     0x11000, 0x1000
+// factory,  app,  factory, 0x12000, 0x1E0000
+// ota_0,    app,  ota_0,   0x20000, 0x1E0000  # 当前运行区
+// ota_1,    app,  ota_1,   ,        0x1E0000  # 下载目标区
+// storage,  data, spiffs,  ,        0x80000
+
+// 版本检查：比较当前版本和服务器版本
+bool check_update(const char* version_url) {
+    // HTTP GET服务器上的version.txt
+    // 比较版本号，有新版本返回true
+    char current_ver[] = "1.0.0";
+    // char server_ver[16];
+    // http_get(version_url, server_ver);
+    // return strcmp(server_ver, current_ver) > 0;
+    return false;
+}</code></pre>
+
+<h2>🕐 SNTP网络时间同步</h2>
+
+<pre><code>// 从NTP服务器获取当前时间
+#include "esp_sntp.h"
+
+void sntp_init(void) {
+    esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
+    esp_sntp_setservername(0, "ntp.aliyun.com");    // 阿里云NTP
+    esp_sntp_setservername(1, "cn.ntp.org.cn");     // 国内备用
+    esp_sntp_setservername(2, "pool.ntp.org");      // 国际备用
+    esp_sntp_init();
+}
+
+// 等待时间同步完成（最多等10秒）
+bool wait_for_sntp_sync(void) {
+    int retry = 0;
+    while (sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET && retry < 100) {
+        vTaskDelay(pdMS_TO_TICKS(100));
+        retry++;
+    }
+    return sntp_get_sync_status() == SNTP_SYNC_STATUS_COMPLETED;
+}
+
+// 获取本地时间字符串
+void get_time_str(char *buf, int maxlen) {
+    time_t now;
+    struct tm timeinfo;
+    time(&now);
+    localtime_r(&now, &timeinfo);
+    strftime(buf, maxlen, "%Y-%m-%d %H:%M:%S", &timeinfo);
+}
+
+// 使用示例
+time_t now = time(NULL);
+printf("Epoch: %lld\n", (long long)now);
+char ts[32];
+get_time_str(ts, sizeof(ts));
+printf("Time: %s\n", ts);</code></pre>
+
+<h2>🧹 WebSocket实时通信</h2>
+
+<pre><code>// WebSocket客户端（实时双向通信）
+#include "esp_websocket_client.h"
+
+static void ws_event_handler(void *arg, esp_event_base_t base,
+    int32_t id, void *event_data) {
+    esp_websocket_event_data_t *data = event_data;
+    
+    switch (id) {
+    case WEBSOCKET_EVENT_CONNECTED:
+        ESP_LOGI("WS", "已连接");
+        esp_websocket_client_send_text(client, "Hello from ESP32!", 
+            strlen("Hello from ESP32!"), pdMS_TO_TICKS(1000));
+        break;
+    
+    case WEBSOCKET_EVENT_DATA:
+        ESP_LOGI("WS", "收到: %.*s", data->data_len, (char*)data->data_ptr);
+        // 处理服务器推送的消息
+        if (strncmp((char*)data->data_ptr, "LED_ON", 6) == 0) {
+            gpio_set_level(GPIO_NUM_2, 1);
+        } else if (strncmp((char*)data->data_ptr, "LED_OFF", 7) == 0) {
+            gpio_set_level(GPIO_NUM_2, 0);
+        }
+        break;
+    
+    case WEBSOCKET_EVENT_DISCONNECTED:
+        ESP_LOGW("WS", "断开");
+        break;
+    }
+}
+
+void websocket_connect(const char *uri) {
+    esp_websocket_client_config_t cfg = {
+        .uri = uri,  // 例如 "ws://192.168.1.100:8080/ws"
+    };
+    client = esp_websocket_client_init(&cfg);
+    esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, 
+        ws_event_handler, NULL);
+    esp_websocket_client_start(client);
+}</code></pre>
+
+<h2>📡 ESP-IDF深度配置（menuconfig）</h2>
+
+<pre><code># ESP-IDF使用Kconfig配置系统（Linux内核同款）
+# 运行 idf.py menuconfig 进入图形化配置界面
+
+# ===== 关键配置项速查 =====
+
+# 1. 分区表 (Partition Table)
+#    → Partition Table → Custom partition table CSV
+#    自定义分区才能做OTA、SPIFFS文件系统
+
+# 2. FreeRTOS配置
+#    → Component config → FreeRTOS
+#    → 勾选 "Run FreeRTOS only on first core" (省电)
+#    → 设任务栈大小: 默认3584→改2048 (省RAM)
+
+# 3. WiFi优化
+#    → Component config → Wi-Fi
+#    → RX buffer: 默认8→改16 (高吞吐场景)
+#    → IRAM optimization: 勾选 (减少WiFi延迟)
+
+# 4. 日志控制
+#    → Component config → Log output
+#    → Default log verbosity: Info (发布版改为Warning)
+#    → 关闭不需要的日志模块 (省Flash)
+
+# 5. 调试工具
+#    → Component config → Application Level Tracing
+#    → 开启 "Enable GDBStub" (无需JTAG也能用GDB!)
+
+# 6. 内存优化
+#    → Component config → ESP System Settings
+#    → Main task stack size: 3584→2048
+#    → 开启 "Place non-ISO C functions into IRAM" (可选, 加速)</code></pre>
+
+<h2>⚡ ESP32-S3/P4新特性速览</h2>
+
+<div class="card">
+<div class="h"><span class="name">ESP32家族进化</span><span class="tag p">进阶</span></div>
+<div class="b">
+<div class="desc">
+<table>
+<tr><th>型号</th><th>CPU</th><th>无线</th><th>特点</th><th>典型应用</th></tr>
+<tr><td>ESP32 (经典)</td><td>Xtensa LX6 ×2, 240MHz</td><td>WiFi4+BLE4.2</td><td>最普及</td><td>通用IoT</td></tr>
+<tr><td>ESP32-S2</td><td>Xtensa LX7 ×1, 240MHz</td><td>WiFi4(无蓝牙)</td><td>USB OTG, 低成本</td><td>WiFi外设</td></tr>
+<tr><td>ESP32-S3</td><td>Xtensa LX7 ×2, 240MHz</td><td>WiFi4+BLE5</td><td>AI加速器, USB OTG, PSRAM</td><td>AIoT/语音/视觉</td></tr>
+<tr><td>ESP32-C3</td><td>RISC-V 32, 160MHz</td><td>WiFi4+BLE5</td><td>低成本, 引脚少</td><td>替代ESP8266</td></tr>
+<tr><td>ESP32-C6</td><td>RISC-V 32, 160MHz</td><td>WiFi6+BLE5+802.15.4</td><td>Thread/Zigbee, Matter</td><td>智能家居</td></tr>
+<tr><td>ESP32-P4</td><td>RISC-V ×2, 400MHz</td><td>无无线</td><td>MIPI/LVDS, H264编码, AI</td><td>HMI/边缘AI</td></tr>
 </table>
 <br>
-<b>閫夊瀷寤鸿锛?/b>鏂版墜鍏ラ棬鐢‥SP32(缁忓吀/DevKitC)銆佷綆鎴愭湰鏂规鐢–3銆丄IoT椤圭洰鐢⊿3銆丠MI/UI椤圭洰鐢≒4
+<b>选型建议：</b>新手入门→ESP32(经典/DevKitC)、低成本→C3、AIoT→S3、HMI→P4
 </div></div></div>
 
-<h2>馃幆 瀹炴垬缁冧範</h2>
+<h2>🐛 常见问题排查</h2>
 
-<div class="tip">馃摑 <b>缁冧範1锛?/b>鐢‥SP32 + MQTT(鍏嶈垂broker.emqx.io)瀹炵幇娓╂箍搴﹀畾鏃朵笂鎶?30s/娆?銆傜敤MQTTX妗岄潰瀹㈡埛绔闃呴獙璇佹暟鎹埌杈俱€?br><br>
-馃摑 <b>缁冧範2锛?/b>瀹炵幇WiFi閰嶇疆WebServer锛圗SP32浣滀负AP锛屾墜鏈鸿繛涓婂悗鎵撳紑192.168.4.1閰嶇疆WiFi SSID/瀵嗙爜锛屼繚瀛樺埌SPIFFS锛夈€?br><br>
-馃摑 <b>缁冧範3锛?/b>鎼缓OTA鍗囩骇绯荤粺锛欵SP32鍚姩鏃舵鏌ュ浐浠剁増鏈紝濡傛湁鏂扮増鏈嚜鍔ㄤ粠HTTP鏈嶅姟鍣ㄤ笅杞藉苟鏇存柊銆?/div>
+<div class="trouble">🔍 <b>问题：编译报错 "section `.dram0.bss' will not fit in region `dram0_0_seg'"</b><br><br>
+❌ <b>现象：</b>链接时RAM溢出<br>
+✅ <b>解决：</b><br>
+1. 减少全局变量（用动态分配替代）<br>
+2. 修改menuconfig：增大Main task stack → 但可能还是不够<br>
+3. 将const数据改为PROGMEM存储到Flash<br>
+4. 用PSRAM（ESP32-S3/WROVER模块支持外部PSRAM）<br>
+5. 检查是否有未释放的malloc</div>
 
-<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
+<div class="trouble">🔍 <b>问题：WiFi连接后ADC读数不准</b><br><br>
+❌ <b>现象：</b>开启WiFi后ADC2通道读数异常<br>
+✅ <b>原因：</b>WiFi驱动占用了ADC2！这是ESP32的硬件设计限制<br>
+✅ <b>解决：</b>WiFi使用时只用ADC1（GPIO32-39），ADC2留给不用WiFi时的场景</div>
+
+<div class="trouble">🔍 <b>问题：OTA升级后设备变砖</b><br><br>
+❌ <b>现象：</b>固件更新后无法启动<br>
+✅ <b>预防（工业级方案）：</b><br>
+1. 使用OTA双分区（ota_0/ota_1），升级失败自动回滚<br>
+2. 在bootloader中检查固件签名和CRC<br>
+3. 保留factory分区作为最后的回退<br>
+4. 上电后检查启动计数：超过N次启动失败自动回滚到factory</div>
+
+<div class="trouble">🔍 <b>问题：编译太慢（每次几分钟）</b><br><br>
+✅ <b>加速方案：</b><br>
+1. 并行编译：<code>idf.py -j8 build</code>（设为CPU核心数）<br>
+2. 安装ccache：<code>brew install ccache</code>(Mac) / <code>sudo apt install ccache</code>(Linux)<br>
+3. 在menuconfig中 → Compiler options → 勾选"Enable Ccache"<br>
+4. 二次编译几乎瞬间完成！</div>
+
+<div class="trouble">🔍 <b>问题：空闲时频繁重启（看门狗复位）</b><br><br>
+❌ <b>现象：</b>设备运行一段时间后自动重启<br>
+✅ <b>原因：</b>任务看门狗(TWDT)超时——某个任务长时间不释放CPU<br>
+✅ <b>排查：</b><br>
+1. 检查loop()或任务中是否有死循环或长时间阻塞<br>
+2. 用vTaskDelay()或delay()让出CPU<br>
+3. 在menuconfig中增大TWDT超时时间<br>
+4. 或者在长循环中手动喂狗: esp_task_wdt_reset()</div>
+
+<h2>🎯 实战项目：IoT温湿度监测站</h2>
+
+<pre><code>// 完整IoT项目：DHT11 + ESP32 + MQTT + OLED显示
+// 功能：每30秒采集温湿度 → MQTT上报 → OLED显示 → 云端控制LED
+
+#include "driver/gpio.h"
+#include "esp_wifi.h"
+#include "mqtt_client.h"
+#include "esp_sntp.h"
+
+// ===== DHT11读取 =====
+#define DHT_PIN GPIO_NUM_4
+
+typedef struct { float temp; float hum; } dht_data_t;
+
+dht_data_t dht11_read(void) {
+    dht_data_t data = {0};
+    // DHT11单总线协议（简化版，完整版太长）
+    // 1. 主机发开始信号（拉低>18ms，拉高20-40μs）
+    // 2. DHT11响应（拉低80μs，拉高80μs）
+    // 3. 读取40位数据（5字节：湿度整数/小数/温度整数/小数/校验）
+    // 使用RMT或精确us延时实现（详见ESP-IDF dht示例）
+    return data;
+}
+
+// ===== 主应用 =====
+void app_main(void) {
+    // 1. 初始化
+    nvs_flash_init();
+    esp_netif_init();
+    esp_event_loop_create_default();
+    
+    // 2. 连接WiFi
+    wifi_init_sta();
+    
+    // 3. 同步时间
+    sntp_init();
+    wait_for_sntp_sync();
+    
+    // 4. 连接MQTT
+    mqtt_init();
+    
+    // 5. 主循环
+    while (1) {
+        dht_data_t d = dht11_read();
+        
+        // OLED显示
+        char buf[32];
+        snprintf(buf, sizeof(buf), "T:%.1fC H:%.1f%%", d.temp, d.hum);
+        // oled_show(buf);
+        
+        // MQTT上报
+        publish_sensor_data(d.temp, d.hum);
+        
+        // 检查空闲内存（内存泄漏预警）
+        static uint32_t last_heap = 0;
+        uint32_t now_heap = esp_get_free_heap_size();
+        if (last_heap > 0 && now_heap < last_heap - 1024) {
+            ESP_LOGW("MEM", "Heap shrunk: %d→%d", last_heap, now_heap);
+        }
+        last_heap = now_heap;
+        
+        vTaskDelay(pdMS_TO_TICKS(30000));
+    }
+}</code></pre>
+
+<h2>📡 ESP-NOW对等通信协议</h2>
+
+<p>ESP-NOW是乐鑫自有的低功耗对等无线通信协议，不依赖WiFi路由器——两个ESP32可以直接通信，类似无线串口。延迟低至2ms，非常适合传感器网络和遥控场景。</p>
+
+<pre><code>// ESP-NOW发送端（传感器节点）
+#include "esp_now.h"
+#include "esp_wifi.h"
+
+typedef struct {
+    float temperature;
+    float humidity;
+    uint32_t timestamp;
+} sensor_data_t;
+
+void espnow_sender_init(void) {
+    // ① 初始化WiFi（ESP-NOW基于WiFi，但不需要连路由）
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    esp_wifi_init(&cfg);
+    esp_wifi_set_mode(WIFI_MODE_STA);  // Station模式即可
+    esp_wifi_start();
+    
+    // ② 初始化ESP-NOW
+    esp_now_init();
+    
+    // ③ 注册对端（接收方的MAC地址）
+    esp_now_peer_info_t peer = {
+        .peer_addr = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF},  // 目标MAC
+        .channel = 0,  // 0=使用当前信道
+        .encrypt = false,
+    };
+    esp_now_add_peer(&peer);
+}
+
+void send_sensor_data(float temp, float hum) {
+    sensor_data_t data = {temp, hum, esp_log_timestamp()};
+    esp_now_send(receiver_mac, (uint8_t*)&data, sizeof(data));
+    // ★ 不需要连接、不需要握手、不需要ACK（可选）
+    // 延迟 ~2ms，比建立TCP连接（~200ms）快100倍
+}
+
+// ★ ESP-NOW核心优势：
+// 1. 无需路由器（适合野外/工业现场）
+// 2. 延迟低（<3ms单跳，适合实时控制）
+// 3. 功耗低（比WiFi TCP低10倍）
+// 4. 可加密（CCMP AES-128，硬件加速）
+// 5. 支持广播和单播
+// ★ 限制：
+// 1. 最大250字节/帧（应用层）
+// 2. 最多20个注册对端
+// 3. 同一信道（不能跨信道通信）</code></pre>
+
+<h2>💾 NVS非易失存储深入</h2>
+
+<p>NVS（Non-Volatile Storage）是ESP-IDF内置的键值存储系统，基于SPI Flash，提供磨损均衡和掉电保护。比裸Flash API好用得多。</p>
+
+<pre><code>// NVS API —— 比直接操作Flash简单100倍
+#include "nvs_flash.h"
+#include "nvs.h"
+
+void nvs_example(void) {
+    // ① 初始化NVS（只需一次）
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES) {
+        // Flash空间不够→擦除→重试
+        nvs_flash_erase();
+        nvs_flash_init();
+    }
+    
+    // ② 打开命名空间（类似文件夹，不同模块不互相干扰）
+    nvs_handle_t handle;
+    nvs_open("config", NVS_READWRITE, &handle);
+    
+    // ③ 读写操作（key-value，自动类型检查）
+    // 写
+    nvs_set_i32(handle, "wifi_channel", 6);
+    nvs_set_str(handle, "device_name", "sensor_01");
+    nvs_set_blob(handle, "calib_data", cal_array, sizeof(cal_array));
+    
+    // 读（带默认值，不存在则返回默认值）
+    int32_t channel = 6;  // 默认值
+    nvs_get_i32(handle, "wifi_channel", &channel);
+    
+    char name[32] = {0};
+    size_t len = sizeof(name);
+    nvs_get_str(handle, "device_name", name, &len);
+    
+    // ④ 一定要commit！（不commit不落盘，断电丢失）
+    nvs_commit(handle);
+    
+    // ⑤ 关闭
+    nvs_close(handle);
+}
+
+// ★ NVS踩坑经验：
+// 1. nvs_set_xxx后必须nvs_commit！否则断电丢数据
+// 2. 命名空间长度≤15字符
+// 3. key长度≤15字符
+// 4. blob最大508000字节（但Flash空间有限）
+// 5. 频繁写入注意磨损：NVS有磨损均衡，但写同一key太频繁会集中磨损
+//    → 解决：用递增key（log_001, log_002...）分散写</code></pre>
+
+<h2>🧠 ESP32-S3 PSRAM配置与使用</h2>
+
+<p>ESP32-S3支持外挂8MB/16MB PSRAM（Octal SPI接口），把可用内存从512KB扩展到8MB+。做图像处理、大缓存、多任务必须用它。</p>
+
+<pre><code># ★ 启用PSRAM（menuconfig或sdkconfig）
+# CONFIG_SPIRAM=y
+# CONFIG_SPIRAM_MODE_OCT=y          # Octal模式（最高带宽）
+# CONFIG_SPIRAM_SPEED_80M=y         # 80MHz时钟
+# CONFIG_SPIRAM_USE_MALLOC=y        # ★ 关键！让malloc自动用PSRAM
+# CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY=y  # 大BSS段放PSRAM
+
+// C代码中使用PSRAM（配置文件启用后，malloc自动用PSRAM！）
+void psram_example(void) {
+    // malloc 会自动从PSRAM分配（如果PSRAM可用且常规RAM不够）
+    uint8_t *big_buf = malloc(2 * 1024 * 1024);  // 2MB缓冲区
+    if (big_buf) {
+        // 检查是否从PSRAM分配的
+        if (esp_ptr_external_ram(big_buf)) {
+            ESP_LOGI("MEM", "2MB allocated from PSRAM!");
+        }
+        free(big_buf);
+    }
+    
+    // 强制从PSRAM分配（即使内部RAM够）
+    uint8_t *psram_buf = heap_caps_malloc(512*1024, MALLOC_CAP_SPIRAM);
+    
+    // 强制从内部RAM（DMA会用到，PSRAM不能DMA）
+    uint8_t *dma_buf = heap_caps_malloc(4096, MALLOC_CAP_DMA);
+    // ★ 重要：PSRAM不能做DMA！DMA缓冲区必须用MALLOC_CAP_DMA
+}
+
+// ★ PSRAM性能影响：
+// 访问延迟：内部RAM ~5ns,  PSRAM ~30-40ns（约6-8倍慢）
+// 吞吐量：  内部RAM ~2GB/s, PSRAM ~200MB/s（80MHz Octal模式）
+// 结论：热点数据（频繁访问）放内部RAM，冷数据（大缓冲）放PSRAM</code></pre>
+
+<h2>⚡ WiFi省电与共存策略</h2>
+
+<div class="card">
+<div class="h"><span class="name">WiFi电源管理模式</span><span class="tag y">重要</span></div>
+<div class="b">
+<div class="desc">ESP32的WiFi功耗可达300mA，是整板耗电大户。合理配置省电模式能降到5mA以下。</div>
+<pre><code>// WiFi省电模式配置
+// ① None: 不休眠，功耗~100-300mA，延迟最低
+// ② Minimum Modem: 调制解调器间歇休眠，功耗~20-30mA
+// ③ Maximum Modem: 调制解调器深度休眠，功耗~5-10mA，延迟+~100ms
+
+esp_wifi_set_ps(WIFI_PS_MAX_MODEM);  // 最大省电模式
+
+// ★ WiFi+BLE共存时的注意事项：
+// ESP32只有一根天线，WiFi和BLE分时共享
+// 如果同时用WiFi和BLE：
+// 1. 协议栈自动时分复用（不需要手动切换）
+// 2. BLE连接间隔影响WiFi速度（每30ms一个BLE窗口≈占用3% WiFi时间）
+// 3. BLE广播频率高→WiFi延迟大→MQTT可能超时
+// 4. 解决：设置BLE连接间隔 >100ms，降低WiFi影响
+// 
+// ESP32-S3有更好的共存设计（独立控制），影响更小</code></pre>
+</div></div>
+
+<h2>🔄 OTA抗变砖策略</h2>
+
+<p>OTA中最可怕的事：升级到一半断电→设备变砖。乐鑫的方案是<b>双分区+回滚</b>机制，即使升级失败也能自动退回到旧固件。</p>
+
+<pre><code>// ★ ESP-IDF OTA 双分区机制（默认启用）
+// Flash分区表（partitions.csv）：
+// factory,  app,  factory, 0x10000, 1M         ← 出厂固件（出厂时烧）
+// ota_0,    app,  ota_0,   ,        1M         ← OTA分区0
+// ota_1,    app,  ota_1,   ,        1M         ← OTA分区1
+// ota_data, data, ota,     ,        0x2000     ← OTA状态存储
+//
+// 工作流程：
+// ① 设备运行 ota_0
+// ② 下载新固件 → 写入 ota_1
+// ③ 校验通过 → 设置下次启动从 ota_1 启动 → 重启
+// ④ 如果 ota_1 启动失败（连续N次）→ 自动回滚到 ota_0
+
+// ★ OTA回滚配置（menuconfig）：
+// CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y          # 启用回滚
+// CONFIG_BOOTLOADER_APP_ANTI_ROLLBACK=y            # 防降级攻击
+// CONFIG_BOOTLOADER_SKIP_VALIDATE_IN_DEEP_SLEEP=n  # 深度睡眠唤醒也要验证
+
+void ota_with_rollback(void) {
+    esp_ota_handle_t ota_handle;
+    const esp_partition_t *update_partition = 
+        esp_ota_get_next_update_partition(NULL);  // 获取空闲OTA分区
+    
+    // 开始OTA
+    esp_ota_begin(update_partition, OTA_SIZE_UNKNOWN, &ota_handle);
+    
+    // 分块写入固件
+    while (has_more_data()) {
+        uint8_t chunk[4096];
+        int len = download_chunk(chunk, sizeof(chunk));
+        esp_ota_write(ota_handle, chunk, len);
+    }
+    
+    // 完成OTA
+    esp_ota_end(ota_handle);
+    
+    // 设置启动分区（但不马上升级，等APP确认运行正常后调用）
+    esp_ota_set_boot_partition(update_partition);
+    
+    // ★ 重启前先记录"待验证"状态
+    // APP启动后调用 esp_ota_mark_app_valid_cancel_rollback() 确认新固件OK
+    // 如果APP崩溃/看门狗复位 且没调用该函数 → 回滚
+    esp_restart();
+}</code></pre>
+
+<div class="warn">⚠ <b>OTA防变砖Checklist：</b><br>
+1. 永远保留 factory 分区（出厂固件，最后防线）<br>
+2. 启用 OTA 回滚（CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y）<br>
+3. 固件签名验证（防止恶意固件，启用 Secure Boot）<br>
+4. OTA下载过程加CRC/MD5校验（每块都要校验，不是整个文件）<br>
+5. 升级前检查电池电量（<20%拒绝升级）<br>
+6. 给用户"强制恢复出厂"的方式（物理按键组合进入factory分区）</div>
+
+<h2>📋 知识点回顾</h2>
 <div class="summary">
-<b>鉁?ESP32楂樼骇鑳藉姏锛?/b><br>
-鈥?ESP-IDF menuconfig锛氬浘褰㈠寲閰嶇疆(鍒嗗尯/FreeRTOS/WiFi/鏃ュ織)<br>
-鈥?MQTT锛欼oT鏍囧噯鍗忚锛孮oS 0/1/2锛屾墍鏈変簯骞冲彴閫氱敤<br>
-鈥?SPIFFS锛氳交閲忔枃浠剁郴缁?閰嶇疆/璇佷功/OTA鍥轰欢瀛樺偍)<br>
-鈥?OTA鍙屽垎鍖猴細factory/ota_0/ota_1锛屽崌绾уけ璐ヨ嚜鍔ㄥ洖婊?br>
-<b>馃洜 ESP-IDF鏍稿績鍛戒护锛?/b><br>
-鈥?idf.py set-target esp32s3 鈥?鍒囨崲鑺墖鍨嬪彿<br>
-鈥?idf.py menuconfig 鈥?鍥惧舰鍖栭厤缃?br>
-鈥?idf.py build flash monitor 鈥?涓€閿紪璇戠儳褰曟煡鐪嬫棩蹇?br>
-鈥?idf.py size-components 鈥?鏌ョ湅鍚勭粍浠禙lash/RAM鍗犵敤<br>
-<b>鈿?鏂版墜鐥涚偣锛?/b><br>
-鈥?GPIO寮曡剼瀹氫箟鍥犺姱鐗囪€屽紓锛屽姟蹇呮煡datasheet<br>
-鈥?WiFi鍜孉DC2鍐茬獊鈥斺€旂敤WiFi鏃禔DC鍙兘鐢ˋDC1鐨勫紩鑴?br>
-鈥?缂栬瘧鎱紵鐢╥df.py -j8 骞惰缂栬瘧(Ctrl+T,Ctrl+E鍦╩onitor涓?
+<b>✅ ESP32核心能力：</b><br>
+• WiFi双模：Station(连路由) + SoftAP(自建热点) + SmartConfig(APP配网)<br>
+• BLE：GAP(广播/扫描/连接) + GATT(Service/Characteristic/Descriptor)<br>
+• MQTT：IoT标准协议(QoS 0/1/2)，所有云平台通用<br>
+• HTTP Client/Server：Web配网页面 + REST API通信<br>
+• SPIFFS：轻量文件系统(存配置/证书/网页)<br>
+• OTA：远程固件升级，双分区保证升级安全<br>
+• 双核编程：Core0(协议)→Core1(应用) 通过队列通信<br>
+• 低功耗：Deep Sleep→Timer/GPIO唤醒→上报数据→继续睡<br><br>
+<b>🛠 ESP-IDF核心命令：</b><br>
+• idf.py set-target esp32s3 — 切换芯片型号<br>
+• idf.py menuconfig — 图形化配置(必学!)<br>
+• idf.py build flash monitor — 一键编译烧录查看日志<br>
+• idf.py size-components — 查看各组件内存占用<br>
+• Ctrl+T Ctrl+E 在monitor中查看任务列表<br><br>
+<b>⚠ 新手痛点TOP5：</b><br>
+• GPIO引脚因芯片型号而异，务必查datasheet<br>
+• WiFi和ADC2冲突——用WiFi时ADC只能用ADC1<br>
+• 编译慢？用ccache + idf.py -j8 并行编译<br>
+• ESP-IDF约3GB——硬盘预留空间<br>
+• 烧录失败先按BOOT键再按EN键进入下载模式<br><br>
+<b>📖 进阶方向：</b><br>
+• ESP RainMaker：官方IoT云平台（免服务端开发）<br>
+• ESP-MDF/Matter：智能家居协议支持<br>
+• ESP-ADF：音频开发框架（语音助手/蓝牙音箱）<br>
+• ESP-WHO：人脸识别框架<br>
+• LVGL：嵌入式图形库（ESP32-S3+触摸屏绝配）
 </div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch06')">鈫?绗?绔?/a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
-<a onclick="window.parent.loadPage('guide-ch08')">绗?绔?鈫?/a>
+  <a onclick="window.parent.loadPage('guide-ch06')">◀ 上一章：STM32</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
+  <a onclick="window.parent.loadPage('guide-ch08')">FreeRTOS ：下一章 ▶</a>
 </div>
 
 <script>
@@ -391,172 +1341,5 @@ document.querySelectorAll('pre').forEach(pre => {
 });
 </script>
 
-<h2>馃摱 WiFi寮€鍙戝疄鎴?/h2>
-
-<p>ESP32鐨勬牳蹇冧紭鍔挎槸鍙屾āWiFi+钃濈墮銆傝繖涓€鑺備粠闆跺紑濮嬫帉鎻iFi缂栫▼銆?/p>
-
-<h3>WiFi Station妯″紡锛堣繛鎺ヨ矾鐢卞櫒锛?/h3>
-
-<pre><code>#include "esp_wifi.h"
-#include "esp_event.h"
-#include "nvs_flash.h"
-
-#define WIFI_SSID "YourWiFi"
-#define WIFI_PASS "YourPassword"
-
-static void wifi_event_handler(void* arg, esp_event_base_t base,
-    int32_t id, void* data) {
-    if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START)
-        esp_wifi_connect();
-    else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
-        ip_event_got_ip_t* ev = (ip_event_got_ip_t*)data;
-        printf("Got IP: " IPSTR "\n", IP2STR(&ev->ip_info.ip));
-    }
-}
-
-void wifi_init_sta(void) {
-    nvs_flash_init();
-    esp_netif_init();
-    esp_event_loop_create_default();
-    esp_netif_create_default_wifi_sta();
-    
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    esp_wifi_init(&cfg);
-    
-    esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID,
-        &wifi_event_handler, NULL);
-    esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP,
-        &wifi_event_handler, NULL);
-    
-    wifi_config_t wifi_cfg = {
-        .sta = {.ssim = WIFI_SSID, .password = WIFI_PASS}
-    };
-    esp_wifi_set_mode(WIFI_MODE_STA);
-    esp_wifi_set_config(WIFI_IF_STA, &wifi_cfg);
-    esp_wifi_start();
-}</code></pre>
-
-<h3>HTTP瀹㈡埛绔紙GET璇锋眰锛?/h3>
-
-<pre><code>#include "esp_http_client.h"
-
-void http_get_example(void) {
-    esp_http_client_config_t cfg = {
-        .url = "http://api.openweathermap.org/data/2.5/weather?q=Beijing",
-        .method = HTTP_METHOD_GET,
-        .timeout_ms = 5000,
-    };
-    esp_http_client_handle_t client = esp_http_client_init(&cfg);
-    esp_err_t err = esp_http_client_perform(client);
-    
-    if (err == ESP_OK) {
-        int status = esp_http_client_get_status_code(client);
-        int len = esp_http_client_get_content_length(client);
-        printf("HTTP %d, Response: %d bytes\n", status, len);
-        // 璇诲彇鍝嶅簲浣?        char buf[512];
-        int read = esp_http_client_read(client, buf, sizeof(buf)-1);
-        buf[read] = 0;
-        printf("%s\n", buf);
-    }
-    esp_http_client_cleanup(client);
-}</code></pre>
-
-<h2>馃敺 钃濈墮BLE瀹炴垬</h2>
-
-<div class="card">
-<div class="h"><span class="name">BLE鏍稿績姒傚康</span><span class="tag g">蹇呴』鐞嗚В</span></div>
-<div class="b">
-<div class="desc">BLE涓嶆槸浼犵粺钃濈墮锛佺悊瑙ｈ繖浜涙蹇垫槸鍏ラ棬鍏抽敭锛?/div>
-<table>
-<tr><th>姒傚康</th><th>璇存槑</th><th>绫绘瘮</th></tr>
-<tr><td>GAP</td><td>璁惧鍙戠幇涓庤繛鎺?/td><td>鎻℃墜鍜屼氦鎹㈠悕鐗?/td></tr>
-<tr><td>GATT</td><td>鏁版嵁浼犺緭鍗忚</td><td>璋堣瘽鐨勫唴瀹瑰拰鏍煎紡</td></tr>
-<tr><td>Service</td><td>鍔熻兘闆嗗悎锛圲UID鏍囪瘑锛?/td><td>涓€涓?閮ㄩ棬"</td></tr>
-<tr><td>Characteristic</td><td>鍏蜂綋鏁版嵁鐐?/td><td>閮ㄩ棬閲岀殑"鍔炲叕妗?</td></tr>
-<tr><td>Descriptor</td><td>Characteristic鐨勫厓鏁版嵁</td><td>妗屼笂鐨?鏍囩璇存槑"</td></tr>
-</table>
-</div></div>
-
-<pre><code>// 鍒涘缓鑷畾涔塀LE鏈嶅姟锛氭俯搴︿紶鎰熷櫒
-// Service UUID: 0000180a-0000-1000-8000-00805f9b34fb
-// Characteristic UUID: 00002a6e-0000-1000-8000-00805f9b34fb
-
-static const uint16_t GATTS_SERVICE_UUID = 0x00FF;
-static const uint16_t GATTS_CHAR_UUID    = 0xFF01;
-
-// BLE骞挎挱鏁版嵁璁剧疆
-static void gap_event_handler(esp_gap_ble_cb_event_t event,
-    esp_ble_gap_cb_param_t* param) {
-    switch (event) {
-    case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
-        esp_ble_gap_start_advertising(&adv_params);
-        break;
-    }
-}
-
-void ble_server_init(void) {
-    esp_ble_gatts_app_register(PROFILE_APP_ID);
-    // 閰嶇疆GATT鏁版嵁搴擄細娣诲姞Service + Characteristic
-    // 璁剧疆Characteristic鍊硷細NOTIFY + READ灞炴€?    // 寮€濮嬪箍鎾紝鎵嬫満APP鎵弿鍗冲彲鍙戠幇
-}</code></pre>
-
-<h2>馃攧 OTA杩滅▼鍗囩骇</h2>
-
-<div class="warn">鈿?<b>OTA鏄疎SP32鏈€鍏峰晢涓氫环鍊肩殑鐗规€с€?/b>鏈変簡瀹冿紝閮ㄧ讲鍚庣殑璁惧鍙互杩滅▼鏇存柊鍥轰欢锛屾棤闇€鐗╃悊鎺ヨЕ銆?/div>
-
-<pre><code>// OTA鍗囩骇娴佺▼
-// 1. 涓嬭浇鏂板浐浠跺埌OTA鍒嗗尯
-// 2. 楠岃瘉鍥轰欢瀹屾暣鎬э紙checksum/绛惧悕锛?// 3. 璁剧疆鍚姩鍒嗗尯锛岄噸鍚?
-#include "esp_ota_ops.h"
-#include "esp_https_ota.h"
-
-void do_ota_update(const char* firmware_url) {
-    esp_http_client_config_t cfg = {
-        .url = firmware_url,
-        .cert_pem = server_cert_pem_start,  // HTTPS璇佷功
-    };
-    esp_https_ota_config_t ota_cfg = {
-        .http_config = &cfg,
-    };
-    esp_err_t ret = esp_https_ota(&ota_cfg);
-    if (ret == ESP_OK) {
-        printf("OTA鎴愬姛锛屽噯澶囬噸鍚?..\n");
-        esp_restart();  // 閲嶅惎杩涘叆鏂板浐浠?    }
-}
-
-// 鍏抽敭閰嶇疆锛氬垎鍖鸿〃蹇呴』鏈塷ta_0鍜宱ta_1涓や釜app鍒嗗尯
-// partitions.csv:
-// # Name,   Type, SubType, Offset,  Size
-// nvs,      data, nvs,     0x9000,  0x6000
-// otadata,  data, ota,     0xf000,  0x2000
-// phy_init, data, phy,     0x11000, 0x1000
-// factory,  app,  factory, 0x12000, 0x1E0000
-// ota_0,    app,  ota_0,   0x20000, 0x1E0000  # 杩愯鍖?// ota_1,    app,  ota_1,   ,        0x1E0000  # 涓嬭浇鍖?/code></pre>
-
-<h2>馃幆 瀹炴垬缁冧範</h2>
-
-<div class="tip">馃摑 <b>缁冧範1锛?/b>瀹炵幇WiFi SmartConfig閰嶇綉鍔熻兘锛堟寜涓€涓寜閽嚜鍔ㄨ繛鎺iFi锛屾墜鏈篈PP閰嶇綉锛夈€?br><br>
-馃摑 <b>缁冧範2锛?/b>鍒涘缓涓€涓狟LE娓╁害璁℃湇鍔★細ESP32璇诲彇DHT11 鈫?BLE骞挎挱娓╁害鍊?鈫?鎵嬫満nRF Connect APP鎺ユ敹鏄剧ず銆?br><br>
-馃摑 <b>缁冧範3锛?/b>鎼缓绠€鏄揙TA鏈嶅姟鍣紙鍙互鐢≒ython鐨刪ttp.server锛夛紝瀹炵幇ESP32浠庢湇鍔″櫒涓嬭浇骞舵洿鏂板浐浠躲€?/div>
-
-<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
-<div class="summary">
-<b>鉁?ESP32鏍稿績鑳藉姏锛?/b><br>
-鈥?WiFi鍙屾ā锛歋tation(杩炶矾鐢? + SoftAP(鑷缓鐑偣)<br>
-鈥?BLE锛欸AP(骞挎挱/鎵弿/杩炴帴) + GATT(Service/Characteristic/Descriptor)<br>
-鈥?OTA锛氳繙绋嬪浐浠跺崌绾э紝鍙屽垎鍖?ota_0/ota_1)淇濊瘉鍗囩骇瀹夊叏<br>
-鈥?ESP-IDF vs Arduino锛氫笓涓氶」鐩敤IDF锛堟€ц兘濂?鍔熻兘鍏級锛屽揩閫熷師鍨嬬敤Arduino<br>
-<b>馃洜 甯哥敤璧勬簮锛?/b><br>
-鈥?ESP-IDF Programming Guide (docs.espressif.com)<br>
-鈥?ESP RainMaker锛氬畼鏂笽oT浜戝钩鍙?br>
-鈥?ESP-MDF/Matter锛氭櫤鑳藉灞呭崗璁敮鎸?br>
-鈥?nRF Connect App锛欱LE璋冭瘯蹇呭宸ュ叿
-</div>
-
-<div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch06')">鈼€ 涓婁竴绔狅細STM32</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
-  <a onclick="window.parent.loadPage('guide-ch08')">FreeRTOS 锛氫笅涓€绔?鈻?/a>
-</div>
 </body>
 </html>
