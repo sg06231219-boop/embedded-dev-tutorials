@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>绗?绔狅細鐑у綍涓庤皟璇?- 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
+<title>第5章：烧录与调试 - 嵌入式小白完全指南</title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,321 +57,321 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>绗?绔狅細鐑у綍涓庤皟璇?/h1>
-<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 5/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
+<h1>第5章：烧录与调试</h1>
+<div class="summary"><b>📖 小白完全指南 · 5/14</b> | 阅读时间约3分钟</div>
 
-<p>缂栬瘧鐢熸垚.bin/.hex鏂囦欢鍚庯紝闇€瑕佺敤<strong>鐑у綍鍣?/strong>鎶婂畠鍐欒繘鍗曠墖鏈虹殑Flash閲屻€傝皟璇曞垯鏄绋嬪簭鍦ㄨ姱鐗囬噷<strong>鏆傚仠銆佸崟姝ユ墽琛屻€佹煡鐪嬪彉閲?/strong>锛屽儚"鎱㈡斁"涓€鏍锋壘Bug銆?/p>
+<p>编译生成.bin/.hex文件后，需要用<strong>烧录器</strong>把它写进单片机的Flash里。调试则是让程序在芯片里<strong>暂停、单步执行、查看变量</strong>，像"慢放"一样找Bug。</p>
 
-<div class="analogy">馃挕 <b>绫绘瘮锛?/b>鐑у綍=鎶婄▼搴?strong>鍒诲埌鑺墖鐨凞NA閲?/strong>锛堝啓姝诲湪Flash涓級锛岃皟璇?缁欑▼搴?strong>鍋氫綋妫€</strong>锛堝仠浣忊啋妫€鏌モ啋缁х画鈫掑啀妫€鏌ワ級銆?/div>
+<div class="analogy">💡 <b>类比：</b>烧录=把程序<strong>刻到芯片的DNA里</strong>（写死在Flash中），调试=给程序<strong>做体检</strong>（停住→检查→继续→再检查）。</div>
 
-<h3>璋冭瘯鎺ュ彛锛欽TAG vs SWD</h3>
+<h3>调试接口：JTAG vs SWD</h3>
 
-<p>ARM Cortex-M鑺墖鏀寔涓ょ璋冭瘯鎺ュ彛銆備簡瑙ｅ尯鍒湁鍔╀簬閫夊璋冭瘯鍣細</p>
+<p>ARM Cortex-M芯片支持两种调试接口。了解区别有助于选对调试器：</p>
 
 <table>
-<tr><th>鐗规€?/th><th>JTAG</th><th>SWD</th></tr>
-<tr><td>寮曡剼鏁?/td><td>5鏍癸紙TMS/TCK/TDI/TDO/TRST锛?/td><td>2鏍癸紙SWDIO/SWCLK锛?/td></tr>
-<tr><td>閫熷害</td><td>涓瓑</td><td>蹇紙涓撶敤鍗忚锛?/td></tr>
-<tr><td>鍗犵敤寮曡剼</td><td>澶氾紙5涓狦PIO锛?/td><td>灏戯紙2涓狦PIO锛?/td></tr>
-<tr><td>閫傜敤鍦烘櫙</td><td>鑰佽姱鐗?FPGA/澶氭牳</td><td>Cortex-M鍗曠墖鏈猴紙鏈€甯哥敤锛?/td></tr>
-<tr><td>鎺ㄨ崘</td><td>鍑犱箮涓嶇敤</td><td>鉁?榛樿閫夋嫨</td></tr>
+<tr><th>特性</th><th>JTAG</th><th>SWD</th></tr>
+<tr><td>引脚数</td><td>5根（TMS/TCK/TDI/TDO/TRST）</td><td>2根（SWDIO/SWCLK）</td></tr>
+<tr><td>速度</td><td>中等</td><td>快（专用协议）</td></tr>
+<tr><td>占用引脚</td><td>多（5个GPIO）</td><td>少（2个GPIO）</td></tr>
+<tr><td>适用场景</td><td>老芯片/FPGA/多核</td><td>Cortex-M单片机（最常用）</td></tr>
+<tr><td>推荐</td><td>几乎不用</td><td>✅ 默认选择</td></tr>
 </table>
 
-<div class="tip">馃挕 <b>瀹為檯缁忛獙锛?/b>STM32鏈€灏忕郴缁熸澘涓婄殑4閽堟帓閽堬紙3V3/GND/SWDIO/SWCLK锛夊氨鏄疭WD鎺ュ彛銆傛棩甯歌皟璇曞彧闇€鎺ヨ繖4鏍瑰氨澶熶簡鈥斺€旀瘮JTAG鐪?鏍圭嚎锛岄€熷害杩樻洿蹇€係T-Link/V2鍜孌AP-Link閮芥敮鎸丼WD銆?/div>
+<div class="tip">💡 <b>实际经验：</b>STM32最小系统板上的4针排针（3V3/GND/SWDIO/SWCLK）就是SWD接口。日常调试只需接这4根就够了——比JTAG省3根线，速度还更快。ST-Link/V2和DAP-Link都支持SWD。</div>
 
 <div class="card">
-<div class="h"><span class="name">璋冭瘯鍣ㄩ€夎喘鎸囧崡</span><span class="tag g">鐪侀挶寤鸿</span></div>
+<div class="h"><span class="name">调试器选购指南</span><span class="tag g">省钱建议</span></div>
 <div class="b">
-<div class="desc">甯傚満涓婅皟璇曞櫒鐞崇悈婊＄洰锛岄€夊鑳界渷涓嶅皯閽卞拰楹荤儲锛?/div>
+<div class="desc">市场上调试器琳琅满目，选对能省不少钱和麻烦：</div>
 <table>
-<tr><th>璋冭瘯鍣?/th><th>浠锋牸</th><th>鏀寔鑺墖</th><th>閫熷害</th><th>鎺ㄨ崘搴?/th></tr>
-<tr><td>ST-Link/V2 浠?/td><td>楼8-15</td><td>STM32鍏ㄧ郴鍒?/td><td>4MHz SWD</td><td>猸愨瓙猸愨瓙猸?鍏ラ棬棣栭€?/td></tr>
-<tr><td>DAP-Link 浠?/td><td>楼15-30</td><td>鎵€鏈塁ortex-M</td><td>10MHz SWD</td><td>猸愨瓙猸愨瓙 鏇撮€氱敤</td></tr>
-<tr><td>J-Link EDU</td><td>楼400+</td><td>鎵€鏈堿RM鏍?/td><td>50MHz SWD</td><td>猸愨瓙猸?涓撲笟棣栭€?/td></tr>
-<tr><td>J-Link OB</td><td>楼30-50</td><td>STM32/閮ㄥ垎Cortex-M</td><td>4MHz SWD</td><td>猸愨瓙猸愨瓙 濂界敤浣嗚吹</td></tr>
-<tr><td>ST-Link/V3</td><td>楼80-120</td><td>STM32+STM8</td><td>24MHz SWD</td><td>猸愨瓙猸愨瓙 瀹樻柟鎺ㄨ崘</td></tr>
+<tr><th>调试器</th><th>价格</th><th>支持芯片</th><th>速度</th><th>推荐度</th></tr>
+<tr><td>ST-Link/V2 仿</td><td>¥8-15</td><td>STM32全系列</td><td>4MHz SWD</td><td>⭐⭐⭐⭐⭐ 入门首选</td></tr>
+<tr><td>DAP-Link 仿</td><td>¥15-30</td><td>所有Cortex-M</td><td>10MHz SWD</td><td>⭐⭐⭐⭐ 更通用</td></tr>
+<tr><td>J-Link EDU</td><td>¥400+</td><td>所有ARM核</td><td>50MHz SWD</td><td>⭐⭐⭐ 专业首选</td></tr>
+<tr><td>J-Link OB</td><td>¥30-50</td><td>STM32/部分Cortex-M</td><td>4MHz SWD</td><td>⭐⭐⭐⭐ 好用但贵</td></tr>
+<tr><td>ST-Link/V3</td><td>¥80-120</td><td>STM32+STM8</td><td>24MHz SWD</td><td>⭐⭐⭐⭐ 官方推荐</td></tr>
 </table>
-<div class="note">鈿狅笍 <b>娉ㄦ剰锛?/b>楼8鐨勪豢ST-Link鍝佽川鍙傚樊涓嶉綈銆傛湁浜?strong>涓嶈兘缁欑洰鏍囨澘渚涚數</strong>锛堥渶瑕侀澶栫粰鏉垮瓙渚涚數锛夛紝鏈変簺SWD閫熷害涓嶇ǔ瀹氥€備拱涔嬪墠鐪嬭瘎璁猴紝<strong>浼樺厛閫夋湁3.3V渚涚數杈撳嚭鐨?/strong>銆?/div>
+<div class="note">⚠️ <b>注意：</b>¥8的仿ST-Link品质参差不齐。有些<strong>不能给目标板供电</strong>（需要额外给板子供电），有些SWD速度不稳定。买之前看评论，<strong>优先选有3.3V供电输出的</strong>。</div>
 </div></div>
 
-<h3>鐑у綍鏂瑰紡瀵规瘮</h3>
+<h3>烧录方式对比</h3>
 
 <table>
-<tr><th>鏂瑰紡</th><th>宸ュ叿</th><th>閫熷害</th><th>璋冭瘯鏀寔</th><th>浠锋牸</th></tr>
-<tr><td>ST-Link</td><td>st-flash / st-util</td><td>蹇?/td><td>鉁?GDB</td><td>楼10(浠?</td></tr>
-<tr><td>J-Link</td><td>JLinkGDBServer</td><td>鏋佸揩</td><td>鉁?GDB+SWO</td><td>楼500+</td></tr>
-<tr><td>DAP-Link</td><td>OpenOCD</td><td>涓?/td><td>鉁?GDB</td><td>楼20</td></tr>
-<tr><td>涓插彛鐑у綍</td><td>STM32 USART bootloader</td><td>鎱?/td><td>鉂?/td><td>楼0</td></tr>
+<tr><th>方式</th><th>工具</th><th>速度</th><th>调试支持</th><th>价格</th></tr>
+<tr><td>ST-Link</td><td>st-flash / st-util</td><td>快</td><td>✅ GDB</td><td>¥10(仿)</td></tr>
+<tr><td>J-Link</td><td>JLinkGDBServer</td><td>极快</td><td>✅ GDB+SWO</td><td>¥500+</td></tr>
+<tr><td>DAP-Link</td><td>OpenOCD</td><td>中</td><td>✅ GDB</td><td>¥20</td></tr>
+<tr><td>串口烧录</td><td>STM32 USART bootloader</td><td>慢</td><td>❌</td><td>¥0</td></tr>
 </table>
 
-<h3>OpenOCD 鐑у綍</h3>
+<h3>OpenOCD 烧录</h3>
 
-<div class="warn">鈿狅笍 <b>鍓嶆彁鏉′欢锛?/b>闇€瑕佸厛瀹夎OpenOCD銆傜敱浜嶨itHub涓嬭浇琚锛岃灏濊瘯浠ヤ笅鏂瑰紡锛?br>
-鈶?鎼滅储"OpenOCD xpack 鍥藉唴闀滃儚"涓嬭浇<br>
-鈶?浠庢窐瀹濊喘涔板紑鍙戞澘鍗栧鎻愪緵鐨勮祫鏂欏寘锛堥€氬父鍖呭惈OpenOCD锛?br>
-鈶?璁╂湁VPN鐨勬湅鍙嬪府蹇欎笅杞?br>
-涓嬭浇鍚庤В鍘嬪埌 <code>D:\EmbeddedTools\OpenOCD</code>锛屾妸bin鐩綍鍔燩ATH鍗冲彲銆?/div>
+<div class="warn">⚠️ <b>前提条件：</b>需要先安装OpenOCD。由于GitHub下载被墙，请尝试以下方式：<br>
+① 搜索"OpenOCD xpack 国内镜像"下载<br>
+② 从淘宝购买开发板卖家提供的资料包（通常包含OpenOCD）<br>
+③ 让有VPN的朋友帮忙下载<br>
+下载后解压到 <code>D:\EmbeddedTools\OpenOCD</code>，把bin目录加PATH即可。</div>
 
-<pre><code># 鐑у綍鍛戒护
+<pre><code># 烧录命令
 openocd -f interface/stlink.cfg -f target/stm32f1x.cfg     -c "program build/blink.elf verify reset exit"
 
-# 鍙摝闄?
+# 只擦除
 openocd -f interface/stlink.cfg -f target/stm32f1x.cfg     -c "init; reset halt; flash erase_sector 0 0 last; reset run; shutdown"</code></pre>
 
-<h3>ST-Link 鐑у綍锛坰t-flash锛?/h3>
+<h3>ST-Link 烧录（st-flash）</h3>
 
-<div class="warn">鈿狅笍 <b>鍓嶆彁鏉′欢锛?/b>闇€瑕佸畨瑁卻tlink宸ュ叿銆備笅杞藉湴鍧€锛?code>github.com/stlink-org/stlink/releases</code>锛堝悓GitHub锛屽彲鑳借澧欙級銆傛浛浠ｆ柟妗堬細浣跨敤STM32CubeIDE鑷甫鐨剆t-link椹卞姩銆?/div>
+<div class="warn">⚠️ <b>前提条件：</b>需要安装stlink工具。下载地址：<code>github.com/stlink-org/stlink/releases</code>（同GitHub，可能被墙）。替代方案：使用STM32CubeIDE自带的st-link驱动。</div>
 
-<pre><code># 瀹夎stlink宸ュ叿锛堥渶缂栬瘧鎴栦笅杞介缂栬瘧鐗堬級
+<pre><code># 安装stlink工具（需编译或下载预编译版）
 # github.com/stlink-org/stlink/releases
-# 涓嬭浇鍚庤В鍘嬶紝鎶奲in鐩綍鍔燩ATH
+# 下载后解压，把bin目录加PATH
 
-# 鐑у綍BIN鏂囦欢
+# 烧录BIN文件
 st-flash write blink.bin 0x08000000
 
-# 鐑у綍HEX鏂囦欢
+# 烧录HEX文件
 st-flash --format ihex write blink.hex
 
-# 鎿﹂櫎鏁寸墖Flash
+# 擦除整片Flash
 st-flash erase
 
-# 璇诲彇Flash鍐呭
+# 读取Flash内容
 st-flash read flash_dump.bin 0x08000000 0x10000</code></pre>
 
-<h3>涓插彛ISP鐑у綍锛堥浂纭欢鎴愭湰锛侊級</h3>
+<h3>串口ISP烧录（零硬件成本！）</h3>
 
-<div class="tip">馃挕 <b>娌℃湁ST-Link锛熺敤USB杞琓TL涔熻兘鐑э紒</b>STM32鍐呯疆Bootloader鏀寔涓插彛涓嬭浇锛屽彧闇€瑕丆H340妯″潡锛埪?锛夈€傞€熷害姣擲T-Link鎱紝浣?strong>闆堕澶栨垚鏈?/strong>銆?/div>
+<div class="tip">💡 <b>没有ST-Link？用USB转TTL也能烧！</b>STM32内置Bootloader支持串口下载，只需要CH340模块（¥5）。速度比ST-Link慢，但<strong>零额外成本</strong>。</div>
 
-<pre><code># 鏂瑰紡1锛欶lyMcu锛堟渶绠€鍗曠殑Windows涓插彛鐑у綍宸ュ叿锛?
-# 涓嬭浇锛歸ww.flymcu.com锛堝厤璐癸紝涓枃鐣岄潰锛?
-# 浣跨敤锛?
-# 1. BOOT0璺崇嚎鎺?锛堟垨鎸変綇BOOT0閿笂鐢碉級
-# 2. 鎵撳紑FlyMcu 鈫?閫夋嫨COM鍙ｅ拰hex鏂囦欢
-# 3. 鐐瑰嚮"寮€濮嬬紪绋?
-# 4. 鐑у綍瀹屾垚鍚嶣OOT0鎺ュ洖0锛屾寜澶嶄綅閿繍琛?
+<pre><code># 方式1：FlyMcu（最简单的Windows串口烧录工具）
+# 下载：www.flymcu.com（免费，中文界面）
+# 使用：
+# 1. BOOT0跳线接1（或按住BOOT0键上电）
+# 2. 打开FlyMcu → 选择COM口和hex文件
+# 3. 点击"开始编程"
+# 4. 烧录完成后BOOT0接回0，按复位键运行
 
-# 鏂瑰紡2锛歴tm32flash锛堝懡浠よ宸ュ叿锛?
-# 涓嬭浇锛歡ithub.com/ARMin stm32flash
-# 浣跨敤锛?
+# 方式2：stm32flash（命令行工具）
+# 下载：github.com/ARMin stm32flash
+# 使用：
 stm32flash -w blink.hex -v -g 0x0 COM3
-# -w 鍐欏叆  -v 鏍￠獙  -g 0x0 鍐欏畬浠?鍦板潃杩愯  COM3 浣犵殑涓插彛</code></pre>
+# -w 写入  -v 校验  -g 0x0 写完从0地址运行  COM3 你的串口</code></pre>
 
-<div class="note">鈿狅笍 <b>涓插彛鐑у綍瑕佺偣锛?/b><br>
-鈥?BOOT0蹇呴』鎺ラ珮鐢靛钩(1)鎵嶈兘杩涘叆涓嬭浇妯″紡<br>
-鈥?鐑у綍瀹屾垚鍚嶣OOT0鎺ュ洖浣庣數骞?0)锛屾寜澶嶄綅閿墠鑳借繍琛岀▼搴?br>
-鈥?鏈変簺鏈€灏忕郴缁熸澘鏈塀OOT0璺崇嚎甯斤紝鏂逛究鍒囨崲<br>
-鈥?姣忔鐑у綍閮借鍒囨崲BOOT0锛屼笉濡係T-Link鏂逛究锛屼絾瀛︿範闃舵瀹屽叏澶熺敤</div>
+<div class="note">⚠️ <b>串口烧录要点：</b><br>
+• BOOT0必须接高电平(1)才能进入下载模式<br>
+• 烧录完成后BOOT0接回低电平(0)，按复位键才能运行程序<br>
+• 有些最小系统板有BOOT0跳线帽，方便切换<br>
+• 每次烧录都要切换BOOT0，不如ST-Link方便，但学习阶段完全够用</div>
 
-<h3>GDB璋冭瘯</h3>
+<h3>GDB调试</h3>
 
-<div class="note">鈿狅笍 <b>璇存槑锛?/b>GDB璋冭瘯闇€瑕佺‖浠惰皟璇曞櫒锛圫T-Link/DAP-Link/J-Link锛夈€傚鏋滀綘鏆傛椂娌℃湁璋冭瘯鍣紝鍙互鍏堣烦杩嘒DB閮ㄥ垎锛岀敤printf璋冭瘯锛堢11绔犺瑙ｏ級銆備笅闈㈡彁渚涗袱绉嶈皟璇曟柟妗堬細<strong>鏂规A鐢∣penOCD</strong>锛堝厤璐瑰紑婧愶紝DAP-Link/ST-Link閫氱敤锛夛紝<strong>鏂规B鐢╯t-util</strong>锛圫T-Link涓撶敤锛屾洿绠€鍗曪級銆?/div>
+<div class="note">⚠️ <b>说明：</b>GDB调试需要硬件调试器（ST-Link/DAP-Link/J-Link）。如果你暂时没有调试器，可以先跳过GDB部分，用printf调试（第11章详解）。下面提供两种调试方案：<strong>方案A用OpenOCD</strong>（免费开源，DAP-Link/ST-Link通用），<strong>方案B用st-util</strong>（ST-Link专用，更简单）。</div>
 
-<h4>鏂规A锛歄penOCD + GDB锛堟帹鑽愶紝閫氱敤鎬ф洿濂斤級</h4>
+<h4>方案A：OpenOCD + GDB（推荐，通用性更好）</h4>
 
-<pre><code># 缁堢1锛氬惎鍔∣penOCD浣滀负GDB Server
+<pre><code># 终端1：启动OpenOCD作为GDB Server
 openocd -f interface/stlink.cfg -f target/stm32f1x.cfg
-# 鐪嬪埌 "Info : stm32f1x.cpu: hardware has 6 breakpoints" 灏辫鏄庤繛鎺ユ垚鍔?
+# 看到 "Info : stm32f1x.cpu: hardware has 6 breakpoints" 就说明连接成功
 
-# 缁堢2锛氬惎鍔℅DB瀹㈡埛绔?
+# 终端2：启动GDB客户端
 arm-none-eabi-gdb build/blink.elf
 
-# GDB甯哥敤鍛戒护锛堜袱鏂规閫氱敤锛?
-(gdb) target remote :3333         # 杩炴帴OpenOCD锛堟敞鎰忕鍙?333锛?
-(gdb) monitor reset halt          # 澶嶄綅骞跺仠浣?
-(gdb) load                         # 鐑у綍绋嬪簭鍒拌姱鐗?
-(gdb) break main                   # 鍦╩ain鍑芥暟璁炬柇鐐?
-(gdb) continue                     # 缁х画杩愯
-(gdb) step                         # 鍗曟锛堣繘鍏ュ嚱鏁帮級
-(gdb) next                         # 鍗曟锛堣烦杩囧嚱鏁帮級
-(gdb) print variable               # 鎵撳嵃鍙橀噺鍊?
-(gdb) watch variable               # 鐩戣鍙橀噺鍙樺寲
-(gdb) backtrace                    # 鏌ョ湅璋冪敤鏍?
-(gdb) info registers               # 鏌ョ湅CPU瀵勫瓨鍣?
-(gdb) x/10x 0x20000000            # 鏌ョ湅鍐呭瓨锛?6杩涘埗锛?
-(gdb) delete                       # 鍒犻櫎鎵€鏈夋柇鐐?
-(gdb) quit                         # 閫€鍑?/code></pre>
+# GDB常用命令（两方案通用）
+(gdb) target remote :3333         # 连接OpenOCD（注意端口3333）
+(gdb) monitor reset halt          # 复位并停住
+(gdb) load                         # 烧录程序到芯片
+(gdb) break main                   # 在main函数设断点
+(gdb) continue                     # 继续运行
+(gdb) step                         # 单步（进入函数）
+(gdb) next                         # 单步（跳过函数）
+(gdb) print variable               # 打印变量值
+(gdb) watch variable               # 监视变量变化
+(gdb) backtrace                    # 查看调用栈
+(gdb) info registers               # 查看CPU寄存器
+(gdb) x/10x 0x20000000            # 查看内存（16进制）
+(gdb) delete                       # 删除所有断点
+(gdb) quit                         # 退出</code></pre>
 
-<h4>鏂规B锛歴t-util + GDB锛圫T-Link涓撶敤锛岀畝鍗曪級</h4>
+<h4>方案B：st-util + GDB（ST-Link专用，简单）</h4>
 
-<div class="warn">鈿狅笍 <b>鍓嶆彁锛?/b>闇€瀹夎stlink宸ュ叿锛?code>github.com/stlink-org/stlink/releases</code>锛圙itHub鍙兘琚锛屾浛浠ｏ細STM32CubeIDE鑷甫st-link椹卞姩锛?/div>
+<div class="warn">⚠️ <b>前提：</b>需安装stlink工具：<code>github.com/stlink-org/stlink/releases</code>（GitHub可能被墙，替代：STM32CubeIDE自带st-link驱动）</div>
 
-<pre><code># 缁堢1锛氬惎鍔℅DB Server
+<pre><code># 终端1：启动GDB Server
 st-util -p 4242
 
-# 缁堢2锛氬惎鍔℅DB瀹㈡埛绔?
+# 终端2：启动GDB客户端
 arm-none-eabi-gdb build/blink.elf
 
-# GDB杩炴帴st-util
+# GDB连接st-util
 (gdb) target remote localhost:4242
 (gdb) load
 (gdb) break main
 (gdb) continue
-# 鍏朵綑鍛戒护涓庢柟妗圓鐩稿悓</code></pre>
+# 其余命令与方案A相同</code></pre>
 
-<div class="tip">馃挕 <b>娌℃湁璋冭瘯鍣ㄦ€庝箞鍔烇紵</b>鐢?strong>涓插彛printf璋冭瘯</strong>锛佺11绔犺缁嗕粙缁嶄簡printf閲嶅畾鍚戞柟娉曪紝瓒冲瑙ｅ喅80%鐨勯棶棰樸€備拱ST-Link鍙渶楼10锛屽缓璁叆闂ㄥ悗灏藉揩鍏ユ墜銆?/div>
+<div class="tip">💡 <b>没有调试器怎么办？</b>用<strong>串口printf调试</strong>！第11章详细介绍了printf重定向方法，足够解决80%的问题。买ST-Link只需¥10，建议入门后尽快入手。</div>
 
-<h3>GDB楂橀樁鎶€宸?/h3>
+<h3>GDB高阶技巧</h3>
 
 <div class="card">
-<div class="h"><span class="name">鏂偣绫诲瀷璇﹁В</span><span class="tag p">杩涢樁</span></div>
+<div class="h"><span class="name">断点类型详解</span><span class="tag p">进阶</span></div>
 <div class="b">
-<div class="desc">GDB鏀寔澶氱鏂偣绫诲瀷锛屼笉鍚屽満鏅敤涓嶅悓鏂偣鑳芥瀬澶ф彁楂樿皟璇曟晥鐜囷細</div>
-<pre><code># === 1. 鏅€氭柇鐐癸紙鏈€鍩虹锛?==
-(gdb) break main           # 鍦╩ain鍑芥暟鍏ュ彛
-(gdb) break main.c:42      # 鍦╩ain.c鐨勭42琛?
-(gdb) break HAL_UART_Transmit  # 鍦ㄥ嚱鏁板叆鍙?
+<div class="desc">GDB支持多种断点类型，不同场景用不同断点能极大提高调试效率：</div>
+<pre><code># === 1. 普通断点（最基础）===
+(gdb) break main           # 在main函数入口
+(gdb) break main.c:42      # 在main.c的第42行
+(gdb) break HAL_UART_Transmit  # 在函数入口
 
-# === 2. 鏉′欢鏂偣锛堝彧鍦ㄦ潯浠舵弧瓒虫椂鍋滀笅锛?==
+# === 2. 条件断点（只在条件满足时停下）===
 (gdb) break main.c:100 if count > 50
 (gdb) break blink.c:30 if error_code != 0
-# 绀轰緥锛氬彧鍦ㄦ俯搴?40掳C鏃跺仠鍦╮ead_temp鍑芥暟
+# 示例：只在温度>40°C时停在read_temp函数
 (gdb) break read_temp if raw_value > 500
 
-# === 3. 涓存椂鏂偣锛堝懡涓竴娆″悗鑷姩鍒犻櫎锛?==
+# === 3. 临时断点（命中一次后自动删除）===
 (gdb) tbreak init_hardware
-# 閫傚悎"鎴戝彧鎯崇湅鍒濆鍖栬窇涓€娆?鐨勫満鏅?
+# 适合"我只想看初始化跑一次"的场景
 
-# === 4. 纭欢鏂偣锛堜笉淇敼Flash鍐呭锛?==
+# === 4. 硬件断点（不修改Flash内容）===
 (gdb) hbreak *(0x08000400)
-# 纭欢鏂偣涓嶄慨鏀笷lash锛岄€傚悎璋冭瘯Flash涓殑浠ｇ爜
-# 娉ㄦ剰锛欳ortex-M3鍙湁6涓‖浠舵柇鐐癸紒
+# 硬件断点不修改Flash，适合调试Flash中的代码
+# 注意：Cortex-M3只有6个硬件断点！
 
-# === 5. 瑙傚療鐐癸紙鍙橀噺鍊兼敼鍙樻椂鍋滀笅锛?==
+# === 5. 观察点（变量值改变时停下）===
 (gdb) watch global_error_count
-(gdb) watch *0x20000100     # 鐩戣鍐呭瓨鍦板潃
-(gdb) rwatch *0x20000100    # 璇荤洃瑙嗭紙鍦板潃琚鏃跺仠涓嬶級
-(gdb) awatch *0x20000100    # 璇诲啓鐩戣锛堣鍐欓兘鍋滀笅锛?
-# 绀轰緥锛氭壘鍑鸿皝鏀逛簡鎴戠殑鍙橀噺
+(gdb) watch *0x20000100     # 监视内存地址
+(gdb) rwatch *0x20000100    # 读监视（地址被读时停下）
+(gdb) awatch *0x20000100    # 读写监视（读写都停下）
+# 示例：找出谁改了我的变量
 (gdb) watch sensor_data.raw_value
-# 浠讳綍淇敼sensor_data.raw_value鐨勪唬鐮侀兘浼氳Е鍙戞柇鐐?
+# 任何修改sensor_data.raw_value的代码都会触发断点
 
-# === 6. 鎹曡幏鐐癸紙鎹曡幏绯荤粺浜嬩欢锛?==
-(gdb) catch fork     # 鎹曡幏fork璋冪敤
-(gdb) catch throw    # 鎹曡幏C++寮傚父
-# 宓屽叆寮廏DB閫氬父涓嶆敮鎸乧atch锛圠inux搴旂敤璋冭瘯鎵嶅父鐢級</code></pre>
-<div class="note">鈿狅笍 <b>纭欢鏂偣闄愬埗锛?/b>Cortex-M绯诲垪鍙湁<strong>4-8涓‖浠舵柇鐐?/strong>锛圫TM32F103鏄?涓級銆傚綋浣犺缃7涓柇鐐规椂GDB浼氭姤閿欍€傝В鍐虫柟娉曪細鈶?鍒犳帀涓嶉渶瑕佺殑鏂偣 鈶?鐢ㄨ蒋浠舵柇鐐癸紙鏀笷lash锛屼絾Flash鏈夋摝鍐欏鍛介檺鍒讹級鈶?娣峰悎浣跨敤纭欢鏂偣鍜岃瀵熺偣銆?/div>
+# === 6. 捕获点（捕获系统事件）===
+(gdb) catch fork     # 捕获fork调用
+(gdb) catch throw    # 捕获C++异常
+# 嵌入式GDB通常不支持catch（Linux应用调试才常用）</code></pre>
+<div class="note">⚠️ <b>硬件断点限制：</b>Cortex-M系列只有<strong>4-8个硬件断点</strong>（STM32F103是6个）。当你设置第7个断点时GDB会报错。解决方法：① 删掉不需要的断点 ② 用软件断点（改Flash，但Flash有擦写寿命限制）③ 混合使用硬件断点和观察点。</div>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">GDB鑴氭湰鍖栬皟璇?/span><span class="tag b">瀹炵敤鎶€宸?/span></div>
+<div class="h"><span class="name">GDB脚本化调试</span><span class="tag b">实用技巧</span></div>
 <div class="b">
-<div class="desc">鎶婂父鐢ㄨ皟璇曞懡浠ゅ啓鍏?gdbinit鏂囦欢锛屾瘡娆¤皟璇曡嚜鍔ㄦ墽琛岋紝鐪佸幓閲嶅杈撳叆锛?/div>
-<pre><code># .gdbinit 鈥?鏀惧湪椤圭洰鏍圭洰褰曪紝GDB鍚姩鏃惰嚜鍔ㄥ姞杞?
-# VS Code Cortex-Debug榛樿绂佺敤.gdbinit锛堝畨鍏ㄥ師鍥狅級锛?
-# 闇€瑕佸湪launch.json涓缃?"gdbInitCommands": []
+<div class="desc">把常用调试命令写入.gdbinit文件，每次调试自动执行，省去重复输入：</div>
+<pre><code># .gdbinit — 放在项目根目录，GDB启动时自动加载
+# VS Code Cortex-Debug默认禁用.gdbinit（安全原因），
+# 需要在launch.json中设置 "gdbInitCommands": []
 
-# 鑷姩杩炴帴鐩爣
+# 自动连接目标
 target remote localhost:3333
 
-# 鑷姩鐑у綍
+# 自动烧录
 monitor reset halt
 load
 
-# 鑷姩璁剧疆鏂偣
+# 自动设置断点
 break main
 break HardFault_Handler
 break Error_Handler
 
-# 鑷姩瀹氫箟鍛戒护锛堝揩閫熸煡鐪嬪叧閿彉閲忥級
+# 自动定义命令（快速查看关键变量）
 define show_system
   printf "Tick: %lu\\n", xTaskGetTickCount()
   printf "Stack: %d bytes free\\n", uxTaskGetStackHighWaterMark(NULL)
   info registers pc lr sp
 end
 
-# 鑷姩瀹氫箟鍛戒护锛堝揩閫熸煡鐪嬪璁惧瘎瀛樺櫒锛?
+# 自动定义命令（快速查看外设寄存器）
 define show_gpio
   x/4x 0x40011000  # GPIOC_CRL
   x/4x 0x40011004  # GPIOC_CRH
   x/4x 0x4001100C  # GPIOC_ODR
 end
 
-# 鍚姩鍚庤嚜鍔╟ontinue
+# 启动后自动continue
 define hookpost-run
   continue
 end</code></pre>
-<div class="tip">馃挕 <b>灏忔妧宸э細</b>鍦╒S Code鐨凜ortex-Debug涓紝鍙互鍦?code>launch.json</code>閲岀敤<code>"preLaunchCommands"</code>鍜?code>"postLaunchCommands"</code>鏇夸唬.gdbinit锛屾洿瀹夊叏涓旇法骞冲彴銆?/div>
+<div class="tip">💡 <b>小技巧：</b>在VS Code的Cortex-Debug中，可以在<code>launch.json</code>里用<code>"preLaunchCommands"</code>和<code>"postLaunchCommands"</code>替代.gdbinit，更安全且跨平台。</div>
 </div></div>
 
-<h3>瀹炴垬缁冧範</h3>
+<h3>实战练习</h3>
 
-<div class="tip">馃挕 <b>缁冧範1锛氳皟璇昄ED闂儊绋嬪簭</b><br>
-鐩爣锛氱敤GDB鎺у埗LED鐨勪寒鐏?br>
-瑕佹眰锛?br>
-鈶?鐑у綍LED闂儊绋嬪簭鍚庯紝鐢℅DB杩炴帴骞跺湪main璁炬柇鐐?br>
-鈶?鐢?code>monitor reset halt</code>澶嶄綅骞跺仠浣?br>
-鈶?鏌ョ湅GPIOC_ODR瀵勫瓨鍣紙<code>x/1x 0x4001100C</code>锛夛紝璁颁笅鍒濆鍊?br>
-鈶?鎵嬪姩鎵ц缈昏浆LED鐨勪唬鐮侊紙<code>set *(uint32_t*)0x4001100C ^= (1<<13)</code>锛?br>
-鈶?瑙傚療LED鏄惁鍙樺寲锛岀悊瑙ｅ瘎瀛樺櫒鎿嶄綔鐨勬湰璐?/div>
+<div class="tip">💡 <b>练习1：调试LED闪烁程序</b><br>
+目标：用GDB控制LED的亮灭<br>
+要求：<br>
+① 烧录LED闪烁程序后，用GDB连接并在main设断点<br>
+② 用<code>monitor reset halt</code>复位并停住<br>
+③ 查看GPIOC_ODR寄存器（<code>x/1x 0x4001100C</code>），记下初始值<br>
+④ 手动执行翻转LED的代码（<code>set *(uint32_t*)0x4001100C ^= (1<<13)</code>）<br>
+⑤ 观察LED是否变化，理解寄存器操作的本质</div>
 
-<div class="tip">馃挕 <b>缁冧範2锛氱敤瑙傚療鐐规壘Bug</b><br>
-鐩爣锛氭湁浜轰笉灏忓績鍦ㄤ腑鏂噷淇敼浜嗗叏灞€鍙橀噺锛岀敤瑙傚療鐐规壘鍒扮姜榄佺ジ棣?br>
-瑕佹眰锛?br>
-鈶?鍐欎竴涓▼搴忥紝鍦═IM涓柇涓剰澶栦慨鏀逛簡sensor_data<br>
-鈶?鐢?code>watch sensor_data</code>璁剧疆瑙傚療鐐?br>
-鈶?<code>continue</code>杩愯锛岃瀵烥DB鍦ㄥ摢鍋滀笅<br>
-鈶?鐢?code>backtrace</code>鏌ョ湅璋冪敤鏍堬紝鎵惧埌淇敼鑰?/div>
+<div class="tip">💡 <b>练习2：用观察点找Bug</b><br>
+目标：有人不小心在中断里修改了全局变量，用观察点找到罪魁祸首<br>
+要求：<br>
+① 写一个程序，在TIM中断中意外修改了sensor_data<br>
+② 用<code>watch sensor_data</code>设置观察点<br>
+③ <code>continue</code>运行，观察GDB在哪停下<br>
+④ 用<code>backtrace</code>查看调用栈，找到修改者</div>
 
-<h3>Bootloader锛氳浜у搧鑳借繙绋嬪崌绾?/h3>
+<h3>Bootloader：让产品能远程升级</h3>
 
 <div class="card">
-<div class="h"><span class="name">Bootloader姒傚康</span><span class="tag p">杩涢樁</span></div>
+<div class="h"><span class="name">Bootloader概念</span><span class="tag p">进阶</span></div>
 <div class="b">
-<div class="desc">Bootloader鏄姱鐗囦笂鐢靛悗绗竴涓繍琛岀殑绋嬪簭锛屽畠鍐冲畾鏄?strong>璺宠浆鍒癆PP</strong>杩樻槸<strong>杩涘叆鍗囩骇妯″紡</strong>銆傛湁浜咮ootloader锛屼骇鍝佸嚭鍘傚悗鍙互閫氳繃涓插彛/WiFi/钃濈墮鍗囩骇鍥轰欢锛屼笉鐢ㄦ媶鏈洪噸鐑э細</div>
-<pre><code>// Bootloader鐨勫吀鍨嬪垽鏂€昏緫
+<div class="desc">Bootloader是芯片上电后第一个运行的程序，它决定是<strong>跳转到APP</strong>还是<strong>进入升级模式</strong>。有了Bootloader，产品出厂后可以通过串口/WiFi/蓝牙升级固件，不用拆机重烧：</div>
+<pre><code>// Bootloader的典型判断逻辑
 int main(void) {
     HAL_Init();
     SystemClock_Config();
     
-    // 鍒ゆ柇鏄惁杩涘叆鍗囩骇妯″紡
+    // 判断是否进入升级模式
     if (check_upgrade_pin() || check_upgrade_flag()) {
-        // 鍗囩骇妯″紡锛氱瓑寰呮帴鏀舵柊鍥轰欢
-        enter_upgrade_mode();  // 閫氳繃涓插彛/YModem鎺ユ敹鍥轰欢
+        // 升级模式：等待接收新固件
+        enter_upgrade_mode();  // 通过串口/YModem接收固件
     } else {
-        // 姝ｅ父妯″紡锛氳烦杞埌APP
-        jump_to_app(APP_START_ADDR);  // 濡?0x08004000
+        // 正常模式：跳转到APP
+        jump_to_app(APP_START_ADDR);  // 如 0x08004000
     }
 }
 
-// 璺宠浆鍒癆PP鐨勫嚱鏁?
+// 跳转到APP的函数
 void jump_to_app(uint32_t app_addr) {
-    // 1. 妫€鏌ユ爤椤跺湴鍧€鏄惁鍚堟硶锛堝湪RAM鑼冨洿鍐咃級
+    // 1. 检查栈顶地址是否合法（在RAM范围内）
     uint32_t app_stack = *(uint32_t*)app_addr;
     if ((app_stack & 0x2FFE0000) != 0x20000000) {
-        return;  // 鏍堝湴鍧€涓嶅湪SRAM鍖猴紝APP鏃犳晥
+        return;  // 栈地址不在SRAM区，APP无效
     }
     
-    // 2. 鍏抽棴鎵€鏈変腑鏂?
+    // 2. 关闭所有中断
     __disable_irq();
     
-    // 3. 閲嶆柊璁剧疆鍚戦噺琛?
+    // 3. 重新设置向量表
     SCB->VTOR = app_addr;
     
-    // 4. 璁剧疆鏍堟寚閽堝苟璺宠浆锛堝唴鑱旀眹缂栵級
+    // 4. 设置栈指针并跳转（内联汇编）
     __set_MSP(app_stack);
     uint32_t app_entry = *(uint32_t*)(app_addr + 4);
     void (*app_reset)(void) = (void(*)())app_entry;
-    app_reset();  // 姘歌繙涓嶄細杩斿洖
+    app_reset();  // 永远不会返回
 }
 
-// APP绔渶瑕佸仛鐨勶細
-// 1. 閾炬帴鑴氭湰涓璅lash璧峰鍦板潃鏀逛负APP_START_ADDR
-// 2. main寮€澶寸棝璁剧疆VTOR: SCB->VTOR = APP_START_ADDR;
-// 3. 涓柇鍚戦噺鍋忕Щ涔熻鐩稿簲璋冩暣</code></pre>
-<div class="note">鈿狅笍 <b>鍏抽敭姒傚康锛?/b>Flash鍒嗗尯绀轰緥鈥斺€?br>
-鈥?0x08000000 - 0x08003FFF锛欱ootloader鍖猴紙16KB锛?br>
-鈥?0x08004000 - 0x0800FFFF锛欰PP鍖猴紙48KB锛?br>
-鈥?0x08010000 - 0x0801FFFF锛歄TA涓嬭浇鍖?閰嶇疆鍖?br>
-娉ㄦ剰锛欰PP鐨勯摼鎺ヨ剼鏈繀椤绘妸FLASH璧峰鍦板潃鏀逛负0x08004000锛屽惁鍒欏悜閲忚〃鍋忕Щ閿欒浼氬鑷存墍鏈変腑鏂け鏁堛€?/div>
+// APP端需要做的：
+// 1. 链接脚本中Flash起始地址改为APP_START_ADDR
+// 2. main开头痛设置VTOR: SCB->VTOR = APP_START_ADDR;
+// 3. 中断向量偏移也要相应调整</code></pre>
+<div class="note">⚠️ <b>关键概念：</b>Flash分区示例——<br>
+• 0x08000000 - 0x08003FFF：Bootloader区（16KB）<br>
+• 0x08004000 - 0x0800FFFF：APP区（48KB）<br>
+• 0x08010000 - 0x0801FFFF：OTA下载区/配置区<br>
+注意：APP的链接脚本必须把FLASH起始地址改为0x08004000，否则向量表偏移错误会导致所有中断失效。</div>
 </div></div>
 
-<h3>VS Code Cortex-Debug 閰嶇疆</h3>
+<h3>VS Code Cortex-Debug 配置</h3>
 
-<div class="note">鈿狅笍 <b>鍓嶆彁锛?/b>鈶?宸插畨瑁匔ortex-Debug鎻掍欢 鈶?宸插畨瑁匫penOCD鎴杝tlink宸ュ叿 鈶?ST-Link璋冭瘯鍣ㄥ凡杩炴帴</div>
+<div class="note">⚠️ <b>前提：</b>① 已安装Cortex-Debug插件 ② 已安装OpenOCD或stlink工具 ③ ST-Link调试器已连接</div>
 
-<h4>鏂规A閰嶇疆锛歄penOCD锛堟帹鑽愶紝涓嶨DB鏂规A閰嶅锛?/h4>
+<h4>方案A配置：OpenOCD（推荐，与GDB方案A配套）</h4>
 
-<pre><code>// .vscode/launch.json - OpenOCD鏂规
+<pre><code>// .vscode/launch.json - OpenOCD方案
 {
     "version": "0.2.0",
     "configurations": [
@@ -390,9 +390,9 @@ void jump_to_app(uint32_t app_addr) {
     ]
 }</code></pre>
 
-<h4>鏂规B閰嶇疆锛歴t-util锛堜笌GDB鏂规B閰嶅锛?/h4>
+<h4>方案B配置：st-util（与GDB方案B配套）</h4>
 
-<pre><code>// .vscode/launch.json - st-util鏂规
+<pre><code>// .vscode/launch.json - st-util方案
 {
     "version": "0.2.0",
     "configurations": [
@@ -411,63 +411,578 @@ void jump_to_app(uint32_t app_addr) {
     ]
 }</code></pre>
 
-<div class="trouble">馃攳 <b>甯歌闂锛氱儳褰曞け璐ュ悎闆?/b><br>
+<div class="trouble">🔍 <b>常见问题：烧录失败合集</b><br>
 <b>1. "No ST-LINK detected" / "Cannot connect to target"</b><br>
-鈥?妫€鏌SB绾库€斺€旀湁浜涚嚎鍙兘鍏呯數涓嶈兘浼犳暟鎹紙鎹㈡牴绾胯瘯璇曪紒锛?br>
-鈥?妫€鏌WD鎺ョ嚎锛歋WDIO/SWCLK/GND鑷冲皯3鏍?br>
-鈥?妫€鏌ョ洰鏍囨澘鏄惁宸蹭緵鐢碉紙浠縎T-Link閫氬父涓嶇粰鐩爣鏉夸緵鐢碉紒锛?br>
-鈥?Windows璁惧绠＄悊鍣ㄩ噷鐪婼T-Link鏄惁琚瘑鍒紙鏈夐粍鑹叉劅鍙瑰彿=椹卞姩鏈锛?br>
-鈥?灏濊瘯鎷旀彃USB锛屾洿鎹SB鍙?br><b>2. "Flash download failed" / "Cannot program"</b><br>
-鈥?鑺墖鏄惁琚淇濇姢浜嗭紵鐢?<code>st-flash --read-unprotect</code> 鎴?<code>openocd -c "stm32f1x unlock 0"</code> 瑙ｉ攣<br>
-鈥?Flash鏄惁琚啓淇濇姢浜嗭紵妫€鏌ラ€夐」瀛楄妭锛圤ption Bytes锛?br>
-鈥?BOOT0寮曡剼鏄惁鎺ラ敊锛燂紙BOOT0=1浼氳繘鍏ョ郴缁烞ootloader锛孲WD鏃犳硶杩炴帴锛?br>
+• 检查USB线——有些线只能充电不能传数据（换根线试试！）<br>
+• 检查SWD接线：SWDIO/SWCLK/GND至少3根<br>
+• 检查目标板是否已供电（仿ST-Link通常不给目标板供电！）<br>
+• Windows设备管理器里看ST-Link是否被识别（有黄色感叹号=驱动未装）<br>
+• 尝试拔插USB，更换USB口<br><b>2. "Flash download failed" / "Cannot program"</b><br>
+• 芯片是否被读保护了？用 <code>st-flash --read-unprotect</code> 或 <code>openocd -c "stm32f1x unlock 0"</code> 解锁<br>
+• Flash是否被写保护了？检查选项字节（Option Bytes）<br>
+• BOOT0引脚是否接错？（BOOT0=1会进入系统Bootloader，SWD无法连接）<br>
 <b>3. "Target voltage detection failed"</b><br>
-鈥?鐩爣鏉挎病鐢碉紒妫€鏌ョ洰鏍囨澘鐨?.3V渚涚數鏄惁姝ｅ父<br>
-鈥?濡傛灉鐢ㄤ豢ST-Link锛岀‘淇濆畠杈撳嚭3.3V缁欑洰鏍囨澘锛堟垨鍗曠嫭渚涚數锛?br>
-<b>4. 鐑у綍鎴愬姛浣嗙▼搴忎笉杩愯</b><br>
-鈥?BOOT0鏄惁宸叉帴鍥?锛燂紙涓插彛ISP鐑у綍鍚庡繀椤诲垏鍥濨OOT0=0锛?br>
-鈥?鎸変竴涓嬪浣嶉敭璇曡瘯<br>
-鈥?妫€鏌ュ惎鍔ㄦ枃浠?閾炬帴鑴氭湰鈥斺€斿悜閲忚〃鏄惁姝ｇ‘鏀剧疆锛?br>
-鈥?妫€鏌ystemInit()鏄惁姝ｇ‘閰嶇疆浜嗘椂閽?/div>
+• 目标板没电！检查目标板的3.3V供电是否正常<br>
+• 如果用仿ST-Link，确保它输出3.3V给目标板（或单独供电）<br>
+<b>4. 烧录成功但程序不运行</b><br>
+• BOOT0是否已接回0？（串口ISP烧录后必须切回BOOT0=0）<br>
+• 按一下复位键试试<br>
+• 检查启动文件/链接脚本——向量表是否正确放置？<br>
+• 检查SystemInit()是否正确配置了时钟</div>
+
+<h3>SWO/SWV：串行线输出与实时跟踪</h3>
+
+<div class="card">
+<div class="h"><span class="name">SWO（Serial Wire Output）概念</span><span class="tag p">进阶</span><span class="tag b">性能分析利器</span></div>
+<div class="b">
+<div class="desc">SWD只用了2根线（SWDIO+SWCLK），但ARM Cortex-M还有第三根线：<strong>SWO（Serial Wire Output）</strong>。通过这根线，芯片可以实时输出调试信息、程序计数器采样、数据跟踪等，<strong>无需占用UART</strong>。配合SWV（Serial Wire Viewer），可以在不停止CPU的情况下分析程序行为。</div>
+<table>
+<tr><th>SWO功能</th><th>说明</th><th>对CPU影响</th></tr>
+<tr><td>ITM printf</td><td>通过SWO输出printf信息（比串口快100倍）</td><td>极低（硬件FIFO自动发送）</td></tr>
+<tr><td>PC采样</td><td>周期性采样程序计数器，生成代码耗时热力图</td><td>零（纯硬件读取）</td></tr>
+<tr><td>数据跟踪</td><td>实时输出变量值（类似无线watch）</td><td>低</td></tr>
+<tr><td>异常跟踪</td><td>记录所有中断/异常的进入/退出时间</td><td>极低</td></tr>
+<tr><td>计数器</td><td>DWT周期计数器、CPI（每指令周期数）</td><td>零</td></tr>
+</table>
+<div class="note">⚠️ <b>硬件要求：</b>SWO需要调试器支持（J-Link全系列支持，ST-Link/V2不支持SWO，ST-Link/V3支持，DAP-Link部分支持）。还需要芯片的SWO引脚引出（STM32最小系统板上的SWO通常就是PB3，但需要检查原理图）。</div>
+</div></div>
+
+<div class="card">
+<div class="h"><span class="name">ITM printf：比串口快100倍的调试输出</span><span class="tag b">实用技巧</span></div>
+<div class="b">
+<div class="desc">传统串口printf在115200波特率下每字节约86μs，输出一行"Hello World"（11字节+换行）需要约1ms。如果在1KHz定时中断里用printf，CPU会被串口完全占满。ITM printf通过SWO输出，速度可达几MB/s，<strong>在中断里使用几乎没有性能损失</strong>。</div>
+<pre><code>// === ITM printf配置（STM32F103 + J-Link/ST-Link V3）===
+
+// 步骤1：在CubeMX中启用SWO引脚
+// Pinout → SYS → Debug → 选择 "Serial Wire" 或 "Trace Asynchronous Sw"
+// SWO引脚通常是PB3
+
+// 步骤2：重定向printf到ITM
+// 在main.c中添加：
+#include &lt;stdio.h&gt;
+
+// ITM发送单个字符（硬件FIFO）
+int _write(int fd, char *ptr, int len) {
+    for (int i = 0; i &lt; len; i++) {
+        ITM_SendChar((*ptr++));  // CMSIS内置函数
+    }
+    return len;
+}
+
+// 步骤3：初始化SWO（在SystemClock_Config之后）
+void SWO_Init(uint32_t portMask, uint32_t cpuFreq, uint32_t swoBaud) {
+    // 使能ITM和DWT
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    
+    // 解锁ITM
+    ITM->LAR = 0xC5ACCE55;
+    
+    // 使能ITM的port 0（printf输出通道）
+    ITM->TER |= (1UL &lt;&lt; 0);
+    
+    // 配置TPIU（Trace Port Interface Unit）
+    TPI->SPPR = 2;  // 异步模式（SWO）
+    TPI->ACPR = (cpuFreq / swoBaud) - 1;  // 波特率分频
+    
+    // 使能SWO输出
+    TPI->FFCR = (1UL &lt;&lt; 2);  // 启用格式化
+    ITM->TCR |= ITM_TCR_ITMENA_Msk;  // 全局使能ITM
+}
+
+// 使用方法：
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+    SWO_Init(1, 72000000, 2000000);  // port0, 72MHz CPU, 2MHz SWO
+    
+    while (1) {
+        printf("System tick: %lu\\r\\n", HAL_GetTick());
+        HAL_Delay(1000);
+    }
+}
+
+// === ITM接收端（电脑端）===
+// 方式1：J-Link SWO Viewer
+// J-Link SWO Viewer Client → 选择CPU频率和SWO速度 → Start
+
+// 方式2：OpenOCD SWO查看
+// openocd -f interface/stlink.cfg -f target/stm32f1x.cfg \\
+//         -c "tpiu config internal - uart off 72000000 2000000" \\
+//         -c "itm ports on"
+// 然后打开另一个终端连接tcl端口查看输出
+
+// 方式3：STM32CubeMonitor / STM32CubeIDE SWV
+// IDE内置的SWV实时追踪窗口</code></pre>
+<div class="tip">💡 <b>性能对比实测：</b>在1KHz定时中断中每秒输出1000次printf：串口115200方式→CPU占用率~90%，程序几乎卡死；ITM printf @2MHz→CPU占用率~2%，程序流畅运行。差距达45倍。</div>
+</div></div>
+
+<h3>RTT（Real-Time Transfer）：J-Link的高速调试通道</h3>
+
+<div class="card">
+<div class="h"><span class="name">SEGGER RTT</span><span class="tag p">进阶</span><span class="tag g">高性能</span></div>
+<div class="b">
+<div class="desc">RTT（Real-Time Transfer）是SEGGER开发的调试输出技术，<strong>不需要SWO引脚、不需要额外UART</strong>，仅通过普通的SWD/JTAG接口就能实现高速双向数据传输（速度可达1MB/s以上）。RTT在目标芯片的RAM中开辟一个环形缓冲区，调试器通过SWD直接读写这个缓冲区。</div>
+<pre><code>// === RTT使用（STM32 + J-Link）===
+
+// 步骤1：添加RTT源文件到工程
+// 从J-Link安装目录复制以下文件到项目：
+//   SEGGER_RTT.c
+//   SEGGER_RTT.h
+//   SEGGER_RTT_Conf.h
+//   SEGGER_RTT_printf.c  (可选，提供RTT版本的printf)
+// 通常在: C:\\Program Files\\SEGGER\\JLink\\Samples\\RTT\\
+
+// 步骤2：在代码中使用RTT
+#include "SEGGER_RTT.h"
+
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+    
+    // 初始化RTT（默认配置，不需要额外参数）
+    SEGGER_RTT_Init();
+    
+    // 方式A：发送字符串
+    SEGGER_RTT_WriteString(0, "System Started!\\n");
+    
+    // 方式B：格式化输出（类似printf）
+    int counter = 0;
+    while (1) {
+        SEGGER_RTT_printf(0, "Counter: %d, Tick: %lu\\n", 
+                          counter++, HAL_GetTick());
+        HAL_Delay(100);
+    }
+}
+
+// === RTT接收端（电脑端）===
+// 方式1：J-Link RTT Viewer（图形化工具）
+// 开始菜单 → SEGGER → J-Link RTT Viewer
+//   选择芯片型号（如STM32F103C8）
+//   选择连接方式（SWD）
+//   → 点击OK → 立即看到输出
+
+// 方式2：J-Link RTT Client（命令行）
+// JLinkRTTClient.exe  （自动连接J-Link GDB Server的RTT通道）
+
+// 方式3：J-Link RTT Logger（记录到文件）
+// JLinkRTTLogger.exe  （后台记录RTT数据到文件）
+
+// === RTT配置优化（SEGGER_RTT_Conf.h）===
+#define BUFFER_SIZE_UP   1024   // 上行缓冲区（芯片→电脑），默认1024
+#define BUFFER_SIZE_DOWN 16     // 下行缓冲区（电脑→芯片），默认16
+// 大流量场景可调到4096，但会消耗更多RAM（从20KB SRAM中扣）</code></pre>
+<div class="note">⚠️ <b>RTT vs SWO vs 串口printf对比：</b><br>
+• <b>RTT（推荐）</b>：速度快（~1MB/s）、不占引脚、需要J-Link。RAM中开缓冲区，不影响实时性<br>
+• <b>SWO/ITM</b>：速度快（~2MB/s）、需要SWO引脚和专用工具。纯硬件输出，CPU开销最低<br>
+• <b>串口printf</b>：速度慢（~11KB/s@115200）、需要TX引脚。实现最简单，但实时性最差<br>
+• <b>选择策略</b>：有J-Link→首选RTT；有SWO→首选ITM；啥都没有→用串口printf</div>
+</div></div>
+
+<h3>HardFault深度解析：单片机最恐怖的异常</h3>
+
+<div class="card">
+<div class="h"><span class="name">HardFault是什么</span><span class="tag r">重要</span><span class="tag p">进阶</span></div>
+<div class="b">
+<div class="desc">HardFault是ARM Cortex-M处理器在遇到<strong>无法恢复的错误</strong>时触发的异常（异常号3）。一旦发生HardFault，程序会跳转到HardFault_Handler，通常的表现是：LED不闪了、串口没输出了、调试器显示"HardFault_Handler"。对于新手来说，遇到HardFault往往意味着"卡住了，不知道怎么办"。</div>
+<pre><code>// === HardFault常见原因（排名分先后）===
+//
+// 1. 空指针/野指针访问（最常见，占60%+）
+//    uint8_t *ptr = NULL;  *ptr = 0x55;  // 访问地址0，必HardFault
+//    解决办法：解引用前检查指针非NULL
+//
+// 2. 访问未初始化的外设时钟
+//    GPIOA->ODR = 0xFF;  // 忘了__HAL_RCC_GPIOA_CLK_ENABLE()
+//    解决办法：操作外设前确保RCC时钟已使能
+//
+// 3. 栈溢出（Stack Overflow）
+//    递归过深 / 局部变量太大 / 中断嵌套太深
+//    部分芯片有MPU可以检测，大部分没有
+//    解决办法：增大栈空间 / 大数组用static或堆
+//
+// 4. 非对齐访问（Cortex-M0/M0+最常见）
+//    uint32_t *p = (uint32_t*)0x20000001;  // 非4字节对齐
+//    uint32_t val = *p;  // Cortex-M0上HardFault!
+//    解决办法：memcpy到对齐的变量
+//
+// 5. 除以零（如果CCR_DIV_0_TRP使能）
+//    int result = 5 / 0;  // 触发UsageFault或HardFault
+//
+// 6. 执行非法指令 / 跳转到非代码区
+//    函数指针指向了数据区 / 栈被破坏导致返回地址错误
+//
+// 7. 中断中调用FreeRTOS API但优先级不正确
+//    在优先级高于configMAX_SYSCALL_INTERRUPT_PRIORITY的中断中调了API
+//
+// 8. Flash等待周期配置错误
+//    系统时钟提高了但Flash等待周期没跟上</code></pre>
+</div></div>
+
+<div class="card">
+<div class="h"><span class="name">HardFault现场分析：保存异常帧</span><span class="tag b">调试技巧</span><span class="tag r">必学</span></div>
+<div class="b">
+<div class="desc">发生HardFault时，Cortex-M会自动<strong>压栈</strong>8个寄存器（R0-R3, R12, LR, PC, xPSR）。通过分析这些寄存器的值，可以精确定位出错位置。以下是完整的HardFault Handler实现：</div>
+<pre><code>// === HardFault Handler（放在stm32f1xx_it.c或main.c）===
+// 发生HardFault时会自动调用此函数
+
+// 定义异常栈帧结构（CM3自动压栈的8个寄存器）
+typedef struct {
+    uint32_t r0;
+    uint32_t r1;
+    uint32_t r2;
+    uint32_t r3;
+    uint32_t r12;
+    uint32_t lr;      // 异常返回地址
+    uint32_t pc;      // 程序计数器（出错位置！）
+    uint32_t xpsr;    // 程序状态寄存器
+} ExceptionStackFrame;
+
+void HardFault_Handler(void) {
+    // 获取栈帧指针
+    // MSP（主栈指针）在进入HardFault时会被自动调整
+    __asm volatile (
+        "TST LR, #4          \\n"   // 检查EXC_RETURN的bit2
+        "ITE EQ              \\n"   // 判断使用的是MSP还是PSP
+        "MRSEQ R0, MSP       \\n"   // 如果bit2=0，用MSP
+        "MRSNE R0, PSP       \\n"   // 如果bit2=1，用PSP
+        "B hard_fault_handler_c \\n" // 跳转到C函数
+    );
+}
+
+// C语言处理函数
+void hard_fault_handler_c(ExceptionStackFrame *frame, uint32_t stacked_lr) {
+    // 此时调试器可以在这些变量上设断点来查看
+    volatile uint32_t fault_pc  = frame->pc;    // ← 出错时的PC地址
+    volatile uint32_t fault_lr  = frame->lr;     // 返回地址
+    volatile uint32_t fault_r0  = frame->r0;
+    volatile uint32_t fault_r1  = frame->r1;
+    volatile uint32_t fault_r2  = frame->r2;
+    volatile uint32_t fault_r3  = frame->r3;
+    volatile uint32_t stacked_pc = (uint32_t)fault_pc;
+    
+    // 读取CFSR（Configurable Fault Status Register）
+    // 这个寄存器告诉你HardFault的具体原因
+    volatile uint32_t cfsr = SCB->CFSR;
+    volatile uint32_t hfsr = SCB->HFSR;
+    volatile uint32_t mmfar = SCB->MMFAR;  // MemManage Fault Address
+    volatile uint32_t bfar  = SCB->BFAR;   // BusFault Address
+    
+    // 在GDB中查看：
+    // (gdb) print fault_pc        → 错误发生的地址
+    // (gdb) print /x cfsr         → 查看具体错误码
+    // (gdb) info line *fault_pc   → 对应源代码哪一行
+    
+    // 用LED闪烁指示HardFault（最简单的通知方式）
+    while (1) {
+        // LED快闪3次，停顿1秒，重复
+        for (int i = 0; i &lt; 3; i++) {
+            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+            HAL_Delay(200);
+        }
+        HAL_Delay(1000);
+    }
+}
+
+// === 使用GDB定位HardFault ===
+// (gdb) break HardFault_Handler
+// (gdb) continue
+// ...程序停在HardFault_Handler...
+// (gdb) print fault_pc
+// $1 = (volatile uint32_t) 0x0800034a
+// (gdb) info line *0x0800034a
+// Line 42 of "main.c" starts at address 0x0800034a
+//     → 就是main.c第42行出了问题！
+// (gdb) print /x cfsr
+// $2 = 0x00008200  → PRECISERR(bit1=0)+IBUSERR(bit8=1)
+//    → 指令总线错误：试图从非法地址取指令
+// (gdb) x/4i fault_pc - 8
+// → 查看出错位置附近的汇编指令</code></pre>
+<div class="tip">💡 <b>实战技巧：</b>在HardFault_Handler中设一个断点（GDB: <code>break HardFault_Handler</code>），一旦程序进入，立即查看PC寄存器（<code>info registers pc</code>）指向的地址，然后用<code>info line *地址</code>找到源码行。80%的HardFault问题可以在5分钟内定位。</div>
+</div></div>
+
+<h3>Cortex-M故障寄存器详解（CFSR/HFSR）</h3>
+
+<pre><code>// SCB->CFSR 分为三个8位字段：
+// [15:8] = UFSR (UsageFault Status Register)
+//  [7:0] = BFSR (BusFault Status Register)
+// [31:16]= MFSR (MemManage Status Register)
+
+// === 常见CFSR故障码速查 ===
+//
+// BFSR (BusFault, CFSR[7:0]):
+//   bit 7 = BFARVALID: BFAR寄存器包含有效地址
+//   bit 4 = STKERR: 压栈时总线错误（栈溢出！）
+//   bit 3 = UNSTKERR: 出栈时总线错误
+//   bit 2 = IMPRECISERR: 不精确错误（最难查...）
+//   bit 1 = PRECISERR: 精确错误（地址在BFAR中）
+//   bit 0 = IBUSERR: 指令总线错误
+//
+// MFSR (MemManage, CFSR[31:16]):
+//   bit 7 = MMARVALID: MMFAR包含有效地址
+//   bit 5 = MLSPERR: 浮点懒压栈错误
+//   bit 4 = MSTKERR: 压栈时MPU访问违规
+//   bit 3 = MUNSTKERR: 出栈时MPU访问违规
+//   bit 1 = DACCVIOL: 数据访问违规（访问了MPU禁用的区域）
+//   bit 0 = IACCVIOL: 指令访问违规
+//
+// UFSR (UsageFault, CFSR[15:8]):
+//   bit 9 = DIVBYZERO: 除以零（需先使能CCR_DIV_0_TRP）
+//   bit 8 = UNALIGNED: 非对齐访问
+//   bit 3 = NOCP: 无协处理器
+//   bit 2 = INVPC: 无效PC加载（跳转到非代码区）
+//   bit 1 = INVSTATE: 无效状态
+//   bit 0 = UNDEFINSTR: 未定义指令
+//
+// HFSR (HardFault Status Register):
+//   bit 31 = DEBUGEVT: 调试事件触发
+//   bit 30 = FORCED: 被强制提升为HardFault
+//     → 说明真正的故障是MemManage/BusFault/UsageFault
+//     → 应查CFSR找到根因
+//   bit 1 = VECTTBL: 向量表读取错误</code></pre>
+
+<h3>芯片读保护与选项字节操作</h3>
+
+<div class="card">
+<div class="h"><span class="name">读保护（RDP）与选项字节</span><span class="tag y">安全</span><span class="tag p">进阶</span></div>
+<div class="b">
+<div class="desc">STM32芯片有读保护机制，可以防止Flash内容被非法读取。但开发过程中<strong>不小心启用读保护后</strong>，调试器无法连接，很多人以为"芯片烧了"。了解选项字节操作可以救急。</div>
+<pre><code>// === STM32选项字节（Option Bytes）结构 ===
+// 地址: 0x1FFFF800 (每个芯片可能不同，查参考手册)
+//
+// RDP (Read Protection Level):
+//   0xAA = Level 0, 无保护（默认，正常调试）
+//   0xBB = Level 1, 读保护开启（Flash内容不能读，但可调试）
+//   0xCC = Level 2, 不可逆保护（连ST官方都解不了！绝对不要用！）
+//
+// 注意：从Level 1改回Level 0会<strong>自动擦除整片Flash</strong>！
+
+// === 命令行操作选项字节（OpenOCD）===
+
+# 读取选项字节
+openocd -f interface/stlink.cfg -f target/stm32f1x.cfg \\
+        -c "init; reset halt; stm32f1x options_read 0; shutdown"
+
+# 解除读保护（会擦除Flash！）
+openocd -f interface/stlink.cfg -f target/stm32f1x.cfg \\
+        -c "init; reset halt; stm32f1x unlock 0; shutdown"
+
+# 但OpenOCD解保护有时不稳定，用STM32CubeProgrammer更可靠：
+# STM32CubeProgrammer CLI (STM32_Programmer_CLI):
+STM32_Programmer_CLI -c port=SWD -ob RDP=0xAA
+
+# === ST-Link命令行操作（st-flash）===
+
+# 解除读保护
+st-flash --read-unprotect
+
+# 查看选项字节
+st-flash --option
+
+# === 代码中修改选项字节（危险操作！）===
+// 软件修改选项字节的代码（仅生产环境使用）
+void SetReadProtection(void) {
+    HAL_FLASH_Unlock();
+    HAL_FLASH_OB_Unlock();
+    
+    FLASH_OBProgramInitTypeDef ob_config = {0};
+    HAL_FLASHEx_OBGetConfig(&ob_config);
+    
+    // ❗警告：设置Level 2后永远无法恢复！
+    ob_config.RDPLevel = OB_RDP_LEVEL_1;  // 仅Level 1
+    ob_config.OptionType = OPTIONBYTE_WRP | OPTIONBYTE_RDP;
+    
+    // WRP（写保护）：保护Bootloader区不被意外擦除
+    ob_config.WRPState = OB_WRPSTATE_ENABLE;
+    ob_config.WRPPage = OB_WRP_PAGES0TO3;  // 保护前4页（每页1KB=4KB）
+    
+    HAL_FLASHEx_OBProgram(&ob_config);
+    HAL_FLASH_OB_Launch();  // 复位后生效
+    
+    HAL_FLASH_OB_Lock();
+    HAL_FLASH_Lock();
+}</code></pre>
+<div class="warn">🚫 <b>绝对不要设Level 2！</b>Level 2是不可逆的——设了之后连ST官方都无法恢复。STM32秒变"一次性芯片"。量产产品用Level 1就够了（阻止Flash读出，但允许通过擦除恢复）。</div>
+</div></div>
+
+<h3>双Bank OTA升级：安全固件更新方案</h3>
+
+<div class="card">
+<div class="h"><span class="name">双Bank OTA升级原理</span><span class="tag p">进阶</span><span class="tag g">工业级方案</span></div>
+<div class="b">
+<div class="desc">前面介绍了单Bank的Bootloader（Bootloader+APP）。这种方案有一个致命缺陷：<strong>升级过程中断电=变砖</strong>。双Bank方案通过在Flash中保存<strong>两份APP副本</strong>来解决这个问题：</div>
+<pre><code>// === 单Bank方案 ===（升级断电→变砖！）
+// Flash布局:
+//   0x08000000: Bootloader  (16KB)
+//   0x08004000: APP         (48KB)  ← 升级时被覆盖
+//   
+// 升级流程: 接收新固件 → 擦除APP区 → 写入新固件
+//             ↑ 这期间断电 → APP区空了 → 变砖
+
+// === 双Bank方案 ===（升级断电→回滚旧版本）
+// Flash布局:
+//   0x08000000: Bootloader  (16KB)
+//   0x08004000: APP_BankA   (48KB)  ← 当前运行版本
+//   0x08010000: APP_BankB   (48KB)  ← 下载新固件到这里
+//   0x0801C000: Flag区域    (16KB)  ← 存储当前激活哪个Bank
+//
+// 升级流程:
+//   1. Bootloader运行 → 检查Flag → 启动BankA
+//   2. APP运行期间收到升级指令
+//   3. 下载新固件到BankB（BankA仍在正常运行）
+//   4. 下载完成、CRC校验通过
+//   5. 写入Flag：下次启动用BankB
+//   6. 软件复位 → Bootloader启动BankB
+//   ↑ 任何时候断电，Flag没变，旧版本照常运行
+
+// === 升级状态机 ===
+typedef enum {
+    OTA_IDLE,           // 空闲
+    OTA_DOWNLOADING,    // 正在下载新固件
+    OTA_VERIFYING,      // 校验中（CRC32）
+    OTA_READY,          // 下载完成，等待切换
+    OTA_SWITCHING,      // 正在切换Bank
+    OTA_FAILED          // 升级失败
+} OTA_State_t;
+
+// === 双Bank切换逻辑（Bootloader中）===
+typedef struct {
+    uint32_t magic;         // 魔数：0xAA55F00D
+    uint32_t active_bank;   // 0=BankA, 1=BankB
+    uint32_t bank_a_crc;    // BankA固件的CRC32
+    uint32_t bank_b_crc;    // BankB固件的CRC32
+    uint32_t bank_a_size;   // BankA固件大小
+    uint32_t bank_b_size;   // BankB固件大小
+} BootFlag_t;
+
+#define BANK_A_ADDR  0x08004000
+#define BANK_B_ADDR  0x08010000
+#define FLAG_ADDR    0x0801F000  // 最后一页放Flag
+
+void Bootloader_Main(void) {
+    BootFlag_t *flag = (BootFlag_t*)FLAG_ADDR;
+    
+    // 检查Flag有效性
+    if (flag->magic != 0xAA55F00D) {
+        // Flag无效，使用默认BankA
+        goto_boot_bank_a();
+        return;
+    }
+    
+    uint32_t app_addr;
+    if (flag->active_bank == 0) {
+        app_addr = BANK_A_ADDR;
+    } else {
+        app_addr = BANK_B_ADDR;
+    }
+    
+    // 检查栈顶地址有效性
+    uint32_t sp = *(uint32_t*)app_addr;
+    if ((sp & 0x2FFE0000) != 0x20000000) {
+        // 栈地址无效，尝试另一个Bank
+        flag->active_bank ^= 1;  // 切换
+        app_addr = (flag->active_bank == 0) ? BANK_A_ADDR : BANK_B_ADDR;
+    }
+    
+    jump_to_app(app_addr);
+}</code></pre>
+<div class="note">⚠️ <b>双Bank前提：</b>需要芯片有足够的Flash空间。STM32F103C8T6只有64KB（实际128KB），双Bank每个Bank只有约56KB（减去Bootloader和Flag），对代码量大的项目不够用。考虑用STM32F103RCT6（256KB Flash）或F4系列（512KB+）。</div>
+</div></div>
+
+<h3>调试器固件更新与常见故障修复</h3>
+
+<div class="trouble">🔧 <b>调试器自身故障排查</b><br><br>
+<b>1. 仿ST-Link突然不识别（"Unknown USB Device"）</b><br>
+• 现象：插上电脑后设备管理器显示"Unknown USB Device"或"设备描述符请求失败"<br>
+• 原因：仿ST-Link的固件损坏（可能是意外断电/静电导致）<br>
+• 解决：<br>
+  - 下载ST-Link固件升级工具：STM32 ST-LINK Utility → ST-LINK菜单 → Firmware Update<br>
+  - 如果工具检测不到 → 短接ST-Link上的BOOT0跳线（进入DFU模式）再试<br>
+  - 极少数仿品需要换一颗STM32F103C8T6主控芯片（¥5）<br><br>
+<b>2. J-Link OB提示"The firmware is defective"</b><br>
+• 现象：J-Link Commander显示固件损坏<br>
+• 解决：下载J-Link软件包 → 运行JLinkSTM32.exe → 选择正确的固件.bin文件 → 重新烧录<br>
+• 注意：J-Link OB的固件是加密的，只能用SEGGER官方工具恢复<br><br>
+<b>3. ST-Link提示"Target voltage detection failed"</b><br>
+• 检查JTAG/SWD接口的第1脚（VCC/VTref）：<br>
+  - 这个脚不是给目标板供电的，是<strong>检测</strong>目标板电压用的<br>
+  - 必须连接到目标板的VCC（3.3V），否则ST-Link拒绝工作<br>
+• 仿ST-Link的3.3V引脚可能没有供电能力 → 目标板必须另外供电<br><br>
+<b>4. DAP-Link烧录失败"SWD Communication Failure"</b><br>
+• 尝试降低SWD时钟频率<br>
+  - OpenOCD: <code>adapter speed 100</code>（降到100KHz）<br>
+  - pyOCD: <code>--frequency 100000</code><br>
+• 检查杜邦线质量——SWD对接触电阻敏感</div>
+
+<h3>扩展实战练习</h3>
+
+<div class="tip">💡 <b>练习3：实现HardFault诊断LED</b><br>
+目标：让单片机在HardFault时通过LED闪烁编码告诉开发者错误类型<br>
+要求：<br>
+① 修改HardFault_Handler，读取CFSR寄存器<br>
+② 根据CFSR的不同bit编码LED闪烁次数<br>
+&nbsp;&nbsp;- BusFault: 快闪1次停0.5秒<br>
+&nbsp;&nbsp;- UsageFault: 快闪2次停0.5秒<br>
+&nbsp;&nbsp;- MemManage: 快闪3次停0.5秒<br>
+③ 加入看门狗复位：HardFault后LED闪烁10次→触发看门狗复位→重试<br>
+④ 进阶：把故障信息存入备份寄存器（BKP），复位后读取并串口输出</div>
+
+<div class="tip">💡 <b>练习4：制作USB转串口+SWD二合一调试器</b><br>
+目标：理解调试器的工作原理<br>
+要求：<br>
+① 用STM32F103C8T6 + DAP-Link固件（开源）制作一个DAP-Link<br>
+② 验证：用自制的DAP-Link给另一块STM32烧录程序<br>
+③ 理解CMSIS-DAP协议的基本原理<br>
+④ 进阶：添加虚拟串口功能（CDC ACM），做成烧录+串口二合一<br>
+参考：GitHub搜索"DAP-Link"或"CMSIS-DAP"开源项目</div>
 
 <div class="summary" style="margin-top:24px">
-<b>馃摎 绗?绔犵煡璇嗙偣鍥為【</b><br><br>
-<b>鉁?鐑у綍鏂瑰紡锛?/b><br>
-鈥?<strong>ST-Link锛堟帹鑽愶級</strong>锛毬?0浠垮埗鍝佸嵆鍙紝鏀寔SWD鐑у綍+GDB璋冭瘯<br>
-鈥?<strong>涓插彛ISP锛堢渷閽憋級</strong>锛氱敤CH340灏辫兘鐑э紝浣嗛渶瑕佸垏鎹OOT0锛屼笉鏀寔璋冭瘯<br>
-鈥?<strong>J-Link锛堜笓涓氾級</strong>锛氶€熷害蹇姛鑳藉叏锛屼絾楼400+锛屽垵瀛﹁€呬笉闇€瑕?br>
-鈥?<strong>DAP-Link锛堥€氱敤锛?/strong>锛氬紑婧愭柟妗堬紝鏀寔鎵€鏈塁ortex-M鑺墖<br><br>
-<b>鉁?璋冭瘯鎺ュ彛锛?/b><br>
-鈥?<strong>SWD</strong>锛?绾匡級鏄疌ortex-M鍗曠墖鏈虹殑鏍囧噯璋冭瘯鎺ュ彛<br>
-鈥?JTAG锛?绾匡級鍑犱箮涓嶇敤锛孲WD鏇村揩鏇寸渷寮曡剼<br>
-鈥?鏍囧噯SWD杩炴帴锛?V3 + GND + SWDIO + SWCLK锛?鏍圭嚎锛?br><br>
-<b>鉁?GDB璋冭瘯鏍稿績鎶€鑳斤細</b><br>
-鈥?<strong>鏂偣</strong>锛歜reak(鏅€?/tbreak(涓存椂)/hbreak(纭欢)/鏉′欢鏂偣<br>
-鈥?<strong>瑙傚療鐐?/strong>锛歸atch(鍐?/rwatch(璇?/awatch(璇诲啓)锛屾壘鍑鸿皝鏀逛簡鍙橀噺<br>
-鈥?<strong>鎺у埗鎵ц</strong>锛歝ontinue(缁х画)/step(杩涘叆)/next(璺宠繃)/finish(璺冲嚭)<br>
-鈥?<strong>鏌ョ湅鐘舵€?/strong>锛歱rint(鍙橀噺)/info registers(瀵勫瓨鍣?/backtrace(璋冪敤鏍?/x(鍐呭瓨)<br>
-鈥?<strong>鑴氭湰鍖?/strong>锛?gdbinit鑷姩鎵ц甯哥敤鍛戒护<br><br>
-<b>鉁?Bootloader鏍稿績姒傚康锛?/b><br>
-鈥?Bootloader鏄姱鐗囦笂鐢靛悗绗竴涓繍琛岀殑绋嬪簭<br>
-鈥?鍒ゆ柇鏉′欢鍚庡喅瀹氾細璺宠浆APP 杩樻槸 杩涘叆鍗囩骇妯″紡<br>
-鈥?APP闇€瑕侀噸鏂拌缃甐TOR锛堝悜閲忚〃鍋忕Щ锛?br>
-鈥?閾炬帴鑴氭湰涓瑼PP鐨凢lash璧峰鍦板潃蹇呴』淇敼<br><br>
-<b>鈿狅笍 甯歌闄烽槺锛?/b><br>
-鈥?浠縎T-Link涓嶈兘缁欑洰鏍囨澘渚涚數鈥斺€旈渶瑕侀澶栨帴3.3V<br>
-鈥?纭欢鏂偣鍙湁6涓紝鐢ㄥ畬灏变笉鑳藉姞<br>
-鈥?鐑у綍鎴愬姛浣嗕笉杩愯鈫掓鏌OOT0銆佹寜澶嶄綅閿?br>
-鈥?USB绾垮彧鑳藉厖鐢典笉鑳戒紶鏁版嵁鈫掓崲鏍圭嚎锛?br>
-鈥?HAL_Delay鍦ㄤ腑鏂噷璋冪敤涓斾紭鍏堢骇>SysTick鈫掓閿侊紒
+<b>📚 第5章知识点回顾</b><br><br>
+<b>✅ 烧录方式：</b><br>
+• <strong>ST-Link（推荐）</strong>：¥10仿制品即可，支持SWD烧录+GDB调试<br>
+• <strong>串口ISP（省钱）</strong>：用CH340就能烧，但需要切换BOOT0，不支持调试<br>
+• <strong>J-Link（专业）</strong>：速度快功能全，但¥400+，初学者不需要<br>
+• <strong>DAP-Link（通用）</strong>：开源方案，支持所有Cortex-M芯片<br><br>
+<b>✅ 调试接口：</b><br>
+• <strong>SWD</strong>（2线）是Cortex-M单片机的标准调试接口<br>
+• JTAG（5线）几乎不用，SWD更快更省引脚<br>
+• 标准SWD连接：3V3 + GND + SWDIO + SWCLK（4根线）<br><br>
+<b>✅ GDB调试核心技能：</b><br>
+• <strong>断点</strong>：break(普通)/tbreak(临时)/hbreak(硬件)/条件断点<br>
+• <strong>观察点</strong>：watch(写)/rwatch(读)/awatch(读写)，找出谁改了变量<br>
+• <strong>控制执行</strong>：continue(继续)/step(进入)/next(跳过)/finish(跳出)<br>
+• <strong>查看状态</strong>：print(变量)/info registers(寄存器)/backtrace(调用栈)/x(内存)<br>
+• <strong>脚本化</strong>：.gdbinit自动执行常用命令<br><br>
+<b>✅ Bootloader核心概念：</b><br>
+• Bootloader是芯片上电后第一个运行的程序<br>
+• 判断条件后决定：跳转APP 还是 进入升级模式<br>
+• APP需要重新设置VTOR（向量表偏移）<br>
+• 链接脚本中APP的Flash起始地址必须修改<br><br>
+<b>✅ 高级调试技术（新增）：</b><br>
+• <strong>SWO/SWV</strong>：通过SWO引脚实时输出调试信息，ITM printf比串口快100倍<br>
+• <strong>RTT</strong>：SEGGER的高速调试通道，仅用SWD就能实现~1MB/s双向传输，不占额外引脚<br>
+• <strong>HardFault诊断</strong>：通过保存异常栈帧+读取CFSR/HFSR寄存器精确定位错误地址<br>
+• <strong>选项字节</strong>：读保护(RDP)的配置与解除（Level 1解除会擦除Flash）<br><br>
+<b>✅ 固件升级方案：</b><br>
+• 单Bank：Bootloader + APP，简单但有断电变砖风险<br>
+• <strong>双Bank</strong>：同时保存新旧版本，升级断电自动回滚，工业级可靠性<br>
+• Level 2读保护是不可逆的——<strong>绝对不要设置</strong><br><br>
+<b>⚠️ 常见陷阱（扩展）：</b><br>
+• 仿ST-Link不能给目标板供电——需要额外接3.3V<br>
+• 硬件断点只有6个，用完就不能加<br>
+• 烧录成功但不运行→检查BOOT0、按复位键<br>
+• USB线只能充电不能传数据→换根线！<br>
+• HAL_Delay在中断里调用且优先级>SysTick→死锁！<br>
+• ST-Link的VTref脚是检测不是供电——目标板必须另外供电<br>
+• HardFault 80%由空指针/未初始化外设/栈溢出引起——先查这三样
 </div>
 
-<!-- ====== 绗?绔?====== -->
+<!-- ====== 第6章 ====== -->
 <a id="ch6"></a>
-<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>浼氱敤STM32 HAL搴撴搷浣淕PIO/UART/TIM/ADC锛岀悊瑙ｄ腑鏂紭鍏堢骇锛岃兘鐙珛鍐橲TM32灏忕▼搴忋€?/div>
+<div class="summary">📖 <b>第6章学完你能干啥：</b>会用STM32 HAL库操作GPIO/UART/TIM/ADC，理解中断优先级，能独立写STM32小程序。</div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch04')">鈫?绗?绔?/a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
-<a onclick="window.parent.loadPage('guide-ch06')">绗?绔?鈫?/a>
+<a onclick="window.parent.loadPage('guide-ch04')">← 第4章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch06')">第6章 →</a>
 </div>
 
 <script>
@@ -486,9 +1001,9 @@ document.querySelectorAll('pre').forEach(pre => {
 });
 </script>
 <div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch04')">鈼€ 涓婁竴绔狅細涓插彛閫氫俊</a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
-  <a onclick="window.parent.loadPage('guide-ch06')">STM32 锛氫笅涓€绔?鈻?/a>
+  <a onclick="window.parent.loadPage('guide-ch04')">◀ 上一章：串口通信</a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
+  <a onclick="window.parent.loadPage('guide-ch06')">STM32 ：下一章 ▶</a>
 </div>
 </body>
 </html>
