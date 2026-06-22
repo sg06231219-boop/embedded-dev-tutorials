@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>绗?2绔狅細椤圭洰瀹炴垬 鈥?鐜鐩戞祴绔?- 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
+<title>第12章：传感器应用实战 - 嵌入式小白完全指南</title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,147 +57,223 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>绗?2绔狅細椤圭洰瀹炴垬 鈥?鐜鐩戞祴绔?/h1>
-<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 12/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
+<h1>第12章：传感器应用实战</h1>
+<div class="summary"><b>📖 小白完全指南 · 12/14</b> | 阅读时间约14分钟</div>
 
-<p>鍋氫竴涓?strong>瀹屾暣鍙繍琛?/strong>鐨勯」鐩細DHT11娓╂箍搴︿紶鎰熷櫒 鈫?STM32璇诲彇 鈫?涓插彛杈撳嚭 鈫?OLED鏄剧ず灞忔樉绀恒€?/p>
+<p>做一个<strong>完整可运行</strong>的项目：DHT11温湿度传感器 → STM32读取 → 串口输出 → OLED显示屏显示。再加装超声波测距、MPU6050姿态传感器，一个多传感器环境监测站就成型了。</p>
 
-<div class="analogy">馃挕 <b>绫绘瘮锛?/b>杩欎釜椤圭洰灏卞儚鍋氫竴閬撳畬鏁寸殑鑿溾€斺€斿墠闈㈢殑绔犺妭鏄鍒囪彍銆佽皟鍛炽€佺伀鍊欙紝鐜板湪瑕佹妸杩欎簺鎶€鑳界粍鍚堣捣鏉ワ紝鍋氫竴閬撶湡姝ｇ殑鑿滀笂妗屻€?/div>
+<div class="analogy">💡 <b>类比：</b>传感器就像人体的<b>感官系统</b>——温度传感器=皮肤，超声波=眼睛(测距)，加速度计=前庭(平衡)，GPS=方向感。MCU就是大脑，处理这些感官信息并作出决策。</div>
 
-<h3>馃洜锔?椤圭洰鍒涘缓锛堜簩閫変竴锛?/h3>
-
-<div class="note">鈿狅笍 <b>閲嶈锛?/b>涓嬮潰鐨勪唬鐮佷緷璧朣TM32 HAL搴撱€備綘闇€瑕佸厛鍒涘缓涓€涓狧AL搴撻」鐩紝浠ヤ笅鏄袱绉嶆柟寮忥細</div>
+<h2>📐 传感器通信协议选型</h2>
 
 <div class="card">
-<div class="h"><span class="name">鏂瑰紡1锛歋TM32CubeMX锛堟帹鑽愶級</span><span class="tag g">鑷姩鐢熸垚</span></div>
+<div class="h"><span class="name">嵌入式三大传感器接口</span><span class="tag g">基础</span></div>
 <div class="b">
-<div class="desc">CubeMX鑷姩鐢熸垚鍒濆鍖栦唬鐮侊紝浣犲彧闇€鍐欎笟鍔￠€昏緫銆?/div>
-<div class="step"><b>姝ラ1锛?/b>鎵撳紑STM32CubeMX 鈫?New Project 鈫?鎼滅储 <code>STM32F103C8</code> 鈫?鍙屽嚮閫夋嫨</div>
-<div class="step"><b>姝ラ2锛?/b>閰嶇疆寮曡剼锛歅A1=GPIO_Output锛圖HT11锛夈€丳B6=I2C1_SCL銆丳B7=I2C1_SDA銆丳A9=USART1_TX銆丳A10=USART1_RX</div>
-<div class="step"><b>姝ラ3锛?/b>宸︿晶閰嶇疆锛欳onnectivity 鈫?USART1 鈫?Mode: Asynchronous 鈫?Baud: 115200</div>
-<div class="step"><b>姝ラ4锛?/b>Connectivity 鈫?I2C1 鈫?鍕鹃€?Enabled</div>
-<div class="step"><b>姝ラ5锛?/b>Project Manager 鈫?Toolchain: CMake 鈫?Generate Code</div>
-<div class="step"><b>姝ラ6锛?/b>鐢熸垚鐨勫伐绋嬩腑锛屽湪 <code>/* USER CODE BEGIN */</code> 鍖哄煙鍐呭啓浣犵殑浠ｇ爜</div>
+<div class="desc">
+<table>
+<tr><th>接口</th><th>线数</th><th>速度</th><th>最大距离</th><th>设备上限</th><th>典型传感器</th></tr>
+<tr><td>I2C</td><td>2线(SCL/SDA)</td><td>100k/400k/1M/3.4M</td><td><1m</td><td>128</td><td>BMP280, MPU6050, OLED, BH1750</td></tr>
+<tr><td>SPI</td><td>4线(SCK/MOSI/MISO/CS)</td><td>1-80MHz</td><td><0.5m</td><td>受CS引脚数限制</td><td>BME680, ICM-20948, SD卡, Flash</td></tr>
+<tr><td>UART</td><td>2线(TX/RX) + GND</td><td>9600-1Mbps</td><td><15m</td><td>1对1</td><td>GPS模块, 指纹模块, 语音模块</td></tr>
+<tr><td>OneWire</td><td>1线+DATA+GND</td><td>16.3kbps</td><td><300m</td><td>总线扫描</td><td>DS18B20, DHT11/22</td></tr>
+<tr><td>Analog</td><td>1线</td><td>受ADC限制</td><td><1m</td><td>受ADC通道数限制</td><td>光敏/气敏/土壤湿度</td></tr>
+</table>
+</div></div></div>
+
+<h2>🌡 项目一：DHT11温湿度监测站</h2>
+
+<div class="note">⚠️ <b>重要：</b>下面的代码依赖STM32 HAL库。你需要先创建一个HAL库项目（CubeMX或EIDE），以下是完整步骤。</div>
+
+<h3>🛠️ 项目创建（二选一）</h3>
+
+<div class="card">
+<div class="h"><span class="name">方式1：STM32CubeMX（推荐）</span><span class="tag g">自动生成</span></div>
+<div class="b">
+<div class="desc">CubeMX自动生成初始化代码，你只需写业务逻辑。</div>
+<div class="step"><b>步骤1：</b>打开STM32CubeMX → New Project → 搜索 <code>STM32F103C8</code> → 双击选择</div>
+<div class="step"><b>步骤2：</b>配置引脚：PA1=GPIO_Output（DHT11）、PB6=I2C1_SCL、PB7=I2C1_SDA、PA9=USART1_TX、PA10=USART1_RX</div>
+<div class="step"><b>步骤3：</b>左侧配置：Connectivity → USART1 → Mode: Asynchronous → Baud: 115200</div>
+<div class="step"><b>步骤4：</b>Connectivity → I2C1 → 勾选 Enabled → Speed: Standard(100K)</div>
+<div class="step"><b>步骤5：</b>Project Manager → Toolchain: CMake → Generate Code</div>
+<div class="step"><b>步骤6：</b>生成的工程中，在 <code>/* USER CODE BEGIN */</code> 区域内写你的代码</div>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">鏂瑰紡2锛欵IDE/PlatformIO鎻掍欢锛堝厤CubeMX锛?/span><span class="tag b">VS Code鍐?/span></div>
+<div class="h"><span class="name">方式2：EIDE/PlatformIO插件（免CubeMX）</span><span class="tag b">VS Code内</span></div>
 <div class="b">
-<div class="desc">宸插畨瑁呯殑VS Code鎻掍欢锛屽彲浠ュ湪VS Code鍐呯洿鎺ュ垱寤篠TM32椤圭洰銆?/div>
-<pre><code>// EIDE鏂瑰紡锛堟帹鑽愶級
-// 1. VS Code 鈫?Ctrl+Shift+P 鈫?"EIDE: New Project"
-// 2. 閫夋嫨 "Cortex-M Project" 鈫?STM32F103C8
-// 3. 椤圭洰鑷姩鍖呭惈HAL搴撳拰鍚姩鏂囦欢
+<div class="desc">已安装的VS Code插件，可以在VS Code内直接创建STM32项目。</div>
+<pre><code>// EIDE方式（推荐）
+// 1. VS Code → Ctrl+Shift+P → "EIDE: New Project"
+// 2. 选择 "Cortex-M Project" → STM32F103C8
+// 3. 项目自动包含HAL库和启动文件
 
-// PlatformIO鏂瑰紡
-// 1. VS Code 鈫?PlatformIO 鈫?New Project
-// 2. Board: BluePill F103C8 鈫?Framework: STM32Cube
-// 3. 鑷姩涓嬭浇HAL搴撳拰缂栬瘧宸ュ叿閾?/code></pre>
+// PlatformIO方式
+// 1. VS Code → PlatformIO → New Project
+// 2. Board: BluePill F103C8 → Framework: STM32Cube
+// 3. 自动下载HAL库和编译工具链</code></pre>
 </div></div>
 
-<div class="tip">馃挕 <b>杩樻病瑁匔ubeMX锛?/b>椤圭洰瀹炴垬鍙互鍏堣烦杩囷紝鎶婂墠闈㈢珷鑺傜殑绾瘎瀛樺櫒浠ｇ爜缁冪啛銆侰ubeMX鏄晥鐜囧伐鍏凤紝涓嶆槸蹇呴渶鍝併€?/div>
-
-<h3>纭欢杩炴帴</h3>
+<h3>硬件连接</h3>
 
 <table>
-<tr><th>DHT11寮曡剼</th><th>STM32寮曡剼</th><th>璇存槑</th></tr>
-<tr><td>VCC</td><td>3.3V</td><td>渚涚數</td></tr>
-<tr><td>GND</td><td>GND</td><td>鍦?/td></tr>
-<tr><td>DATA</td><td>PA1</td><td>鏁版嵁绾匡紙闇€4.7K涓婃媺锛?/td></tr>
+<tr><th>DHT11引脚</th><th>STM32引脚</th><th>说明</th></tr>
+<tr><td>VCC</td><td>3.3V</td><td>供电(3.3-5V均可)</td></tr>
+<tr><td>GND</td><td>GND</td><td>地</td></tr>
+<tr><td>DATA</td><td>PA1</td><td>数据线（需4.7KΩ上拉到VCC）</td></tr>
 </table>
 
 <table>
-<tr><th>OLED(SSD1306)</th><th>STM32寮曡剼</th><th>璇存槑</th></tr>
-<tr><td>VCC</td><td>3.3V</td><td>渚涚數</td></tr>
-<tr><td>GND</td><td>GND</td><td>鍦?/td></tr>
-<tr><td>SCL</td><td>PB6(I2C1_SCL)</td><td>I2C鏃堕挓</td></tr>
-<tr><td>SDA</td><td>PB7(I2C1_SDA)</td><td>I2C鏁版嵁</td></tr>
+<tr><th>OLED(SSD1306)</th><th>STM32引脚</th><th>说明</th></tr>
+<tr><td>VCC</td><td>3.3V</td><td>供电</td></tr>
+<tr><td>GND</td><td>GND</td><td>地</td></tr>
+<tr><td>SCL</td><td>PB6(I2C1_SCL)</td><td>I2C时钟（需接4.7K上拉）</td></tr>
+<tr><td>SDA</td><td>PB7(I2C1_SDA)</td><td>I2C数据（需接4.7K上拉）</td></tr>
 </table>
 
-<h3>DHT11椹卞姩浠ｇ爜</h3>
+<div class="tip">💡 <b>关于上拉电阻：</b>DHT11的DATA线需要4.7KΩ上拉到VCC。I2C的SCL/SDA如果模块上没有上拉电阻也要加。大部分现成的模块(Mini MPU6050、OLED模块)已经焊接了上拉电阻。</div>
 
-<pre><code>// dht11.h
+<h3>DHT11驱动代码（完整版）</h3>
+
+<pre><code>// dht11.h —— 简洁接口
 #ifndef DHT11_H
 #define DHT11_H
 #include "stm32f1xx_hal.h"
 
 typedef struct {
-    uint8_t humidity_int;    // 婀垮害鏁存暟閮ㄥ垎
-    uint8_t humidity_dec;    // 婀垮害灏忔暟閮ㄥ垎
-    uint8_t temp_int;        // 娓╁害鏁存暟閮ㄥ垎
-    uint8_t temp_dec;        // 娓╁害灏忔暟閮ㄥ垎
+    uint8_t humidity_int;    // 湿度整数部分 (%)
+    uint8_t humidity_dec;    // 湿度小数部分
+    uint8_t temp_int;        // 温度整数部分 (°C)
+    uint8_t temp_dec;        // 温度小数部分
+    uint8_t checksum;        // 校验和
 } DHT11_Data_t;
 
-uint8_t DHT11_Read(DHT11_Data_t *data, GPIO_TypeDef *port, uint16_t pin);
+typedef enum {
+    DHT11_OK = 0,
+    DHT11_ERR_TIMEOUT,       // 传感器无响应
+    DHT11_ERR_CHECKSUM,      // 校验失败
+    DHT11_ERR_BUSY           // 距上次读取不足2秒
+} DHT11_Status_t;
+
+DHT11_Status_t DHT11_Read(DHT11_Data_t *data, GPIO_TypeDef *port, uint16_t pin);
 
 #endif</code></pre>
 
-<pre><code>// dht11.c
+<pre><code>// dht11.c —— 完整实现
 #include "dht11.h"
 
+static uint32_t last_read_tick = 0;
+
+// 微秒级延时（基于系统时钟72MHz估算）
 static void delay_us(uint32_t us) {
-    uint32_t ticks = us * (SystemCoreClock / 1000000) / 5;
-    while (ticks--);
+    uint32_t ticks = us * (SystemCoreClock / 1000000UL) / 5;
+    while (ticks--) __NOP();
 }
 
-uint8_t DHT11_Read(DHT11_Data_t *data, GPIO_TypeDef *port, uint16_t pin) {
+DHT11_Status_t DHT11_Read(DHT11_Data_t *data, GPIO_TypeDef *port, uint16_t pin) {
     uint8_t buf[5] = {0};
+    uint32_t timeout;
     GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    // 涓绘満鍙戦€佽捣濮嬩俊鍙凤紙鎷変綆18ms锛?    GPIO_InitStruct.Pin = pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    
+    // 防止读取间隔过短（DHT11要求>1秒，保守取2秒）
+    if (HAL_GetTick() - last_read_tick < 2000) {
+        return DHT11_ERR_BUSY;
+    }
+    last_read_tick = HAL_GetTick();
+    
+    // === 步骤1：主机发送起始信号（拉低18ms） ===
+    GPIO_InitStruct.Pin = pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;  // 开漏输出（兼容5V）
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(port, &amp;GPIO_InitStruct);
+    HAL_GPIO_Init(port, &GPIO_InitStruct);
+    
+    // 拉低至少18ms
     HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
     HAL_Delay(18);
+    
+    // 拉高20-40μs，通知DHT11"我准备好了"
     HAL_GPIO_WritePin(port, pin, GPIO_PIN_SET);
     delay_us(30);
-
-    // 鍒囨崲涓鸿緭鍏?    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    
+    // === 步骤2：切换为输入，等待DHT11响应 ===
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    HAL_GPIO_Init(port, &amp;GPIO_InitStruct);
-
-    // 绛夊緟DHT11鍝嶅簲
-    uint32_t timeout = 100;
-    while (HAL_GPIO_ReadPin(port, pin) &amp;&amp; timeout--) delay_us(1);
-    if (timeout == 0) return 1;  // 鏃犲搷搴?
-    // 鎺ユ敹40浣嶆暟鎹?    for (int i = 0; i &lt; 5; i++) {
-        for (int j = 0; j &lt; 8; j++) {
+    HAL_GPIO_Init(port, &GPIO_InitStruct);
+    delay_us(5);  // 让IO稳定
+    
+    // DHT11应该拉低80μs再拉高80μs作为响应
+    // 等待DHT11拉低
+    timeout = 100;
+    while (HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_SET) {
+        if (--timeout == 0) return DHT11_ERR_TIMEOUT;
+        delay_us(1);
+    }
+    
+    // 等待DHT11拉高
+    timeout = 100;
+    while (HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_RESET) {
+        if (--timeout == 0) return DHT11_ERR_TIMEOUT;
+        delay_us(1);
+    }
+    // 等待DHT11再次拉低（准备发送数据）
+    timeout = 100;
+    while (HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_SET) {
+        if (--timeout == 0) return DHT11_ERR_TIMEOUT;
+        delay_us(1);
+    }
+    
+    // === 步骤3：读取40位数据 ===
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 8; j++) {
+            // 等待低电平结束
             timeout = 100;
-            while (!HAL_GPIO_ReadPin(port, pin) &amp;&amp; timeout--) delay_us(1);
-            delay_us(40);
-            if (HAL_GPIO_ReadPin(port, pin)) {
-                buf[i] |= (1 &lt;&lt; (7 - j));
-                timeout = 100;
-                while (HAL_GPIO_ReadPin(port, pin) &amp;&amp; timeout--) delay_us(1);
+            while (HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_RESET) {
+                if (--timeout == 0) return DHT11_ERR_TIMEOUT;
+                delay_us(1);
+            }
+            
+            // 测量高电平持续时间：26-28μs=0, 70μs=1
+            delay_us(35);  // 延时到关键判断点
+            if (HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_SET) {
+                buf[i] |= (1 << (7 - j));  // MSB先发
+            }
+            
+            // 等待高电平结束
+            timeout = 100;
+            while (HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_SET) {
+                if (--timeout == 0) return DHT11_ERR_TIMEOUT;
+                delay_us(1);
             }
         }
     }
-
-    // 鏍￠獙
-    if (buf[4] != (uint8_t)(buf[0] + buf[1] + buf[2] + buf[3]))
-        return 2;  // 鏍￠獙澶辫触
-
+    
+    // === 步骤4：校验 ===
+    if (buf[4] != (uint8_t)(buf[0] + buf[1] + buf[2] + buf[3])) {
+        return DHT11_ERR_CHECKSUM;
+    }
+    
+    // 填充数据
     data->humidity_int = buf[0];
     data->humidity_dec = buf[1];
     data->temp_int     = buf[2];
     data->temp_dec     = buf[3];
-    return 0;  // 鎴愬姛
+    data->checksum     = buf[4];
+    
+    return DHT11_OK;
 }</code></pre>
 
-<h3>涓荤▼搴?/h3>
-
-<pre><code>// main.c
+<pre><code>// main.c —— 主程序（串口输出 + OLED显示）
 #include "stm32f1xx_hal.h"
 #include "dht11.h"
-#include &lt;stdio.h&gt;
+#include <stdio.h>
 
 DHT11_Data_t dht;
 extern UART_HandleTypeDef huart1;
 extern I2C_HandleTypeDef hi2c1;
 
+// printf重定向到UART1
 int fputc(int ch, FILE *f) {
-    HAL_UART_Transmit(&amp;huart1, (uint8_t *)&amp;ch, 1, HAL_MAX_DELAY);
+    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
     return ch;
 }
 
@@ -207,50 +283,50 @@ int main(void) {
     MX_GPIO_Init();
     MX_USART1_UART_Init();
     MX_I2C1_Init();
-
-    printf("
-=== Environment Monitor ===
-");
-
+    
+    // 初始化OLED
+    ssd1306_Init();
+    ssd1306_Fill(Black);
+    ssd1306_UpdateScreen(&hi2c1);
+    
+    printf("\r\n=== DHT11 Environment Monitor ===\r\n");
+    
     while (1) {
-        uint8_t ret = DHT11_Read(&amp;dht, GPIOA, GPIO_PIN_1);
-        if (ret == 0) {
-            printf("Temp: %d.%d C, Humi: %d.%d %%\n",
-                dht.temp_int, dht.temp_dec,
-                dht.humidity_int, dht.humidity_dec);
-        } else {
-            printf("DHT11 error: %d\n", ret);
+        DHT11_Status_t ret = DHT11_Read(&dht, GPIOA, GPIO_PIN_1);
+        
+        if (ret == DHT11_OK) {
+            // 串口输出
+            printf("Temp: %d.%d°C  Humi: %d.%d%%\r\n",
+                   dht.temp_int, dht.temp_dec,
+                   dht.humidity_int, dht.humidity_dec);
+            
+            // OLED显示
+            char buf[32];
+            ssd1306_Fill(Black);
+            ssd1306_SetCursor(0, 0);
+            ssd1306_WriteString("=== ENV MONITOR ===", Font_6x8, White);
+            
+            snprintf(buf, sizeof(buf), "Temp: %d.%d C", dht.temp_int, dht.temp_dec);
+            ssd1306_SetCursor(0, 16);
+            ssd1306_WriteString(buf, Font_7x10, White);
+            
+            snprintf(buf, sizeof(buf), "Humi: %d.%d %%", dht.humidity_int, dht.humidity_dec);
+            ssd1306_SetCursor(0, 36);
+            ssd1306_WriteString(buf, Font_7x10, White);
+            
+            ssd1306_UpdateScreen(&hi2c1);
+            
+        } else if (ret == DHT11_ERR_TIMEOUT) {
+            printf("DHT11 Error: No response!\r\n");
+        } else if (ret == DHT11_ERR_CHECKSUM) {
+            printf("DHT11 Error: Checksum failed!\r\n");
         }
-        HAL_Delay(2000);  // DHT11鏈€灏忛棿闅?绉?    }
+        
+        HAL_Delay(2000);  // DHT11最小间隔2秒
+    }
 }</code></pre>
 
-<div class="card">
-<div class="h"><span class="name">OLED鏄剧ず灞忔墿灞?/span><span class="tag b">SSD1306 I2C</span><span class="tag y">鍙€?/span></div>
-<div class="b">
-<div class="desc">鎯宠娓╂箍搴︽暟鎹樉绀哄湪OLED灞忎笂锛熸寜浠ヤ笅姝ラ鎿嶄綔锛?/div>
-
-<div class="step"><b>姝ラ1锛?/b>涓嬭浇ssd1306椹卞姩锛?code>github.com/afiskon/stm32-ssd1306</code>锛圙itHub鍙兘琚锛屾浛浠ｏ細娣樺疂鎼?SSD1306 STM32椹卞姩浠ｇ爜"锛?/div>
-<div class="step"><b>姝ラ2锛?/b>灏?<code>ssd1306.c</code>銆?code>ssd1306.h</code>銆?code>ssd1306_fonts.c</code> 澶嶅埗鍒颁綘鐨?<code>src/</code> 鍜?<code>inc/</code> 鐩綍</div>
-<div class="step"><b>姝ラ3锛?/b>鍦╩ain.c椤堕儴娣诲姞锛?code>#include "ssd1306.h"</code></div>
-<div class="step"><b>姝ラ4锛?/b>鍦╳hile(1)鐨凞HT11璇诲彇鎴愬姛鍒嗘敮閲屽姞鍏LED鏄剧ず浠ｇ爜锛?/div>
-
-<pre><code>// OLED鏄剧ず浠ｇ爜锛堝湪DHT11璇诲彇鎴愬姛鍚庢坊鍔狅級
-ssd1306_Init();  // 鍙渶璋冪敤涓€娆★紝寤鸿鏀惧湪main()鍒濆鍖栧尯
-char buf[32];
-snprintf(buf, sizeof(buf), "Temp:%d.%dC", dht.temp_int, dht.temp_dec);
-ssd1306_SetCursor(0, 0);
-ssd1306_WriteString(buf, Font_7x10, White);
-snprintf(buf, sizeof(buf), "Humi:%d.%d%%", dht.humidity_int, dht.humidity_dec);
-ssd1306_SetCursor(0, 16);
-ssd1306_WriteString(buf, Font_7x10, White);
-ssd1306_UpdateScreen(&amp;hi2c1);</code></pre>
-
-<div class="step"><b>姝ラ5锛?/b>CMakeLists.txt鐨凷OURCES涓坊鍔狅細<code>src/ssd1306.c src/ssd1306_fonts.c</code></div>
-
-<div class="tip">馃挕 <b>鏆傛椂娌℃湁OLED锛?/b>娌″叧绯伙紒鍙敤涓插彛杈撳嚭涔熷畬鍏∣K锛屽厛璺戦€欴HT11浼犳劅鍣ㄥ啀璇淬€侽LED鏄敠涓婃坊鑺便€?/div>
-</div></div>
-
-<h3>CMakeLists.txt 瀹屾暣鐗?/h3>
+<h3>CMakeLists.txt 完整版</h3>
 
 <pre><code>cmake_minimum_required(VERSION 3.20)
 project(env_monitor C ASM)
@@ -258,8 +334,8 @@ project(env_monitor C ASM)
 set(SOURCES
     src/main.c src/dht11.c src/stm32f1xx_it.c
     src/system_stm32f1xx.c
-    # 濡傛灉瑕佸惎鐢∣LED鏄剧ず锛屽彇娑堜笅琛屾敞閲婏細
-    # src/ssd1306.c
+    # 启用OLED显示：
+    src/ssd1306.c src/ssd1306_fonts.c
 )
 
 include_directories(inc CMSIS)
@@ -285,20 +361,745 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
     COMMAND echo "Flash: st-flash write ${PROJECT_NAME}.bin 0x08000000"
 )</code></pre>
 
-<div class="tip">馃挕 <b>鎵╁睍鏂瑰悜锛?/b><br>
-鈥?鍔燛SP8266/ESP32妯″潡锛岄€氳繃WiFi涓婁紶鍒版湇鍔″櫒<br>
-鈥?鍔燤QTT鍗忚锛屾帴鍏ome Assistant<br>
-鈥?鍔犺渹楦ｅ櫒锛屾俯搴﹁秴闄愭姤璀?br>
-鈥?鍔燬D鍗★紝璁板綍鍘嗗彶鏁版嵁</div>
+<h2>📡 项目二：HC-SR04超声波测距</h2>
 
-<!-- ====== 绗?3绔?====== -->
-<a id="ch13"></a>
-<div class="summary">馃摉 <b>绗?3绔犲瀹屼綘鑳藉共鍟ワ細</b>鏈変簡涓€鏁村閫熸煡鎵嬪唽鈥斺€斿惎鍔ㄦ枃浠?閾炬帴鑴氭湰/GDB鍛戒护/Makefile妯℃澘/甯哥敤瀵勫瓨鍣?浣嶆搷浣滃畯锛岄殢鏃舵煡闃呫€?/div>
+<div class="analogy">💡 <b>原理：</b>超声波像<b>蝙蝠回声定位</b>——发射40KHz超声波脉冲，遇到障碍物反射回来，测量往返时间，乘以声速÷2就得到距离。</div>
+
+<pre><code>// 超声波测距 - 基于定时器输入捕获
+// HC-SR04引脚：VCC(5V)、GND、TRIG(触发)、ECHO(回响)
+
+#define TRIG_PORT GPIOB
+#define TRIG_PIN  GPIO_PIN_0
+#define ECHO_PORT GPIOB
+#define ECHO_PIN  GPIO_PIN_1
+#define SOUND_SPEED_CM_US 0.0343f  // 声速 = 343m/s = 0.0343cm/μs
+
+// 发送10μs触发脉冲
+void hcsr04_trigger(void) {
+    HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_RESET);
+    delay_us(2);
+    HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_SET);
+    delay_us(10);  // 至少10μs
+    HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_RESET);
+}
+
+// 使用输入捕获测量ECHO高电平时间
+float hcsr04_get_distance_cm(void) {
+    uint32_t pulse_width_us = 0;
+    uint32_t timeout;
+    
+    // 发送触发脉冲
+    hcsr04_trigger();
+    
+    // 等待ECHO变高（超时=无回波）
+    timeout = 100000;  // ~100ms超时
+    while (HAL_GPIO_ReadPin(ECHO_PORT, ECHO_PIN) == GPIO_PIN_RESET) {
+        if (--timeout == 0) return -1.0f;  // 超时=超出范围
+    }
+    
+    // 测量高电平宽度（μs级精度）
+    uint32_t start = DWT->CYCCNT;  // DWT计数器（需先使能）
+    timeout = 100000;
+    while (HAL_GPIO_ReadPin(ECHO_PORT, ECHO_PIN) == GPIO_PIN_SET) {
+        if (--timeout == 0) return -1.0f;
+    }
+    uint32_t end = DWT->CYCCNT;
+    
+    // 计算时间（假设72MHz）
+    pulse_width_us = (end - start) / (SystemCoreClock / 1000000);
+    
+    // 距离 = 声速 × 时间 / 2（往返）
+    return pulse_width_us * SOUND_SPEED_CM_US / 2.0f;
+}
+
+// 使能DWT周期计数器（用于精确计时）
+void dwt_enable(void) {
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+}
+
+// 更稳定的版本：TIM输入捕获+中断（推荐）
+// 配置TIM2_CH1为输入捕获，检测ECHO引脚
+volatile uint32_t ic_val1 = 0, ic_val2 = 0;
+volatile uint8_t ic_captured = 0;
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+    if (htim->Instance == TIM2 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
+        if (ic_captured == 0) {
+            ic_val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+            ic_captured = 1;
+        } else {
+            ic_val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+            __HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
+            ic_captured = 2;
+            __HAL_TIM_DISABLE_IT(htim, TIM_IT_CC1);  // 停止捕获
+        }
+    }
+}
+
+float hcsr04_get_distance_tim(void) {
+    // 1. 发送触发脉冲
+    hcsr04_trigger();
+    
+    // 2. 启动输入捕获，等待中断处理
+    ic_captured = 0;
+    __HAL_TIM_SET_COUNTER(&htim2, 0);
+    HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
+    
+    // 3. 等待捕获完成（最多100ms）
+    uint32_t timeout = 100000;
+    while (ic_captured < 2 && timeout--) {
+        delay_us(1);
+    }
+    HAL_TIM_IC_Stop_IT(&htim2, TIM_CHANNEL_1);
+    
+    if (timeout == 0) return -1.0f;
+    
+    // 4. 计算距离
+    uint32_t pulse = (ic_val2 > ic_val1) ? (ic_val2 - ic_val1) 
+        : (0xFFFF - ic_val1 + ic_val2);
+    float time_us = pulse * (1000000.0f / (float)(HAL_RCC_GetPCLK1Freq() * 2 / (htim2.Init.Prescaler + 1)));
+    
+    return time_us * SOUND_SPEED_CM_US / 2.0f;
+}
+// HC-SR04测量范围：2cm ~ 400cm，精度~3mm</code></pre>
+
+<h2>🔬 项目三：MPU6050姿态传感器</h2>
+
+<p>MPU6050集成了3轴加速度计+3轴陀螺仪，是姿态检测的首选传感器。</p>
+
+<pre><code>// MPU6050 6轴传感器 I2C驱动
+#define MPU6050_ADDR    0x68  // AD0接地=0x68，接VCC=0x69
+#define MPU6050_WHO_AM_I 0x75
+#define MPU6050_PWR_MGMT1 0x6B
+#define MPU6050_ACCEL_XOUT_H 0x3B
+
+typedef struct {
+    int16_t ax, ay, az;   // 加速度原始值
+    int16_t gx, gy, gz;   // 陀螺仪原始值
+    int16_t temp;         // 温度原始值
+} MPU6050_Raw_t;
+
+typedef struct {
+    float ax, ay, az;     // 加速度(g)
+    float gx, gy, gz;     // 角速度(°/s)
+    float pitch, roll;    // 姿态角(°)
+    float temp;           // 温度(°C)
+} MPU6050_Data_t;
+
+// 初始化
+uint8_t mpu6050_init(void) {
+    uint8_t whoami;
+    HAL_I2C_Mem_Read(&hi2c1, MPU6050_ADDR<<1, MPU6050_WHO_AM_I, 1, &whoami, 1, 100);
+    if (whoami != 0x68) return 0;  // MPU6050 ID恒为0x68
+    
+    // 唤醒MPU6050（清除睡眠位）
+    uint8_t wake_cmd = 0x00;
+    HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDR<<1, MPU6050_PWR_MGMT1, 1, &wake_cmd, 1, 100);
+    
+    // 配置量程：加速度±2g, 陀螺仪±250°/s
+    uint8_t accel_cfg = 0x00;  // ±2g
+    uint8_t gyro_cfg  = 0x00;  // ±250°/s
+    HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDR<<1, 0x1C, 1, &accel_cfg, 1, 100);
+    HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDR<<1, 0x1B, 1, &gyro_cfg, 1, 100);
+    
+    return 1;
+}
+
+// 读取原始数据
+void mpu6050_read_raw(MPU6050_Raw_t *raw) {
+    uint8_t buf[14];
+    HAL_I2C_Mem_Read(&hi2c1, MPU6050_ADDR<<1, MPU6050_ACCEL_XOUT_H, 1, buf, 14, 100);
+    
+    raw->ax = (int16_t)((buf[0] << 8) | buf[1]);
+    raw->ay = (int16_t)((buf[2] << 8) | buf[3]);
+    raw->az = (int16_t)((buf[4] << 8) | buf[5]);
+    raw->temp = (int16_t)((buf[6] << 8) | buf[7]);
+    raw->gx = (int16_t)((buf[8] << 8) | buf[9]);
+    raw->gy = (int16_t)((buf[10] << 8) | buf[11]);
+    raw->gz = (int16_t)((buf[12] << 8) | buf[13]);
+}
+
+// 转换为工程单位
+void mpu6050_convert(MPU6050_Raw_t *raw, MPU6050_Data_t *data) {
+    // ±2g量程 → 16384 LSB/g
+    data->ax = raw->ax / 16384.0f;
+    data->ay = raw->ay / 16384.0f;
+    data->az = raw->az / 16384.0f;
+    
+    // ±250°/s量程 → 131 LSB/(°/s)
+    data->gx = raw->gx / 131.0f;
+    data->gy = raw->gy / 131.0f;
+    data->gz = raw->gz / 131.0f;
+    
+    // 温度
+    data->temp = raw->temp / 340.0f + 36.53f;
+    
+    // 加速度计计算初始姿态角
+    data->pitch = atan2(data->ay, sqrt(data->ax*data->ax + data->az*data->az)) * 180/M_PI;
+    data->roll  = atan2(-data->ax, data->az) * 180/M_PI;
+}</code></pre>
+
+<h2>🎯 传感器融合：互补滤波器</h2>
+
+<p>单个传感器有局限——加速度计有重力干扰和高频振动噪声，陀螺仪有零漂。融合两者才能得到稳定姿态。</p>
+
+<pre><code>// 互补滤波：陀螺仪积分(短期准) + 加速度计(长期准)
+// angle = α × (angle + gyro×dt) + (1-α) × accel_angle
+// α典型值 0.96~0.98
+
+#define ALPHA 0.98f
+float pitch = 0.0f, roll = 0.0f;
+float last_time = 0.0f;
+
+void complementary_filter(MPU6050_Data_t *data, float dt) {
+    // 加速度计计算角度（低频准，高频不准）
+    float acc_pitch = atan2(data->ay, sqrt(data->ax*data->ax + data->az*data->az)) * 180/M_PI;
+    float acc_roll  = atan2(-data->ax, data->az) * 180/M_PI;
+    
+    // 首次初始化
+    if (pitch == 0.0f && roll == 0.0f) {
+        pitch = acc_pitch;
+        roll  = acc_roll;
+        return;
+    }
+    
+    // 互补滤波融合
+    pitch = ALPHA * (pitch + data->gx * dt) + (1.0f - ALPHA) * acc_pitch;
+    roll  = ALPHA * (roll  + data->gy * dt) + (1.0f - ALPHA) * acc_roll;
+    
+    data->pitch = pitch;
+    data->roll  = roll;
+}</code></pre>
+
+<h2>📐 I2C总线扫描器</h2>
+
+<p>不确定I2C设备地址？先用扫描器排查。这是嵌入式开发最常用的调试工具之一。</p>
+
+<pre><code>// I2C总线扫描器 —— 必备调试工具
+void i2c_scan(I2C_HandleTypeDef *hi2c) {
+    printf("\r\n=== I2C Bus Scan ===\r\n");
+    printf("    ");
+    for (int col = 0; col < 16; col++) {
+        printf(" %01X ", col);
+    }
+    printf("\r\n");
+    
+    uint8_t found = 0;
+    for (uint8_t addr = 1; addr < 128; addr++) {
+        if (addr % 16 == 0) printf("%02X: ", addr);
+        
+        if (HAL_I2C_IsDeviceReady(hi2c, addr << 1, 2, 5) == HAL_OK) {
+            uint8_t reg0;
+            // 尝试读寄存器0确认设备确实存在
+            if (HAL_I2C_Mem_Read(hi2c, addr << 1, 0x00, 1, &reg0, 1, 10) == HAL_OK ||
+                HAL_I2C_Master_Receive(hi2c, addr << 1, &reg0, 1, 10) == HAL_OK) {
+                printf("%02X ", addr);
+                found++;
+            } else {
+                printf("?? ");
+            }
+        } else {
+            printf("-- ");
+        }
+        
+        if ((addr + 1) % 16 == 0) printf("\r\n");
+    }
+    
+    printf("Found %d device(s) on I2C bus\r\n\r\n", found);
+}
+
+// 常见I2C地址速查（7位地址）
+// BMP280:    0x76/0x77 (SDO接GND/VCC)
+// MPU6050:   0x68/0x69 (AD0接GND/VCC)
+// SSD1306:   0x3C/0x3D (SA0接GND/VCC)
+// BH1750:    0x23/0x5C (ADDR接GND/VCC)
+// SHT30:     0x44/0x45 (ADDR接GND/VCC)
+// VL53L0X:   0x29 (固定)
+// MAX17048:  0x36 (固定)
+// AT24C02:   0x50-0x57 (A0/A1/A2)</code></pre>
+
+<h2>🎛 卡尔曼滤波器实战</h2>
+
+<pre><code>// 一维卡尔曼滤波：传感器数据平滑
+// 适用于：温度、气压、距离等单一测量值
+
+typedef struct {
+    float x;  // 状态估计值
+    float P;  // 估计误差协方差
+    float Q;  // 过程噪声协方差（调大→更信任预测/平滑）
+    float R;  // 测量噪声协方差（调大→更不信任传感器）
+    float K;  // 卡尔曼增益（自动计算）
+} Kalman1D_t;
+
+// 初始化
+void kalman_init(Kalman1D_t *kf, float initial_value, float Q, float R) {
+    kf->x = initial_value;
+    kf->P = 1.0f;
+    kf->Q = Q;
+    kf->R = R;
+    kf->K = 0.0f;
+}
+
+// 每次新测量值到来时调用
+float kalman_update(Kalman1D_t *kf, float measurement) {
+    // 预测步骤
+    kf->P = kf->P + kf->Q;
+    
+    // 更新步骤
+    kf->K = kf->P / (kf->P + kf->R);
+    kf->x = kf->x + kf->K * (measurement - kf->x);
+    kf->P = (1.0f - kf->K) * kf->P;
+    
+    return kf->x;
+}
+
+// 使用示例
+Kalman1D_t temp_kf;
+kalman_init(&temp_kf, 25.0f, 0.01f, 1.0f);
+
+// 在循环中使用
+for (;;) {
+    float raw_temp = read_temperature();  // 带噪声的原始值
+    float smooth_temp = kalman_update(&temp_kf, raw_temp);
+    printf("Raw: %.2f → Smooth: %.2f\r\n", raw_temp, smooth_temp);
+    HAL_Delay(100);
+}
+
+// 参数调优指南：
+// Q小(0.001) + R大(10) → 超平滑但响应慢（适合温度气压）
+// Q大(0.1) + R小(0.1) → 响应快但噪声多（适合快速变化量）
+// 典型起点：Q=0.01, R=1.0，然后根据效果微调</code></pre>
+
+<h2>🪡 滑动平均滤波器</h2>
+
+<p>比卡尔曼更简单直观，适合资源受限的场景。</p>
+
+<pre><code>// 滑动平均滤波器（Moving Average）
+// 适合：ADC噪声平滑、传感器稳定读数
+
+#define MA_WINDOW 10
+
+typedef struct {
+    float buffer[MA_WINDOW];
+    uint8_t index;
+    uint8_t count;
+    float sum;
+} MovingAvg_t;
+
+void ma_init(MovingAvg_t *ma) {
+    memset(ma->buffer, 0, sizeof(ma->buffer));
+    ma->index = 0;
+    ma->count = 0;
+    ma->sum   = 0;
+}
+
+float ma_filter(MovingAvg_t *ma, float new_val) {
+    // 减去最旧值
+    ma->sum -= ma->buffer[ma->index];
+    // 加入新值
+    ma->buffer[ma->index] = new_val;
+    ma->sum += new_val;
+    // 移动指针
+    ma->index = (ma->index + 1) % MA_WINDOW;
+    if (ma->count < MA_WINDOW) ma->count++;
+    // 返回平均值
+    return ma->sum / (float)ma->count;
+}
+
+// 使用
+MovingAvg_t adc_filter;
+ma_init(&adc_filter);
+float stable_adc = ma_filter(&adc_filter, raw_adc_value);</code></pre>
+
+<h2>🛠 常见问题排查</h2>
+
+<div class="trouble"><b>🔍 问题1：DHT11一直读出错/返回TIMEOUT</b><br>
+❌ <b>症状：</b>串口一直输出"DHT11 Error: No response!"<br>
+✅ <b>排查：</b><br>
+1. 接线不对：VCC/GND/DATA三线缺一不可<br>
+2. DATA线没接上拉电阻：DHT11 DATA需要4.7KΩ上拉到VCC<br>
+3. GPIO配置错误：初始化为输出推挽(OUTPUT_PP)发送信号，再切为输入(INPUT)接收<br>
+4. 延时时间不准：delay_us基于的SystemCoreClock不对<br>
+✅ <b>修复：</b><br>
+1. 用万用表测VCC-GND电压是否为3.3V<br>
+2. 加4.7KΩ上拉电阻<br>
+3. 确保时序正确：拉低18ms→拉高30μs→等响应<br>
+4. 用逻辑分析仪看DATA线波形最直观</div>
+
+<div class="trouble"><b>🔍 问题2：DHT11读数全是0或255</b><br>
+❌ <b>症状：</b>读取成功(返回OK)，但温度和湿度全是0或255。<br>
+✅ <b>排查：</b><br>
+1. 读取间隔太短：DHT11要求≥1秒（安全取2秒）<br>
+2. 位读取逻辑有误：DHT11的"0"是高电平26-28μs，"1"是70μs<br>
+3. 校验和计算有误：checksum = hum_int + hum_dec + temp_int + temp_dec<br>
+4. 干扰导致数据跳变<br>
+✅ <b>修复：</b><br>
+1. 加读取间隔检查<br>
+2. 在拉高后延时30-40μs再判断MCU引脚电平<br>
+3. 连续读3次取中位数</div>
+
+<div class="trouble"><b>🔍 问题3：I2C通信失败(HAL_TIMEOUT)</b><br>
+❌ <b>症状：</b>HAL_I2C_Master_Transmit返回HAL_TIMEOUT。<br>
+✅ <b>排查：</b><br>
+1. 用i2c_scan()确认设备地址是否正确（7位地址 << 1）<br>
+2. SCL/SDA没有上拉电阻：I2C是开漏输出，必须外接上拉（一般4.7KΩ）<br>
+3. 设备没上电：检查VCC和GND<br>
+4. 总线冲突：多个设备地址相同？<br>
+✅ <b>修复：</b><br>
+1. 扫描总线确认地址<br>
+2. 加4.7KΩ上拉电阻到3.3V<br>
+3. 降低I2C频率：从400K降到100K<br>
+4. 用逻辑分析仪看SCL/SDA波形</div>
+
+<div class="trouble"><b>🔍 问题4：HC-SR04测距不准/跳动大</b><br>
+❌ <b>症状：</b>距离读数忽大忽小，或固定值不变。<br>
+✅ <b>排查：</b><br>
+1. 供电不足：HC-SR04需要5V，3.3V供电会不稳定<br>
+2. 测量表面：软质/倾斜表面回波弱<br>
+3. 最小盲区：HC-SR04有2cm盲区，<2cm的测量不准<br>
+4. Echo引脚电平：5V输出直接接3.3V容忍的MCU引脚（STM32大部分5V容忍）<br>
+✅ <b>修复：</b><br>
+1. 用5V供电（注意MCU的Echo引脚是否5V容忍）<br>
+2. 多次测量取中位数（如测5次排序取中间值）<br>
+3. 加滑动平均滤波<br>
+4. 测量间隔>60ms（超声波脉冲衰减时间）</div>
+
+<div class="trouble"><b>🔍 问题5：MPU6050静止时角度漂移</b><br>
+❌ <b>症状：</b>传感器不动但角度缓慢漂移(几秒就偏了10°)。<br>
+✅ <b>排查：</b><br>
+1. 只用陀螺仪积分？陀螺仪有零偏(Zero-G offset)，随时间积分会漂<br>
+2. 互补滤波系数不对：ALPHA太小(太信加速度计)或有震动干扰<br>
+3. 采样率太低<br>
+✅ <b>修复：</b><br>
+1. 用互补滤波或Mahony/Madgwick融合算法<br>
+2. 上电后先静止0.5s测陀螺仪零偏，后续减去零偏<br>
+3. 提高采样率到100Hz以上<br>
+4. Yaw角(航向)必须加磁力计才能长期稳定</div>
+
+<h2>🛡 工业级传感器调试技巧</h2>
+
+<div class="card">
+<div class="h"><span class="name">传感器调试工具链</span><span class="tag y">进阶</span></div>
+<div class="b">
+<div class="desc">
+<b>通信抓包：</b><br>
+• <b>逻辑分析仪(Saleae Logic 8)：</b>同时抓I2C/SPI/UART，看时序是否对<br>
+• <b>示波器：</b>看信号质量和电平，确认上拉电阻是否正确<br>
+• <b>I2C Scanner：</b>先确认设备地址再写驱动<br><br>
+<b>数据处理：</b><br>
+• <b>SerialPlot/Arduino串口绘图器：</b>串口发送数据，实时显示波形<br>
+• <b>Python + matplotlib：</b>离线分析传感器数据<br>
+• <b>SWO/ITM：</b>高速数据输出（见第10章）<br><br>
+<b>数据格式（方便上位机解析）：</b><br>
+<code>printf("DATA:%d,%d,%d\r\n", temp, hum, dist);</code><br>
+上位机按 "DATA:" 前缀过滤，","分隔字段
+</div></div></div>
+
+<h2>🔧 MPU6050 姿态解算深度实战</h2>
+
+<p>MPU6050是最常见的6轴IMU（3轴加速度+3轴陀螺仪）。但原始数据不能直接用——加速度计噪声大、陀螺仪有漂移。姿态融合算法是核心。</p>
+
+<pre><code>// ★ MPU6050 初始化（避开最常见配置陷阱）
+void mpu6050_init_correct(void) {
+    // ① 唤醒MPU6050（默认Sleep模式！新人第一坑）
+    i2c_write_reg(MPU6050_ADDR, 0x6B, 0x00);  // 清除SLEEP位
+    HAL_Delay(100);  // ★ 必须等100ms！时钟稳定需要时间
+    
+    // ② 设置陀螺仪量程（±250/500/1000/2000 °/s）
+    // 250°/s: 精度0.0076°/LSB → 适合姿态检测
+    // 2000°/s: 精度0.061°/LSB → 适合无人机快速翻转
+    i2c_write_reg(MPU6050_ADDR, 0x1B, 0x00);  // ±250°/s
+    
+    // ③ 设置加速度计量程（±2/4/8/16g）
+    i2c_write_reg(MPU6050_ADDR, 0x1C, 0x00);  // ±2g
+    
+    // ④ 设置数字低通滤波器（DLPF）
+    // DLPF_CFG=0: 260Hz(加速度)/256Hz(陀螺仪) → 延迟0.98ms
+    // DLPF_CFG=3: 44Hz → 延迟4.9ms → 更平滑但延迟大
+    // DLPF_CFG=6: 5Hz → 延迟19ms → 仅适合静态
+    // 推荐：DLPF_CFG=2(94Hz) 用于姿态控制
+    i2c_write_reg(MPU6050_ADDR, 0x1A, 0x02);  // DLPF=94Hz
+    
+    // ⑤ 设置采样率分频 → 采样率 = 8kHz / (1 + SMPLRT_DIV)
+    // SMPLRT_DIV=7 → 1kHz采样率（陀螺仪输出频率）
+    i2c_write_reg(MPU6050_ADDR, 0x19, 0x07);  // 1KHz
+}
+
+// ★ 读取原始数据并转换（注意：先读加速度高位！）
+void mpu6050_read_all(float *accel, float *gyro) {
+    uint8_t raw[14];
+    // 从0x3B开始连续读14字节：
+    // ACCEL_XOUT_H/L, ACCEL_YOUT_H/L, ACCEL_ZOUT_H/L,
+    // TEMP_OUT_H/L,
+    // GYRO_XOUT_H/L, GYRO_YOUT_H/L, GYRO_ZOUT_H/L
+    i2c_read_regs(MPU6050_ADDR, 0x3B, raw, 14);
+    
+    // 加速度转换（±2g量程: 16384 LSB/g）
+    accel[0] = (int16_t)(raw[0]<<8 | raw[1]) / 16384.0f;  // X
+    accel[1] = (int16_t)(raw[2]<<8 | raw[3]) / 16384.0f;  // Y
+    accel[2] = (int16_t)(raw[4]<<8 | raw[5]) / 16384.0f;  // Z
+    
+    // 陀螺仪转换（±250°/s量程: 131 LSB/°/s）
+    gyro[0] = (int16_t)(raw[8]<<8  | raw[9])  / 131.0f;   // X
+    gyro[1] = (int16_t)(raw[10]<<8 | raw[11]) / 131.0f;   // Y
+    gyro[2] = (int16_t)(raw[12]<<8 | raw[13]) / 131.0f;   // Z
+    // ★ 常见错误：raw[8]和raw[9]顺序反了！高位在前
+}</code></pre>
+
+<div class="trouble">🔍 <b>MPU6050踩坑TOP3：</b><br>
+<b>1. 忘记唤醒：</b>默认SLEEP=1，直接读数据全是0。必须先写0x6B寄存器为0x00，等100ms再读。<br>
+<b>2. I2C地址混淆：</b>AD0引脚接GND→地址0x68，接VDD→地址0x69。HAL库地址要左移1位→0xD0/0xD2。很多人右移了。<br>
+<b>3. 数据跳变剧烈：</b>DLPF没设对。默认DLPF=0(260Hz)，加速度含大量振动噪声。运动平稳应用设DLPF=3~4(44~21Hz)。</div>
+
+<h2>📡 传感器总线拓扑实战</h2>
+
+<p>实际项目中很少只有一个传感器。多个传感器共享I2C总线时，电源解耦、上拉电阻、地址冲突都是实际问题。</p>
+
+<pre><code>// ★ I2C多传感器共享总线的电源设计要点
+// 每个传感器VCC-GND之间必须有去耦电容：
+// ① 100nF陶瓷电容（贴片0603）——滤高频噪声
+// ② 10μF钽电容（或大容量MLCC）——滤低频纹波
+// ③ 两个电容紧贴传感器VCC引脚（距离<5mm！）
+//
+// ★ 上拉电阻计算：
+// 标准I2C: Rp = (VDD - VOL) / IOL
+// 3.3V系统: Rp ≈ (3.3 - 0.4) / 0.003 = 967Ω → 选1KΩ~4.7KΩ
+// 高速(400KHz): 用1KΩ（边沿更陡）
+// 省电: 用10KΩ（电流小）
+// 多个设备共享I2C时，上拉电阻只需一组（不要每个设备都加！）
+
+// ★ 磁力计/气压计/IMU共同使用时I2C总线布局：
+// MCU ── SDA ──┬── BMP280 ──┬── MPU6050 ──┬── OLED
+//      ── SCL ──┘            │             │
+//      ── 3.3V ─┴── 各芯片独立去耦 ──────┘
+// 上拉电阻（4.7KΩ×2）：放在MCU侧第一个节点处</code></pre>
+
+<h2>🌐 传感器数据格式标准化</h2>
+
+<pre><code>// 标准化数据输出格式（方便上位机/ChatGPT解析）
+// 格式：$TYPE,val1,val2,val3*CK\r\n
+
+void send_nmea_style_data(float temp, float hum, float pressure) {
+    uint8_t checksum = 0;
+    char buf[100];
+    
+    // 构造消息
+    snprintf(buf, sizeof(buf), "$ENV,%.1f,%.1f,%.1f", temp, hum, pressure);
+    
+    // 计算校验和（$和*之间所有字节的异或）
+    for (char *p = buf + 1; *p != '\0'; p++) {
+        checksum ^= (uint8_t)*p;
+    }
+    
+    // 发送（注意\r\n不是\n！）
+    printf("%s*%02X\r\n", buf, checksum);
+}
+// 输出示例：$ENV,25.3,68.5,1013.2*5A</code></pre>
+
+<h2>🔬 传感器校准深入</h2>
+
+<p>传感器出厂时都有误差，不校准的数据基本等于"仅供参考"。校准是做产品的分水岭——Demo读到值就完事了，产品必须保证精度。</p>
+
+<div class="card">
+<div class="h"><span class="name">校准三步法</span><span class="tag g">必学</span></div>
+<div class="b">
+<div class="desc">所有传感器通用校准流程。以BMP280气压计为例，输出原始值→补偿计算→得到真实值。</div>
+
+<h4>第一步：读取出厂校准参数</h4>
+<pre><code>// BMP280出厂校准参数（每颗芯片都不一样的）
+// 这些值在芯片出厂时写入NVM，必须读出来参与计算！
+typedef struct {
+    uint16_t dig_T1;  // 温度补偿参数1
+    int16_t  dig_T2;  // 温度补偿参数2
+    int16_t  dig_T3;  // 温度补偿参数3
+    uint16_t dig_P1;  // 气压补偿参数1
+    int16_t  dig_P2;  // 气压补偿参数2
+    int16_t  dig_P3;  // 气压补偿参数3
+    int16_t  dig_P4;  // 气压补偿参数4
+    int16_t  dig_P5;  // 气压补偿参数5
+    int16_t  dig_P6;  // 气压补偿参数6
+    int16_t  dig_P7;  // 气压补偿参数7
+    int16_t  dig_P8;  // 气压补偿参数8
+    int16_t  dig_P9;  // 气压补偿参数9
+} bmp280_calib_t;
+
+void bmp280_read_calib(bmp280_calib_t *cal) {
+    uint8_t buf[24];
+    // 校准参数存储在0x88~0xA1（共24字节）
+    HAL_I2C_Mem_Read(&hi2c1, BMP280_ADDR<<1, 0x88, 1, buf, 24, 100);
+    // 解析（注意LSB在前）
+    cal->dig_T1 = buf[0]  | (buf[1] << 8);
+    cal->dig_T2 = buf[2]  | (buf[3] << 8);
+    // ... 剩余参数类似
+}</code></pre>
+
+<h4>第二步：软件补偿算法</h4>
+<pre><code>// BMP280温度补偿公式（来自Bosch数据手册§3.11.3）
+// 这是32位有符号定点运算，中间变量必须用int32_t！
+float bmp280_compensate_temp(int32_t adc_T, bmp280_calib_t *cal) {
+    int32_t var1, var2, T;
+    // var1 = (adc_T/16384 - dig_T1/1024) * dig_T2
+    var1 = ((((adc_T >> 3) - ((int32_t)cal->dig_T1 << 1))) * 
+            ((int32_t)cal->dig_T2)) >> 11;
+    // var2 = (adc_T/131072 - dig_T1/8192)^2 * dig_T3
+    var2 = (((((adc_T >> 4) - ((int32_t)cal->dig_T1)) * 
+              ((adc_T >> 4) - ((int32_t)cal->dig_T1))) >> 12) *
+            ((int32_t)cal->dig_T3)) >> 14;
+    T = (var1 + var2);
+    // 返回 °C（BMP280内部精度0.01°C）
+    return (float)((T * 5 + 128) >> 8) / 100.0f;
+}
+// ★ 关键：这些公式必须严格按数据手册实现，差一个移位精度全废！</code></pre>
+
+<h4>第三步：二次校准（零偏+比例）</h4>
+<pre><code>// 出厂校准 ≠ 最终精度！实际使用时还要做二次校准：
+// 真实值 = (原始值 - 偏移量) * 比例因子
+//
+// 例如温度传感器：
+// 在冰水混合物中测得 2.3°C → 偏移量 = 2.3
+// 在沸水中测得 98.5°C → 比例因子 = 100/(98.5-2.3) = 1.0395
+// 校准后：温度 = (raw - 2.3) * 1.0395
+
+typedef struct {
+    float offset;  // 零偏
+    float scale;   // 比例系数
+} sensor_cal_t;
+
+float apply_calibration(float raw, sensor_cal_t *cal) {
+    return (raw - cal->offset) * cal->scale;
+}</code></pre>
+</div></div>
+
+<h2>🔌 I2C总线深入：多设备仲裁与时钟拉伸</h2>
+
+<div class="card">
+<div class="h"><span class="name">时钟拉伸(Clock Stretching)</span><span class="tag r">容易踩坑</span></div>
+<div class="b">
+<div class="desc">I2C规范允许从设备在来不及处理时拉住SCL为低，暂停通信。这是一个"隐藏"特性，很多初学者遇到I2C卡死都是因为这个。</div>
+<pre><code>// ★ 时钟拉伸的典型场景：
+// 1. 从设备（如BMP280）正在进行ADC转换，主设备发起读取
+//    → 从设备拉低SCL，等ADC完成（最长几ms）再释放
+// 2. EEPROM正在写操作，主设备试图读
+//    → 从设备拉低SCL直到写入完成（最长5ms！）
+
+// STM32 HAL库默认开启了时钟拉伸支持，但可以配置超时：
+// 在CubeMX → I2C Configuration → Clock Stretching → Enable
+// HAL_I2C_Master_Transmit(&hi2c1, addr, data, len, timeout);
+// timeout 必须大于最坏情况的时钟拉伸时间！
+// BMP280测量时最长8ms → 超时设20ms比较安全
+
+// ★ 调试技巧：逻辑分析仪抓SCL线，如果看到某段SCL持续低电平
+// 而SDA为高 → 多半是从设备在时钟拉伸</code></pre>
+</div></div>
+
+<div class="card">
+<div class="h"><span class="name">I2C多设备地址冲突</span><span class="tag y">常见问题</span></div>
+<div class="b">
+<div class="desc">多个相同型号传感器挂在同一I2C总线上时地址冲突。比如两个BMP280默认地址都是0x76。</div>
+<pre><code>// 解决方案1：利用芯片地址选择引脚
+// BMP280的SDO引脚：接GND=地址0x76, 接VDD=地址0x77
+// MPU6050的AD0引脚：接GND=地址0x68, 接VDD=地址0x69
+// → 一块板最多挂2个同型号传感器
+
+// 解决方案2：I2C多路复用器（TCA9548A）
+// 1个I2C地址→8个独立I2C通道，每条通道可以有重叠地址
+// TCA9548A默认地址0x70-0x77（A0/A1/A2引脚选择）
+void tca_select_channel(uint8_t ch) {
+    uint8_t cmd = 1 << ch;  // 通道0→0x01, 通道1→0x02, ...
+    HAL_I2C_Master_Transmit(&hi2c1, 0x70<<1, &cmd, 1, 10);
+}
+// 切换通道后要加1ms等待信号稳定
+// 使用：tca_select_channel(0); bmp280_read_ch0();
+//       tca_select_channel(1); bmp280_read_ch1();</code></pre>
+</div></div>
+
+<h2>⚡ 传感器低功耗采样策略</h2>
+
+<p>电池供电的设备（纽扣电池/锂电池），传感器的功耗决定了续航时间。一味的"每秒读一次"会耗光电。以下是实战中常用的低功耗采样模式：</p>
+
+<pre><code>// 模式1：间歇采样（Duty Cycling）—— 最常用
+// 原理：大部分时间MCU和传感器都休眠，定时醒来采样
+// 计算：DHT11每次读数20ms @ 2.5mA = 0.05mAs
+//       STM32在Stop模式 = 5μA
+//       如果每10秒采样一次，平均功耗 ≈ (0.05mAs + 9.98s*5μA)/10s ≈ 10μA
+//       → 200mAh纽扣电池可用 ~20000小时 = 2年！
+
+void low_power_sample_loop(void) {
+    while (1) {
+        // 1. 唤醒传感器（如果传感器有Sleep模式）
+        bmp280_set_mode(BMP280_MODE_FORCED);  // 单次转换模式
+        HAL_Delay(10);  // 等待转换完成（BMP280最长8ms）
+        
+        // 2. 快速读取
+        float temp = bmp280_read_temp();
+        float press = bmp280_read_press();
+        
+        // 3. 传感器休眠
+        bmp280_set_mode(BMP280_MODE_SLEEP);   // 功耗从720μA→0.1μA
+        
+        // 4. 数据缓存到RAM，攒够一批再通过无线发送
+        store_reading(temp, press);
+        if (buffer_full()) {
+            wifi_wake_and_send();  // 集中发送省WiFi功耗
+        }
+        
+        // 5. MCU深度休眠
+        enter_stop_mode(10000);  // RTC唤醒，10秒后回来
+    }
+}
+
+// 模式2：阈值触发采样
+// 原理：平时休眠，传感器内置比较器检测到超过阈值才唤醒MCU
+// 典型场景：振动检测（加速度计运动中断）、门磁、水位
+void threshold_trigger_init(void) {
+    // MPU6050运动唤醒：加速度超过阈值→INT引脚拉低→唤醒MCU
+    mpu6050_set_motion_threshold(50);  // 50mg阈值
+    mpu6050_enable_motion_interrupt(); // 使能运动中断
+    // MCU进入Stop模式，MPU6050的INT引脚接WKUP
+    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+}</code></pre>
+
+<h2>🎯 实战练习</h2>
+
+<div class="tip">📝 <b>练习1：温湿度监测站（入门）</b><br>
+DHT11 + STM32 + 串口打印。先跑通最基本的数据读取。加LED指示：温度>30°C红灯闪烁。<br><br>
+📝 <b>练习2：多传感器融合站（进阶）</b><br>
+DHT11 + BMP280 + OLED + STM32。I2C总线上挂2个传感器+1个OLED。用互斥量保护I2C。对比卡尔曼滤波前后的数据稳定性。<br><br>
+📝 <b>练习3：超声波倒车雷达（实战）</b><br>
+HC-SR04 + 蜂鸣器 + LED。距离<50cm→蜂鸣器慢响，<20cm→快速响，<10cm→长响。用状态机管理。<br><br>
+📝 <b>练习4：姿态显示仪（进阶）</b><br>
+MPU6050互补滤波 → 串口100Hz输出pitch/roll → 上位机绘图。加分：OLED实时显示角度+水平仪图标。<br><br>
+📝 <b>练习5：I2C总线多设备联调</b><br>
+一跟I2C总线上挂BMP280+MPU6050+OLED，I2C Scan确认地址后，3个设备轮询读取。用逻辑分析仪抓I2C通信波形。</div>
+
+<h2>📋 知识点回顾</h2>
+<div class="summary">
+<b>✅ 传感器开发核心技能：</b><br>
+• <b>I2C共享总线：</b>最多128个设备，靠7位地址区分。先扫描再写驱动<br>
+• <b>传感器融合：</b>互补滤波(简单α=0.98) → Mahony(中等) → Madgwick(精度高)<br>
+• <b>卡尔曼滤波：</b>数学最优估计，核心是调Q(过程噪声)和R(测量噪声)<br>
+• <b>滑动平均：</b>最简单去噪，窗口大小=平滑度vs响应速度的权衡<br>
+• <b>校准参数：</b>传感器出厂预存的修正系数，必须读取并用于补偿计算<br>
+<b>🛠 调试技巧：</b><br>
+• 先用I2C Scanner确认设备地址<br>
+• 用逻辑分析仪/示波器看通信波形（比猜代码快100倍）<br>
+• 串口以固定频率输出，用SerialPlot看波形<br>
+• 传感器读数跳变 → 检查电源去耦电容(100nF+10μF紧贴VCC-GND)<br>
+• 通信超时 → 检查上拉电阻(4.7KΩ)和地址(7位<<1)<br>
+<b>📏 性能优化：</b><br>
+• DHT11: ≥2秒间隔，~20ms读取时间<br>
+• HC-SR04: ≥60ms间隔，2cm-400cm量程<br>
+• MPU6050: ≥100Hz采样率做姿态融合，≤400KHz I2C总线<br>
+• 卡尔曼: Q=0.01, R=1.0起步，根据响应/噪声权衡调参
+</div>
 
 <div class="chnav">
-<a onclick="window.parent.loadPage('guide-ch11')">鈫?绗?1绔?/a>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
-<a onclick="window.parent.loadPage('guide-ch13')">绗?3绔?鈫?/a>
+<a onclick="window.parent.loadPage('guide-ch11')">← 第11章</a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch13')">第13章 →</a>
 </div>
 
 <script>
@@ -316,155 +1117,5 @@ document.querySelectorAll('pre').forEach(pre => {
   pre.appendChild(btn);
 });
 </script>
-
-<h2>馃搻 浼犳劅鍣ㄩ€氫俊鍗忚閫夊瀷</h2>
-
-<div class="card">
-<div class="h"><span class="name">宓屽叆寮忎笁澶т紶鎰熷櫒鎺ュ彛</span><span class="tag g">鍩虹</span></div>
-<div class="b">
-<div class="desc">
-<table>
-<tr><th>鎺ュ彛</th><th>绾挎暟</th><th>閫熷害</th><th>璺濈</th><th>鍏稿瀷浼犳劅鍣?/th></tr>
-<tr><td>I2C</td><td>2绾?SCL/SDA)</td><td>100k/400k/1MHz</td><td>&lt;1m</td><td>BMP280, MPU6050, OLED</td></tr>
-<tr><td>SPI</td><td>4绾?SCK/MOSI/MISO/CS)</td><td>1-80MHz</td><td>&lt;0.5m</td><td>BME680, ICM-20948, SD鍗?/td></tr>
-<tr><td>UART</td><td>2绾?TX/RX)</td><td>9600-1Mbps</td><td>&lt;15m</td><td>GPS妯″潡, 鎸囩汗妯″潡, PM2.5</td></tr>
-</table>
-</div></div></div>
-
-<h3>I2C鎬荤嚎锛氬叡浜笌瀵诲潃</h3>
-
-<pre><code>// I2C绮鹃珦锛氫竴涓€荤嚎鎸傚涓澶囷紝7浣嶅湴鍧€鍖哄垎
-// 鍚屼竴涓猄CL/SDA涓婃寕6涓紶鎰熷櫒锛?
-// 鎵弿I2C鎬荤嚎鎵€鏈夎澶?void i2c_scan(void) {
-    printf("I2C 鎵弿寮€濮?..\n");
-    for (uint8_t addr = 1; addr < 127; addr++) {
-        if (HAL_I2C_IsDeviceReady(&hi2c1, addr << 1, 2, 10) == HAL_OK) {
-            printf("鍙戠幇璁惧: 0x%02X\n", addr);
-        }
-    }
-}
-// 甯歌I2C鍦板潃锛?// BMP280: 0x76/0x77, MPU6050: 0x68, OLED SSD1306: 0x3C
-// BH1750: 0x23, SHT30: 0x44, VL53L0X: 0x29</code></pre>
-
-<h2>馃幆 浼犳劅鍣ㄨ瀺鍚堬細MPU6050濮挎€佽В绠?/h2>
-
-<p>鍗曚釜浼犳劅鍣ㄦ湁灞€闄愨€斺€斿姞閫熷害璁℃湁閲嶅姏骞叉壈锛岄檧铻轰华鏈夋紓绉汇€傝瀺鍚堜袱鑰呮墠鑳藉緱鍒扮ǔ瀹氬Э鎬併€?/p>
-
-<h3>浜掕ˉ婊ゆ尝鍣紙绠€鍗曚絾鏈夋晥锛?/h3>
-
-<pre><code>// 浜掕ˉ婊ゆ尝锛氶檧铻轰华绉垎(鐭湡鍑? + 鍔犻€熷害璁?闀挎湡鍑?
-// angle = 伪*(angle + gyro*dt) + (1-伪)*accel_angle
-// 伪 = 0.98 (闄€铻轰华鏉冮噸)
-
-#define ALPHA 0.98f
-float pitch = 0, roll = 0;
-float dt = 0.01;  // 10ms閲囨牱闂撮殧
-
-void complementary_filter(float ax, float ay, float az,
-                          float gx, float gy, float gz) {
-    // 鍔犻€熷害璁¤绠楄搴︼紙闈欐€佸噯锛屼絾鍔ㄦ€佷笉鍑嗭級
-    float acc_pitch = atan2(ay, sqrt(ax*ax + az*az)) * 180/M_PI;
-    float acc_roll  = atan2(-ax, az) * 180/M_PI;
-    
-    // 浜掕ˉ婊ゆ尝铻嶅悎
-    pitch = ALPHA * (pitch + gx * dt) + (1-ALPHA) * acc_pitch;
-    roll  = ALPHA * (roll  + gy * dt) + (1-ALPHA) * acc_roll;
-}</code></pre>
-
-<div class="card">
-<div class="h"><span class="name">Mahony/Madgwick AHRS绠楁硶</span><span class="tag p">杩涢樁</span></div>
-<div class="b">
-<div class="desc">
-浜掕ˉ婊ゆ尝閫傚悎鐜╁叿绾у簲鐢紝鏃犱汉鏈?鏈哄櫒浜烘帹鑽愮敤<b>Mahony</b>鎴?b>Madgwick</b>绠楁硶銆備袱鑰呴兘鏄垚鐔熺殑AHRS锛堝Э鎬佸拰鑸悜鍙傝€冪郴缁燂級绠楁硶锛?鈥?<b>Mahony:</b> 鍩轰簬PI鎺у埗鍣紝璁＄畻閲忓皬锛岄€傚悎F103<br>
-鈥?<b>Madgwick:</b> 鍩轰簬姊害涓嬮檷锛屾敹鏁涙洿蹇紝闇€瑕佹洿澶歊AM<br>
-鈥?涓よ€呬唬鐮侀兘宸插紑婧愶紙C璇█锛夛紝鐩存帴绉绘鍗冲彲<br>
-鈥?闇€瑕?杞翠紶鎰熷櫒(鍔犻€熷害+闄€铻?纾佸姏璁?鎵嶈兘寰楀埌鐪熷疄鐨刌aw瑙?</div></div></div>
-
-<h3>鍗″皵鏇兼护娉㈠櫒锛堟暟瀛︿笂鏈€浼橈級</h3>
-
-<pre><code>// 涓€缁村崱灏旀浖婊ゆ尝锛氫紶鎰熷櫒鏁版嵁骞虫粦
-// 棰勬祴锛歺 = x, P = P + Q
-// 鏇存柊锛欿 = P/(P+R), x = x + K*(z-x), P = (1-K)*P
-
-typedef struct {
-    float x;  // 鐘舵€佷及璁″€?    float P;  // 浼拌璇樊鍗忔柟宸?    float Q;  // 杩囩▼鍣０锛堣皟澶р啋鏇翠俊浠绘ā鍨嬶級
-    float R;  // 娴嬮噺鍣０锛堣皟灏忊啋鏇翠俊浠讳紶鎰熷櫒锛?} Kalman1D;
-
-float kalman_update(Kalman1D* k, float measurement) {
-    // 棰勬祴
-    k->P = k->P + k->Q;
-    // 鏇存柊
-    float K = k->P / (k->P + k->R);
-    k->x = k->x + K * (measurement - k->x);
-    k->P = (1 - K) * k->P;
-    return k->x;
-}
-
-// 浣跨敤绀轰緥
-Kalman1D temp_kf = {.x=25.0, .P=1.0, .Q=0.01, .R=1.0};
-float smooth_temp = kalman_update(&temp_kf, raw_adc_temp);
-// Q灏忊啋娓╁害鍙樺寲骞虫粦浣嗘粸鍚?| R灏忊啋蹇€熷弽搴斾絾鍣０澶?/code></pre>
-
-<h2>鈿?浼犳劅鍣ㄩ┍鍔ㄥ疄鎴橈細BMP280</h2>
-
-<pre><code>// BMP280 娓╁害+姘斿帇浼犳劅鍣?I2C椹卞姩
-#define BMP280_ADDR 0x76  // SDO鎺ュ湴鏃跺湴鍧€涓?x76
-#define BMP280_REG_ID 0xD0
-
-// 鏍″噯鍙傛暟锛圔MP280鍑哄巶棰勫瓨锛?typedef struct {
-    uint16_t dig_T1; int16_t dig_T2, dig_T3;
-    uint16_t dig_P1; int16_t dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9;
-} BMP280_Calib;
-
-BMP280_Calib calib;
-
-uint8_t bmp280_init(void) {
-    uint8_t chip_id;
-    HAL_I2C_Mem_Read(&hi2c1, BMP280_ADDR<<1, BMP280_REG_ID, 1, &chip_id, 1, 100);
-    if (chip_id != 0x58) return 0;  // 涓嶆槸BMP280锛?    
-    // 璇诲彇鏍″噯鍙傛暟锛堝叡24瀛楄妭锛?    uint8_t buf[24];
-    HAL_I2C_Mem_Read(&hi2c1, BMP280_ADDR<<1, 0x88, 1, buf, 24, 100);
-    // 瑙ｆ瀽鏍″噯鍙傛暟...锛堢渷鐣ヨВ鏋愪唬鐮侊級
-    
-    // 閰嶇疆锛氬己鍒舵ā寮忥紝16x杩囬噰鏍?    HAL_I2C_Mem_Write(&hi2c1, BMP280_ADDR<<1, 0xF4, 1, (uint8_t[]){0x57}, 1, 100);
-    return 1;
-}
-
-float bmp280_read_temperature(void) {
-    uint8_t buf[3];
-    HAL_I2C_Mem_Read(&hi2c1, BMP280_ADDR<<1, 0xFA, 1, buf, 3, 100);
-    int32_t adc_T = ((uint32_t)buf[0]<<12) | ((uint32_t)buf[1]<<4) | (buf[2]>>4);
-    // 琛ュ伩璁＄畻锛圔ME280 datasheet鍏紡锛?    int32_t var1, var2, T;
-    var1 = ((((adc_T>>3) - ((int32_t)calib.dig_T1<<1))) * ((int32_t)calib.dig_T2)) >> 11;
-    var2 = (((((adc_T>>4) - ((int32_t)calib.dig_T1)) * ((adc_T>>4) - ((int32_t)calib.dig_T1))) >> 12) * ((int32_t)calib.dig_T3)) >> 14;
-    T = (var1 + var2) / 5120.0f;
-    return T;
-}</code></pre>
-
-<h2>馃幆 瀹炴垬缁冧範</h2>
-
-<div class="tip">馃摑 <b>缁冧範1锛?/b>鐢∕PU6050瀹炵幇浜掕ˉ婊ゆ尝濮挎€佽璁＄畻锛岄€氳繃UART浠?00Hz鍙戦€乸itch/roll鍒颁覆鍙ｇ粯鍥惧伐鍏峰疄鏃舵樉绀恒€?br><br>
-馃摑 <b>缁冧範2锛?/b>鐢˙MP280鍋氱畝鏄撻珮搴﹁锛氭皵鍘嬧啋娴锋嫈鎹㈢畻锛堝叕寮忥細h = 44330*(1-(P/P0)^(1/5.255))锛夛紝姣旇緝瀹ゅ唴鍜屽澶栫殑楂樺害宸€?br><br>
-馃摑 <b>缁冧範3锛?/b>瀹炵幇涓€缁村崱灏旀浖婊ゆ尝锛屽钩婊慏HT11鐨勬俯搴﹁鏁帮紝瀵规瘮鍘熷鍊煎拰婊ゆ尝鍚庡€笺€?/div>
-
-<h2>馃搵 鐭ヨ瘑鐐瑰洖椤?/h2>
-<div class="summary">
-<b>鉁?浼犳劅鍣ㄥ紑鍙戞牳蹇冿細</b><br>
-鈥?I2C鍏变韩鎬荤嚎锛氭渶澶?28涓澶囷紝闈?浣嶅湴鍧€鍖哄垎<br>
-鈥?浼犳劅鍣ㄨ瀺鍚堬細浜掕ˉ婊ゆ尝(绠€鍗?/Mahony(涓瓑)/Madgwick(绮惧害楂?<br>
-鈥?鍗″皵鏇兼护娉細鏁板鏈€浼樹及璁★紝璋僎鍜孯鍙傛暟鏄叧閿?br>
-鈥?鏍″噯鍙傛暟锛氫紶鎰熷櫒鍑哄巶棰勫瓨鐨勪慨姝ｇ郴鏁帮紝蹇呴』璇诲彇骞朵娇鐢?br>
-<b>馃洜 璋冭瘯鎶€宸э細</b><br>
-鈥?鍏堢敤Saleae閫昏緫鍒嗘瀽浠?绀烘尝鍣ㄧ湅I2C娉㈠舰<br>
-鈥?妫€鏌CK/NACK锛歂ACK=璁惧鍦板潃閿欎簡鎴栨病涓婄數<br>
-鈥?涓插彛浠ュ浐瀹氶鐜囪緭鍑烘暟鎹紝鐢⊿erialPlot/Arduino IDE缁樺浘鐪嬫尝褰?br>
-鈥?浼犳劅鍣ㄨ鏁扮獊鐒惰烦鍙樷啋妫€鏌ョ數婧愬幓鑰︾數瀹?100nF+10渭F)
-</div>
-
-<div class="chnav">
-  <a onclick="window.parent.loadPage('guide-ch11')">鈼€ 涓婁竴绔狅細璋冭瘯鎶€宸?/a>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
-  <a onclick="window.parent.loadPage('guide-ch13')">浠ｇ爜閫熸煡 锛氫笅涓€绔?鈻?/a>
-</div>
 </body>
 </html>
