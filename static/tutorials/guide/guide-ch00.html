@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>绗?绔狅細鐜鎼缓 鈥?Windows宓屽叆寮忓紑鍙戠幆澧?- 宓屽叆寮忓皬鐧藉畬鍏ㄦ寚鍗?/title>
+<title>第0章：环境搭建 — Windows嵌入式开发环境 - 嵌入式小白完全指南</title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--br:#30363d;--t:#c9d1d9;--t2:#8b949e;--a:#58a6ff;--g:#3fb950;--o:#d2991d;--r:#f85149;--p:#a371f7;--c1:#39c5cf}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,91 +57,91 @@ pre:hover .copy-btn{opacity:1}
 </head>
 <body>
 
-<h1>绗?绔狅細鐜鎼缓 鈥?Windows宓屽叆寮忓紑鍙戠幆澧?/h1>
-<div class="summary"><b>馃摉 灏忕櫧瀹屽叏鎸囧崡 路 0/14</b> | 闃呰鏃堕棿绾?鍒嗛挓</div>
+<h1>第0章：环境搭建 — Windows嵌入式开发环境</h1>
+<div class="summary"><b>📖 小白完全指南 · 0/14</b> | 阅读时间约3分钟</div>
 
-<p>宓屽叆寮忓紑鍙戦渶瑕佷竴濂?strong>浜ゅ弶缂栬瘧宸ュ叿閾?/strong>鈥斺€斿洜涓轰綘鐨勭數鑴戞槸x86鏋舵瀯锛屽崟鐗囨満鏄疉RM鏋舵瀯锛岀紪璇戝櫒蹇呴』鍦≒C涓婅繍琛屻€佷骇鍑篈RM鏈哄櫒鐮併€傚氨鍍忓湪涓浗鐢ㄧ數鑴戣璁＄編鍥界殑闆朵欢锛岄渶瑕佷竴濂?璺ㄥ浗宸ュ叿"銆?/p>
+<p>嵌入式开发需要一套<strong>交叉编译工具链</strong>——因为你的电脑是x86架构，单片机是ARM架构，编译器必须在PC上运行、产出ARM机器码。就像在中国用电脑设计美国的零件，需要一套"跨国工具"。</p>
 
-<div class="analogy">馃挕 <b>绫绘瘮锛?/b>宓屽叆寮忓紑鍙戠幆澧冨氨鍍?strong>鍘ㄦ埧</strong>鈥斺€擜RM GCC鏄彍鍒€锛堝垏鑿?缂栬瘧浠ｇ爜锛夛紝CMake鏄彍璋辨ā鏉匡紙瑙勫垝鍋氳彍娴佺▼锛夛紝Make鏄嚜鍔ㄧ倰鑿滄満锛堟寜鑿滆氨鎵ц锛夛紝涓插彛宸ュ叿鏄璁叉満锛堝拰鑺墖瀵硅瘽鐨勫敮涓€鏂瑰紡锛夈€傛病鏈夎繖浜涳紝浣犺繛"hello world"閮界儳涓嶈繘鑺墖銆?/div>
+<div class="analogy">💡 <b>类比：</b>嵌入式开发环境就像<strong>厨房</strong>——ARM GCC是菜刀（切菜=编译代码），CMake是菜谱模板（规划做菜流程），Make是自动炒菜机（按菜谱执行），串口工具是对讲机（和芯片对话的唯一方式）。没有这些，你连"hello world"都烧不进芯片。</div>
 
-<h3>鉁?宸插畨瑁呭伐鍏锋竻鍗?/h3>
+<h3>✅ 已安装工具清单</h3>
 
 <div class="card">
-<div class="h"><span class="name">ARM GCC 14.2</span><span class="tag g">鏍稿績缂栬瘧鍣?/span><span class="tag b">C:\Program Files (x86)\Arm GNU Toolchain</span></div>
+<div class="h"><span class="name">ARM GCC 14.2</span><span class="tag g">核心编译器</span><span class="tag b">C:\Program Files (x86)\Arm GNU Toolchain</span></div>
 <div class="b">
-<div class="desc">ARM瀹樻柟浜ゅ弶缂栬瘧鍣紝鎶奀/C++浠ｇ爜缂栬瘧鎴怉RM鏈哄櫒鐮併€傚寘鍚玤cc/g++/objcopy/objdump/size绛夊叏濂楀伐鍏枫€?/div>
-<pre><code># 楠岃瘉瀹夎
+<div class="desc">ARM官方交叉编译器，把C/C++代码编译成ARM机器码。包含gcc/g++/objcopy/objdump/size等全套工具。</div>
+<pre><code># 验证安装
 arm-none-eabi-gcc --version
-# 杈撳嚭锛歛rm-none-eabi-gcc (Arm GNU Toolchain 14.2.Rel1) 14.2.1 20241119</code></pre>
+# 输出：arm-none-eabi-gcc (Arm GNU Toolchain 14.2.Rel1) 14.2.1 20241119</code></pre>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">CMake 4.3.3</span><span class="tag g">鏋勫缓绯荤粺</span><span class="tag b">C:\Program Files\CMake\</span></div>
+<div class="h"><span class="name">CMake 4.3.3</span><span class="tag g">构建系统</span><span class="tag b">C:\Program Files\CMake\</span></div>
 <div class="b">
-<div class="desc">鐜颁唬鏋勫缓绯荤粺锛岀敤CMakeLists.txt鎻忚堪椤圭洰缁撴瀯锛岃嚜鍔ㄧ敓鎴怣akefile鎴朜inja鏋勫缓鏂囦欢銆?/div>
+<div class="desc">现代构建系统，用CMakeLists.txt描述项目结构，自动生成Makefile或Ninja构建文件。</div>
 <pre><code>cmake --version
-# 杈撳嚭锛歝make version 4.3.3</code></pre>
+# 输出：cmake version 4.3.3</code></pre>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">Make 3.81</span><span class="tag g">缁忓吀鏋勫缓</span><span class="tag y">GnuWin32</span></div>
+<div class="h"><span class="name">Make 3.81</span><span class="tag g">经典构建</span><span class="tag y">GnuWin32</span></div>
 <div class="b">
-<div class="desc">缁忓吀鏋勫缓宸ュ叿锛岃鍙朚akefile瑙勫垯锛屾寜渚濊禆鍏崇郴鑷姩缂栬瘧銆傚祵鍏ュ紡椤圭洰鏈€甯哥敤鐨勬瀯寤烘柟寮忋€?/div>
+<div class="desc">经典构建工具，读取Makefile规则，按依赖关系自动编译。嵌入式项目最常用的构建方式。</div>
 <pre><code>make --version
-# 杈撳嚭锛欸NU Make 3.81</code></pre>
+# 输出：GNU Make 3.81</code></pre>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">PuTTY 0.84</span><span class="tag g">涓插彛缁堢</span><span class="tag b">C:\Program Files\PuTTY\</span></div>
+<div class="h"><span class="name">PuTTY 0.84</span><span class="tag g">串口终端</span><span class="tag b">C:\Program Files\PuTTY\</span></div>
 <div class="b">
-<div class="desc">寮€婧愮粓绔伐鍏凤紝閫氳繃涓插彛锛圕OM鍙ｏ級鏌ョ湅鍗曠墖鏈虹殑printf杈撳嚭鍜岃皟璇曚俊鎭€傛敮鎸丼SH/Telnet/Serial銆?/div>
+<div class="desc">开源终端工具，通过串口（COM口）查看单片机的printf输出和调试信息。支持SSH/Telnet/Serial。</div>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">VS Code + 宓屽叆寮忔彃浠?/span><span class="tag g">浠ｇ爜缂栬緫鍣?/span><span class="tag p">6涓彃浠?/span></div>
+<div class="h"><span class="name">VS Code + 嵌入式插件</span><span class="tag g">代码编辑器</span><span class="tag p">6个插件</span></div>
 <div class="b">
-<div class="desc">宸插畨瑁呮彃浠讹細C/C++锛堟櫤鑳芥彁绀?璋冭瘯锛夈€丆Make Tools锛堟瀯寤洪泦鎴愶級銆丆ortex-Debug锛圓RM璋冭瘯锛夈€丒IDE锛堝祵鍏ュ紡IDE锛夈€丳latformIO锛堜竴绔欏紡寮€鍙戠幆澧冿級銆丆++ Extension Pack</div>
-<pre><code># 鏌ョ湅宸茶鎻掍欢
+<div class="desc">已安装插件：C/C++（智能提示+调试）、CMake Tools（构建集成）、Cortex-Debug（ARM调试）、EIDE（嵌入式IDE）、PlatformIO（一站式开发环境）、C++ Extension Pack</div>
+<pre><code># 查看已装插件
 code --list-extensions</code></pre>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">Python 3.14 + pyserial/esptool</span><span class="tag g">鑴氭湰宸ュ叿</span></div>
+<div class="h"><span class="name">Python 3.14 + pyserial/esptool</span><span class="tag g">脚本工具</span></div>
 <div class="b">
-<div class="desc">pyserial鎻愪緵涓插彛缂栫▼鎺ュ彛锛堝懡浠よminiterm宸ュ叿锛夛紝esptool鐢ㄤ簬ESP32鍥轰欢鐑у綍銆?/div>
-<pre><code># 涓插彛缁堢锛堣秴绾уソ鐢級
+<div class="desc">pyserial提供串口编程接口（命令行miniterm工具），esptool用于ESP32固件烧录。</div>
+<pre><code># 串口终端（超级好用）
 python -m serial.tools.miniterm COM3 115200
 
-# ESP32鐑у綍
+# ESP32烧录
 esptool.py --chip esp32 -p COM3 write_flash 0x1000 firmware.bin</code></pre>
 </div></div>
 
-<h3>馃敡 PATH鐜鍙橀噺閰嶇疆</h3>
+<h3>🔧 PATH环境变量配置</h3>
 
-<p>鎶婂伐鍏峰姞鍒癙ATH锛岃繖鏍峰湪<strong>浠绘剰鐩綍</strong>鐨勫懡浠よ閲岄兘鑳界洿鎺ヨ皟鐢紝涓嶇敤姣忔杈撳叆瀹屾暣璺緞銆?/p>
+<p>把工具加到PATH，这样在<strong>任意目录</strong>的命令行里都能直接调用，不用每次输入完整路径。</p>
 
-<div class="step"><b>姝ラ1锛?/b>Win + S 鎼滅储"鐜鍙橀噺" 鈫?鎵撳紑"缂栬緫绯荤粺鐜鍙橀噺"</div>
-<div class="step"><b>姝ラ2锛?/b>鐐?鐜鍙橀噺" 鈫?閫変腑鐢ㄦ埛鍙橀噺鐨?Path" 鈫?鐐?缂栬緫"</div>
-<div class="step"><b>姝ラ3锛?/b>鐐?鏂板缓"锛屽姞鍏ヤ互涓嬭矾寰勶紙宸茶嚜鍔ㄩ厤缃殑璺宠繃锛夛細</div>
+<div class="step"><b>步骤1：</b>Win + S 搜索"环境变量" → 打开"编辑系统环境变量"</div>
+<div class="step"><b>步骤2：</b>点"环境变量" → 选中用户变量的"Path" → 点"编辑"</div>
+<div class="step"><b>步骤3：</b>点"新建"，加入以下路径（已自动配置的跳过）：</div>
 <pre><code>C:\Program Files (x86)\Arm GNU Toolchain arm-none-eabi\14.2 rel1\bin
 C:\Program Files\CMake\bin
 C:\Program Files (x86)\GnuWin32\bin
 C:\Program Files\PuTTY
 C:\Users\LYS\AppData\Local\Python\pythoncore-3.14-64\Scripts</code></pre>
 
-<div class="tip">馃挕 <b>灏忔妧宸э細</b>鍔犲畬PATH鍚庯紝<strong>閲嶆柊鎵撳紑</strong>鎵€鏈夊懡浠よ绐楀彛鎵嶄細鐢熸晥銆傞獙璇侊細鎵撳紑鏂扮殑PowerShell锛岀洿鎺ヨ緭鍏?<code>arm-none-eabi-gcc --version</code>锛岃兘杩愯灏辫鏄庨厤濂戒簡銆?/div>
+<div class="tip">💡 <b>小技巧：</b>加完PATH后，<strong>重新打开</strong>所有命令行窗口才会生效。验证：打开新的PowerShell，直接输入 <code>arm-none-eabi-gcc --version</code>，能运行就说明配好了。</div>
 
-<h3>馃攳 鐜涓€閿獙璇佽剼鏈?/h3>
+<h3>🔍 环境一键验证脚本</h3>
 
-<p>澶嶅埗涓嬮潰鐨勮剼鏈埌PowerShell杩愯锛岃嚜鍔ㄦ娴嬫墍鏈夊伐鍏锋槸鍚﹂厤缃纭細</p>
+<p>复制下面的脚本到PowerShell运行，自动检测所有工具是否配置正确：</p>
 
-<pre><code># 淇濆瓨涓?check_env.ps1 鎴栫洿鎺ュ鍒惰繍琛?
-# 鑷姩妫€娴婸ython鍛戒护锛坧ython/python3/python3.14绛夛級
+<pre><code># 保存为 check_env.ps1 或直接复制运行
+# 自动检测Python命令（python/python3/python3.14等）
 $pyCmd = $null
 foreach ($cmd in @('python3.14','python3','python')) {
     try { $null = & $cmd --version 2>&1; $pyCmd = $cmd; break } catch {}
 }
-if (-not $pyCmd) { Write-Host "鉂?Python鏈壘鍒帮紝璇风‘璁ゅ凡瀹夎骞跺姞鍏ATH" -ForegroundColor Red }
+if (-not $pyCmd) { Write-Host "❌ Python未找到，请确认已安装并加入PATH" -ForegroundColor Red }
 
 $tools = @(
     @{name='ARM GCC'; cmd='arm-none-eabi-gcc --version'},
@@ -152,110 +152,110 @@ $tools = @(
     @{name='esptool'; cmd="$pyCmd -m esptool version"}
 )
 
-Write-Host "`n=== 宓屽叆寮忕幆澧冩娴?===`n" -ForegroundColor Cyan
+Write-Host "`n=== 嵌入式环境检测 ===`n" -ForegroundColor Cyan
 foreach ($t in $tools) {
-    Write-Host "妫€娴?$($t.name)... " -NoNewline
+    Write-Host "检测 $($t.name)... " -NoNewline
     try {
         $result = Invoke-Expression $t.cmd 2>&1
         if ($LASTEXITCODE -eq 0 -or $result -match '\d') {
-            Write-Host "鉁?OK" -ForegroundColor Green
+            Write-Host "✅ OK" -ForegroundColor Green
         } else {
-            Write-Host "鉂?澶辫触" -ForegroundColor Red
+            Write-Host "❌ 失败" -ForegroundColor Red
         }
     } catch {
-        Write-Host "鉂?鏈畨瑁? -ForegroundColor Red
+        Write-Host "❌ 未安装" -ForegroundColor Red
     }
 }
-Write-Host "`n妫€娴嬪畬鎴愶紒" -ForegroundColor Cyan</code></pre>
+Write-Host "`n检测完成！" -ForegroundColor Cyan</code></pre>
 
-<div class="note">鈿狅笍 <b>娉ㄦ剰浜嬮」锛?/b><br>
-鈥?濡傛灉Make妫€娴嬪け璐ワ紝璇存槑GnuWin32鐨刡in鐩綍鏈姞鍏ATH锛屾墜鍔ㄦ坊鍔狅細<code>C:\Program Files (x86)\GnuWin32\bin</code><br>
-鈥?Python Scripts鐩綍涔熼渶妫€鏌ワ細<code>C:\Users\浣犵殑鐢ㄦ埛鍚峔AppData\Local\Programs\Python\Python3xx\Scripts</code><br>
-鈥?pyserial鍜宔sptool瑁呭湪鍝釜Python涓嬶紝閭ｄ釜Scripts鐩綍灏辫鍔燩ATH</div>
+<div class="note">⚠️ <b>注意事项：</b><br>
+• 如果Make检测失败，说明GnuWin32的bin目录未加入PATH，手动添加：<code>C:\Program Files (x86)\GnuWin32\bin</code><br>
+• Python Scripts目录也需检查：<code>C:\Users\你的用户名\AppData\Local\Programs\Python\Python3xx\Scripts</code><br>
+• pyserial和esptool装在哪个Python下，那个Scripts目录就要加PATH</div>
 
-<h3>馃洅 鍏ラ棬纭欢鎺ㄨ崘</h3>
+<h3>🛒 入门硬件推荐</h3>
 
 <table>
-<tr><th>纭欢</th><th>鍨嬪彿</th><th>浠锋牸</th><th>鐢ㄩ€?/th><th>璐拱</th></tr>
-<tr><td>STM32寮€鍙戞澘</td><td>STM32F103C8T6鏈€灏忕郴缁熸澘</td><td>楼5-10</td><td>鍏ラ棬棣栭€夛紝璧勬簮鏈€涓板瘜</td><td><a href="https://s.taobao.com/search?q=STM32F103C8T6+%E6%9C%80%E5%B0%8F%E7%B3%BB%E7%BB%9F%E6%9D%BF" style="color:var(--a)" target="_blank">娣樺疂鎼滅储</a></td></tr>
-<tr><td>鐑у綍鍣?/td><td>ST-Link V2锛堜豢鐗堬級</td><td>楼10-15</td><td>绋嬪簭鐑у綍+GDB璋冭瘯</td><td><a href="https://s.taobao.com/search?q=ST-Link+V2+%E4%B8%8B%E8%BD%BD%E5%99%A8" style="color:var(--a)" target="_blank">娣樺疂鎼滅储</a></td></tr>
-<tr><td>USB杞琓TL</td><td>CH340G妯″潡</td><td>楼5</td><td>涓插彛閫氫俊</td><td><a href="https://s.taobao.com/search?q=CH340+USB%E8%BD%ACTTL" style="color:var(--a)" target="_blank">娣樺疂鎼滅储</a></td></tr>
-<tr><td>璋冭瘯鍣?/td><td>DAP-Link (CMSIS-DAP)</td><td>楼20</td><td>鏇撮€氱敤锛屾敮鎸佸绉嶈姱鐗?/td><td><a href="https://s.taobao.com/search?q=DAP-Link+CMSIS-DAP" style="color:var(--a)" target="_blank">娣樺疂鎼滅储</a></td></tr>
-<tr><td>闈㈠寘鏉?鏉滈偊绾?/td><td>830瀛旈潰鍖呮澘+鍏姣嶇嚎</td><td>楼10</td><td>鎺ョ嚎瀹為獙</td><td><a href="https://s.taobao.com/search?q=%E9%9D%A2%E5%8C%85%E6%9D%BF+%E6%9D%9C%E9%82%A6%E7%BA%BF" style="color:var(--a)" target="_blank">娣樺疂鎼滅储</a></td></tr>
+<tr><th>硬件</th><th>型号</th><th>价格</th><th>用途</th><th>购买</th></tr>
+<tr><td>STM32开发板</td><td>STM32F103C8T6最小系统板</td><td>¥5-10</td><td>入门首选，资源最丰富</td><td><a href="https://s.taobao.com/search?q=STM32F103C8T6+%E6%9C%80%E5%B0%8F%E7%B3%BB%E7%BB%9F%E6%9D%BF" style="color:var(--a)" target="_blank">淘宝搜索</a></td></tr>
+<tr><td>烧录器</td><td>ST-Link V2（仿版）</td><td>¥10-15</td><td>程序烧录+GDB调试</td><td><a href="https://s.taobao.com/search?q=ST-Link+V2+%E4%B8%8B%E8%BD%BD%E5%99%A8" style="color:var(--a)" target="_blank">淘宝搜索</a></td></tr>
+<tr><td>USB转TTL</td><td>CH340G模块</td><td>¥5</td><td>串口通信</td><td><a href="https://s.taobao.com/search?q=CH340+USB%E8%BD%ACTTL" style="color:var(--a)" target="_blank">淘宝搜索</a></td></tr>
+<tr><td>调试器</td><td>DAP-Link (CMSIS-DAP)</td><td>¥20</td><td>更通用，支持多种芯片</td><td><a href="https://s.taobao.com/search?q=DAP-Link+CMSIS-DAP" style="color:var(--a)" target="_blank">淘宝搜索</a></td></tr>
+<tr><td>面包板+杜邦线</td><td>830孔面包板+公对母线</td><td>¥10</td><td>接线实验</td><td><a href="https://s.taobao.com/search?q=%E9%9D%A2%E5%8C%85%E6%9D%BF+%E6%9D%9C%E9%82%A6%E7%BA%BF" style="color:var(--a)" target="_blank">淘宝搜索</a></td></tr>
 </table>
 
-<div class="note">鈿狅笍 <b>璐拱鎻愮ず锛?/b>STM32F103C8T6鏉?+ ST-Link V2 + CH340妯″潡锛屼笁浠跺绾β?5锛岀帺杞湰涔︽墍鏈塖TM32渚嬪瓙瀹屽叏澶熺敤銆?/div>
+<div class="note">⚠️ <b>购买提示：</b>STM32F103C8T6板 + ST-Link V2 + CH340模块，三件套约¥25，玩转本书所有STM32例子完全够用。</div>
 
-<h3>馃搻 STM32F103C8T6 鏈€灏忕郴缁熸澘寮曡剼鍥?/h3>
+<h3>📐 STM32F103C8T6 最小系统板引脚图</h3>
 
-<p>钃濊壊灏忔澘瀛愭槸宓屽叆寮忓叆闂ㄦ渶甯歌鐨勫紑鍙戞澘锛屽紩鑴氭帓鍒楀涓嬶細</p>
+<p>蓝色小板子是嵌入式入门最常见的开发板，引脚排列如下：</p>
 
 <table>
-<tr><th>宸︿晶鎺掗拡锛堣嚜涓婅€屼笅锛?/th><th>寮曡剼</th><th>鍙充晶鎺掗拡锛堣嚜涓婅€屼笅锛?/th><th>寮曡剼</th></tr>
-<tr><td>3V3</td><td>3.3V杈撳嚭</td><td>GND</td><td>鍦?/td></tr>
-<tr><td>GND</td><td>鍦?/td><td>GND</td><td>鍦?/td></tr>
-<tr><td>PA0</td><td>ADC/KEY</td><td>5V</td><td>5V杈撳叆</td></tr>
+<tr><th>左侧排针（自上而下）</th><th>引脚</th><th>右侧排针（自上而下）</th><th>引脚</th></tr>
+<tr><td>3V3</td><td>3.3V输出</td><td>GND</td><td>地</td></tr>
+<tr><td>GND</td><td>地</td><td>GND</td><td>地</td></tr>
+<tr><td>PA0</td><td>ADC/KEY</td><td>5V</td><td>5V输入</td></tr>
 <tr><td>PA1</td><td>ADC</td><td>PB9</td><td>I2C1_SDA</td></tr>
 <tr><td>PA2</td><td>USART2_TX</td><td>PB8</td><td>I2C1_SCL</td></tr>
-<tr><td>PA3</td><td>USART2_RX</td><td>PB7</td><td>I2C1_SDA(閲嶆槧灏?</td></tr>
-<tr><td>PA4</td><td>SPI1_NSS</td><td>PB6</td><td>I2C1_SCL(閲嶆槧灏?</td></tr>
-<tr><td>PA5</td><td>SPI1_SCK</td><td>PB5</tdtd><td>SPI1_MOSI(閲嶆槧灏?</td></tr>
+<tr><td>PA3</td><td>USART2_RX</td><td>PB7</td><td>I2C1_SDA(重映射)</td></tr>
+<tr><td>PA4</td><td>SPI1_NSS</td><td>PB6</td><td>I2C1_SCL(重映射)</td></tr>
+<tr><td>PA5</td><td>SPI1_SCK</td><td>PB5</tdtd><td>SPI1_MOSI(重映射)</td></tr>
 <tr><td>PA6</td><td>SPI1_MISO</td><td>PB4</td><td>NJTRST</td></tr>
 <tr><td>PA7</td><td>SPI1_MOSI</td><td>PB3</td><td>JTDO</td></tr>
 <tr><td>PB0</td><td>ADC</td><td>PA15</td><td>JTDI</td></tr>
 <tr><td>PB1</td><td>ADC</td><td>PA12</td><td>USB D+</td></tr>
 <tr><td>PB10</td><td>I2C2_SCL</td><td>PA11</td><td>USB D-</td></tr>
 <tr><td>PB11</td><td>I2C2_SDA</td><td>PA10</td><td>USART1_RX</td></tr>
-<tr><td>RST</td><td>澶嶄綅</td><td>PA9</td><td>USART1_TX</td></tr>
+<tr><td>RST</td><td>复位</td><td>PA9</td><td>USART1_TX</td></tr>
 <tr><td>3V3</td><td>3.3V</td><td>PA8</td><td>MCO</td></tr>
-<tr><td>GND</td><td>鍦?/td><td>PB15</td><td>SPI2_MOSI</td></tr>
-<tr><td>GND</td><td>鍦?/td><td>PB14</td><td>SPI2_MISO</td></tr>
+<tr><td>GND</td><td>地</td><td>PB15</td><td>SPI2_MOSI</td></tr>
+<tr><td>GND</td><td>地</td><td>PB14</td><td>SPI2_MISO</td></tr>
 <tr><td>5V</td><td>5V</td><td>PB13</td><td>SPI2_SCK</td></tr>
-<tr><td>VBAT</td><td>澶囩敤鐢垫簮</td><td>PB12</td><td>SPI2_NSS</td></tr>
+<tr><td>VBAT</td><td>备用电源</td><td>PB12</td><td>SPI2_NSS</td></tr>
 </table>
 
-<div class="note">鈿狅笍 <b>鍏抽敭寮曡剼閫熻锛?/b><br>
-鈥?<strong>PC13</strong>=鏉胯浇LED锛堝ぇ閮ㄥ垎钃濊壊灏忔澘锛?br>
-鈥?<strong>PA9/PA10</strong>=USART1锛堜覆鍙ｉ€氫俊鐢ㄨ繖瀵癸級<br>
-鈥?<strong>PB6/PB7</strong>=I2C1锛圤LED/浼犳劅鍣級<br>
-鈥?<strong>PA4-PA7</strong>=SPI1锛團lash/灞忓箷锛?br>
-鈥?<strong>BOOT0</strong>=璺崇嚎甯斤紝鎺?杩涘叆涓嬭浇妯″紡锛屾帴0姝ｅ父杩愯</div>
+<div class="note">⚠️ <b>关键引脚速记：</b><br>
+• <strong>PC13</strong>=板载LED（大部分蓝色小板）<br>
+• <strong>PA9/PA10</strong>=USART1（串口通信用这对）<br>
+• <strong>PB6/PB7</strong>=I2C1（OLED/传感器）<br>
+• <strong>PA4-PA7</strong>=SPI1（Flash/屏幕）<br>
+• <strong>BOOT0</strong>=跳线帽，接1进入下载模式，接0正常运行</div>
 
-<h3>鉂?闇€鎵嬪姩瀹夎鐨勫伐鍏?/h3>
+<h3>❌ 需手动安装的工具</h3>
 
 <table>
-<tr><th>宸ュ叿</th><th>鍘熷洜</th><th>涓嬭浇鍦板潃</th></tr>
-<tr><td>Wireshark</td><td>98MB锛岀綉缁滄參鏃惰秴鏃?/td><td>wireshark.org/download.html</td></tr>
-<tr><td>OpenOCD</td><td>GitHub涓嬭浇琚</td><td>github.com/xpack-dev-tools/openocd-xpack/releases</td></tr>
-<tr><td>MobaXterm</td><td>瀹樻柟鏈嶅姟鍣ㄦ參</td><td>mobaxterm.mobatek.net</td></tr>
-<tr><td>STM32CubeMX</td><td>闇€娉ㄥ唽ST璐﹀彿</td><td>st.com/en/development-tools/stm32cubemx.html</td></tr>
+<tr><th>工具</th><th>原因</th><th>下载地址</th></tr>
+<tr><td>Wireshark</td><td>98MB，网络慢时超时</td><td>wireshark.org/download.html</td></tr>
+<tr><td>OpenOCD</td><td>GitHub下载被墙</td><td>github.com/xpack-dev-tools/openocd-xpack/releases</td></tr>
+<tr><td>MobaXterm</td><td>官方服务器慢</td><td>mobaxterm.mobatek.net</td></tr>
+<tr><td>STM32CubeMX</td><td>需注册ST账号</td><td>st.com/en/development-tools/stm32cubemx.html</td></tr>
 </table>
 
-<p><strong>浠ヤ笂4涓伐鍏蜂笉褰卞搷鍩虹瀛︿範</strong>锛屽墠6绔犱笉闇€瑕併€傜瓑鍩虹鎵撳ソ浜嗗啀瑁呫€?/p>
+<p><strong>以上4个工具不影响基础学习</strong>，前6章不需要。等基础打好了再装。</p>
 
-<h3>馃敡 Windows鍛戒护琛岀幆澧冧紭鍖?/h3>
+<h3>🔧 Windows命令行环境优化</h3>
 
-<p>Windows鑷甫鐨刢md.exe鍔熻兘鏈夐檺锛屽己鐑堟帹鑽愪娇鐢?strong>PowerShell</strong>鎴?strong>Windows Terminal</strong>浣滀负鏃ュ父缁堢銆備互涓嬫槸鍑犱釜鑳借寮€鍙戞晥鐜囩炕鍊嶇殑閰嶇疆鎶€宸э細</p>
+<p>Windows自带的cmd.exe功能有限，强烈推荐使用<strong>PowerShell</strong>或<strong>Windows Terminal</strong>作为日常终端。以下是几个能让开发效率翻倍的配置技巧：</p>
 
-<h4>PowerShell Profile 閰嶇疆</h4>
+<h4>PowerShell Profile 配置</h4>
 
-<p>PowerShell鐨凱rofile锛堥厤缃枃浠讹級绫讳技Linux鐨?bashrc鈥斺€旀瘡娆″惎鍔ㄧ粓绔嚜鍔ㄥ姞杞姐€傛妸浣犵殑甯哥敤alias鍜屽嚱鏁版斁杩涘幓锛?/p>
+<p>PowerShell的Profile（配置文件）类似Linux的.bashrc——每次启动终端自动加载。把你的常用alias和函数放进去：</p>
 
-<pre><code># 鍒涘缓/缂栬緫Profile
+<pre><code># 创建/编辑Profile
 notepad $PROFILE
-# 濡傛灉鏂囦欢涓嶅瓨鍦紝鍏堝垱寤猴細
+# 如果文件不存在，先创建：
 New-Item -Path $PROFILE -Type File -Force
 
-# === 浠ヤ笅鍐欏叆 Profile ===
-# 宓屽叆寮忓紑鍙戝揩鎹烽敭
+# === 以下写入 Profile ===
+# 嵌入式开发快捷键
 function arm-gcc { arm-none-eabi-gcc $args }
 function arm-size { arm-none-eabi-size $args }
 function arm-objcopy { arm-none-eabi-objcopy $args }
 
-# 蹇€熸瀯寤哄嚱鏁帮紙淇濆瓨涓?stm32-build锛?
+# 快速构建函数（保存为 stm32-build）
 function stm32-build {
     param([string]$target = "all")
-    # 鑷姩妫€娴婱akefile/CMakeLists.txt
+    # 自动检测Makefile/CMakeLists.txt
     if (Test-Path "Makefile") {
         & make -j4 $target
     } elseif (Test-Path "CMakeLists.txt") {
@@ -265,41 +265,41 @@ function stm32-build {
         cmake --build . -j4
         cd ..
     } else {
-        Write-Host "鏈壘鍒癕akefile鎴朇MakeLists.txt" -ForegroundColor Red
+        Write-Host "未找到Makefile或CMakeLists.txt" -ForegroundColor Red
     }
 }
 
-# 蹇€熷垪鍑轰覆鍙?
+# 快速列出串口
 function com-list {
     [System.IO.Ports.SerialPort]::GetPortNames()
-    # 鎴栬€呯敤 pyserial:
+    # 或者用 pyserial:
     # python -m serial.tools.list_ports
 }
 
-# 涓插彛缁堢蹇嵎鍑芥暟
+# 串口终端快捷函数
 function com-term($port="COM3", $baud=115200) {
     python -m serial.tools.miniterm $port $baud
 }</code></pre>
 
-<div class="tip">馃挕 <b>PowerShell鎵ц绛栫暐闂锛?/b>濡傛灉杩愯鑴氭湰鎶?绂佹杩愯鑴氭湰"锛屼互绠＄悊鍛樿韩浠借繍琛岋細<br><code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code></div>
+<div class="tip">💡 <b>PowerShell执行策略问题：</b>如果运行脚本报"禁止运行脚本"，以管理员身份运行：<br><code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code></div>
 
-<h4>Windows Terminal 鎺ㄨ崘閰嶇疆</h4>
+<h4>Windows Terminal 推荐配置</h4>
 
-<p>寰蒋鍟嗗簵鎼滅储"Windows Terminal"瀹夎銆傚缓璁湪璁剧疆涓厤缃細</p>
+<p>微软商店搜索"Windows Terminal"安装。建议在设置中配置：</p>
 
-<pre><code>// settings.json 鍏抽敭閰嶇疆椤?
+<pre><code>// settings.json 关键配置项
 {
   "profiles": {
     "defaults": {
-      "fontFace": "Cascadia Code",     // 缂栫▼涓撶敤绛夊瀛椾綋
+      "fontFace": "Cascadia Code",     // 编程专用等宽字体
       "fontSize": 12,
-      "cursorShape": "filledBox",       // 鍧楃姸鍏夋爣锛堟洿鏄剧溂锛?
-      "colorScheme": "One Half Dark"    // 鏆楄壊涓婚
+      "cursorShape": "filledBox",       // 块状光标（更显眼）
+      "colorScheme": "One Half Dark"    // 暗色主题
     },
     "list": [
       {
-        "guid": "{浣犵殑PowerShell GUID}",
-        "name": "宓屽叆寮忓紑鍙?,
+        "guid": "{你的PowerShell GUID}",
+        "name": "嵌入式开发",
         "startingDirectory": "C:\\Users\\LYS\\projects\\stm32",
         "commandline": "powershell.exe -NoLogo",
         "tabTitle": "STM32 Dev"
@@ -308,28 +308,28 @@ function com-term($port="COM3", $baud=115200) {
   }
 }</code></pre>
 
-<h3>馃摝 Git鐗堟湰鎺у埗鍩虹</h3>
+<h3>📦 Git版本控制基础</h3>
 
-<p>宓屽叆寮忛」鐩篃闇€瑕佺増鏈鐞嗭紒浠ｇ爜鏀逛贡浜嗚兘鍥為€€锛屽浜哄崗浣滃繀澶囥€傚鏋滀綘杩樻病瑁匞it锛屽幓 <a href="https://git-scm.com/download/win" style="color:var(--a)" target="_blank">git-scm.com</a> 涓嬭浇瀹夎锛堜竴璺粯璁ゅ嵆鍙級銆?/p>
+<p>嵌入式项目也需要版本管理！代码改乱了能回退，多人协作必备。如果你还没装Git，去 <a href="https://git-scm.com/download/win" style="color:var(--a)" target="_blank">git-scm.com</a> 下载安装（一路默认即可）。</p>
 
-<h4>Git鏈€灏忛厤缃?/h4>
+<h4>Git最小配置</h4>
 
-<pre><code># 瀹夎鍚庨鍏堥厤缃韩浠斤紙蹇呴』锛屽惁鍒欐棤娉曟彁浜わ級
-git config --global user.name "浣犵殑鍚嶅瓧"
+<pre><code># 安装后首先配置身份（必须，否则无法提交）
+git config --global user.name "你的名字"
 git config --global user.email "your@email.com"
 
-# 閬垮厤涓枃鏂囦欢鍚嶄贡鐮?
+# 避免中文文件名乱码
 git config --global core.quotepath false
 git config --global gui.encoding utf-8
 git config --global i18n.commit.encoding utf-8
 
-# 楠岃瘉閰嶇疆
+# 验证配置
 git config --list</code></pre>
 
-<h4>宓屽叆寮忛」鐩?.gitignore 妯℃澘</h4>
+<h4>嵌入式项目 .gitignore 模板</h4>
 
-<pre><code># .gitignore - 宓屽叆寮忓紑鍙戜笓鐢?
-# 缂栬瘧浜х墿鈥斺€旇繖浜涙枃浠舵瘡娆＄紪璇戦兘閲嶆柊鐢熸垚锛屽畬鍏ㄤ笉闇€瑕佹彁浜?
+<pre><code># .gitignore - 嵌入式开发专用
+# 编译产物——这些文件每次编译都重新生成，完全不需要提交
 *.o
 *.obj
 *.elf
@@ -341,105 +341,105 @@ git config --list</code></pre>
 *.d
 *.dep
 
-# IDE / 缂栬緫鍣ㄤ复鏃舵枃浠?
+# IDE / 编辑器临时文件
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# CMake鏋勫缓杈撳嚭
+# CMake构建输出
 build/
 cmake-build-*/
 
-# 鎿嶄綔绯荤粺鏉傞」
+# 操作系统杂项
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# 娉ㄦ剰锛氫笉瑕佸拷鐣?.c .h .s .ld CMakeLists.txt Makefile锛?
-# 杩欎簺鏄簮浠ｇ爜鍜屾瀯寤洪厤缃紝蹇呴』鎻愪氦</code></pre>
+# 注意：不要忽略 .c .h .s .ld CMakeLists.txt Makefile！
+# 这些是源代码和构建配置，必须提交</code></pre>
 
-<div class="tip">馃挕 <b>缁忛獙娉曞垯锛?/b>鍙彁浜?strong>婧愭枃浠?鏋勫缓閰嶇疆</strong>锛?c/.h/.s/.ld/Makefile/CMakeLists.txt锛夛紝<strong>缁濅笉鎻愪氦缂栬瘧浜х墿</strong>锛?o/.elf/.bin锛夈€俫it鏄瓨婧愮爜鐨勶紝涓嶆槸瀛樼紪璇戠粨鏋滅殑銆?/div>
+<div class="tip">💡 <b>经验法则：</b>只提交<strong>源文件+构建配置</strong>（.c/.h/.s/.ld/Makefile/CMakeLists.txt），<strong>绝不提交编译产物</strong>（.o/.elf/.bin）。git是存源码的，不是存编译结果的。</div>
 
-<h4>宓屽叆寮忛」鐩父鐢℅it鍛戒护</h4>
+<h4>嵌入式项目常用Git命令</h4>
 
-<pre><code># 鍒濆鍖栦粨搴擄紙鍦ㄩ」鐩牴鐩綍鎵ц涓€娆★級
+<pre><code># 初始化仓库（在项目根目录执行一次）
 git init
 
-# 鏌ョ湅鐘舵€侊紙鏈€甯哥敤鍛戒护锛屾瘡澶╃敤鏃犳暟娆★級
+# 查看状态（最常用命令，每天用无数次）
 git status
 
-# 娣诲姞鏂囦欢鍒版殏瀛樺尯
-git add .                    # 娣诲姞鎵€鏈変慨鏀?
-git add src/main.c           # 鍙坊鍔犳寚瀹氭枃浠?
+# 添加文件到暂存区
+git add .                    # 添加所有修改
+git add src/main.c           # 只添加指定文件
 
-# 鎻愪氦锛堜繚瀛樺綋鍓嶇姸鎬佸揩鐓э級
-git commit -m "feat: 鍒濆鍖朙ED闂儊绋嬪簭"
+# 提交（保存当前状态快照）
+git commit -m "feat: 初始化LED闪烁程序"
 
-# 鏌ョ湅鎻愪氦鍘嗗彶
-git log --oneline --graph   # 鍥惧舰鍖栧睍绀猴紝娓呯埥
+# 查看提交历史
+git log --oneline --graph   # 图形化展示，清爽
 
-# 鍥為€€锛堟敼鍧忎簡鎯冲洖鍘伙級
-git checkout -- src/main.c   # 鍥為€€鍗曚釜鏂囦欢鍒版渶鍚庝竴娆℃彁浜?
-git reset --soft HEAD~1      # 鎾ら攢鏈€鍚庝竴娆ommit锛屾敼鍔ㄤ繚鐣?
-git reset --hard HEAD~1      # 鎾ら攢鏈€鍚庝竴娆ommit锛屾敼鍔ㄥ叏涓紙鎱庣敤锛侊級
+# 回退（改坏了想回去）
+git checkout -- src/main.c   # 回退单个文件到最后一次提交
+git reset --soft HEAD~1      # 撤销最后一次commit，改动保留
+git reset --hard HEAD~1      # 撤销最后一次commit，改动全丢（慎用！）
 
-# 鏌ョ湅鏀瑰姩缁嗚妭
-git diff                     # 鐪嬫湭鏆傚瓨鐨勬敼鍔?
-git diff --staged           # 鐪嬪凡鏆傚瓨鐨勬敼鍔?
-git show HEAD               # 鐪嬫渶鍚庝竴娆ommit鏀逛簡鍟?/code></pre>
+# 查看改动细节
+git diff                     # 看未暂存的改动
+git diff --staged           # 看已暂存的改动
+git show HEAD               # 看最后一次commit改了啥</code></pre>
 
-<h3>馃悰 甯歌鐜瀹夎閿欒鎺掕В</h3>
+<h3>🐛 常见环境安装错误排解</h3>
 
-<div class="trouble">馃攳 <b>閿欒1锛歛rm-none-eabi-gcc 涓嶆槸鍐呴儴鎴栧閮ㄥ懡浠?/b><br>
-<strong>鍘熷洜锛?/strong>ARM GCC鐨刡in鐩綍娌℃湁鍔犲叆PATH锛屾垨鍔犱簡PATH浣嗘病鏈夐噸鏂版墦寮€鍛戒护琛岀獥鍙ｃ€?br>
-<strong>瑙ｅ喅姝ラ锛?/strong><br>
-鈶?纭瀹夎璺緞姝ｇ‘锛屾墦寮€鏂囦欢绠＄悊鍣ㄦ壘鍒帮細<code>C:\Program Files (x86)\Arm GNU Toolchain arm-none-eabi\14.2 rel1\bin</code><br>
-鈶?妫€鏌ヨ繖涓洰褰曚笅鏄惁鏈?<code>arm-none-eabi-gcc.exe</code><br>
-鈶?鎸塛in+S鎼滅储"鐜鍙橀噺" 鈫?缂栬緫鐢ㄦ埛PATH 鈫?娣诲姞涓婇潰鐨刡in璺緞<br>
-鈶?<strong>鍏抽棴鎵€鏈夊懡浠よ绐楀彛锛岄噸鏂版墦寮€</strong>锛堣繖姝?0%鐨勪汉浼氭紡鎺夛紒锛?br>
-鈶?鏂扮殑鍛戒护琛岄噷杩愯 <code>arm-none-eabi-gcc --version</code> 楠岃瘉</div>
+<div class="trouble">🔍 <b>错误1：arm-none-eabi-gcc 不是内部或外部命令</b><br>
+<strong>原因：</strong>ARM GCC的bin目录没有加入PATH，或加了PATH但没有重新打开命令行窗口。<br>
+<strong>解决步骤：</strong><br>
+① 确认安装路径正确，打开文件管理器找到：<code>C:\Program Files (x86)\Arm GNU Toolchain arm-none-eabi\14.2 rel1\bin</code><br>
+② 检查这个目录下是否有 <code>arm-none-eabi-gcc.exe</code><br>
+③ 按Win+S搜索"环境变量" → 编辑用户PATH → 添加上面的bin路径<br>
+④ <strong>关闭所有命令行窗口，重新打开</strong>（这步90%的人会漏掉！）<br>
+⑤ 新的命令行里运行 <code>arm-none-eabi-gcc --version</code> 验证</div>
 
-<div class="trouble">馃攳 <b>閿欒2锛歮ake --version 姝ｅ父锛屼絾 make 鍛戒护鎶?make: *** No targets specified and no makefile found. Stop."</b><br>
-<strong>鍘熷洜锛?/strong>杩欎笉鏄敊璇紒杩欒鏄巑ake鎵惧埌浜嗕絾娌℃湁Makefile銆備綘闇€瑕佸湪涓€涓湁Makefile鐨勭洰褰曢噷杩愯make锛屾垨鑰呭垱寤轰竴涓狹akefile銆?/div>
+<div class="trouble">🔍 <b>错误2：make --version 正常，但 make 命令报"make: *** No targets specified and no makefile found. Stop."</b><br>
+<strong>原因：</strong>这不是错误！这说明make找到了但没有Makefile。你需要在一个有Makefile的目录里运行make，或者创建一个Makefile。</div>
 
-<div class="trouble">馃攳 <b>閿欒3锛歝make 鎶?"The C compiler identification is unknown"</b><br>
-<strong>鍘熷洜锛?/strong>浜ゅ弶缂栬瘧鍣ㄤ笉鍦≒ATH涓紝CMake娌℃硶鑷姩妫€娴嬨€?br>
-<strong>瑙ｅ喅锛?/strong><br>
-鈶?纭繚 <code>arm-none-eabi-gcc --version</code> 鑳芥甯告墽琛?br>
-鈶?鍦–Make鏋勫缓鏃舵樉寮忔寚瀹氬伐鍏烽摼鏂囦欢锛?br><code>cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake ..</code><br>
-鈶?纭繚toolchain-arm.cmake涓殑 <code>CMAKE_C_COMPILER</code> 璺緞姝ｇ‘</div>
+<div class="trouble">🔍 <b>错误3：cmake 报 "The C compiler identification is unknown"</b><br>
+<strong>原因：</strong>交叉编译器不在PATH中，CMake没法自动检测。<br>
+<strong>解决：</strong><br>
+① 确保 <code>arm-none-eabi-gcc --version</code> 能正常执行<br>
+② 在CMake构建时显式指定工具链文件：<br><code>cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake ..</code><br>
+③ 确保toolchain-arm.cmake中的 <code>CMAKE_C_COMPILER</code> 路径正确</div>
 
-<div class="trouble">馃攳 <b>閿欒4锛歱ython -m serial.tools.miniterm 鎶?No module named serial"</b><br>
-<strong>鍘熷洜锛?/strong>pyserial娌℃湁瀹夎锛屾垨瑁呭湪浜嗗叾浠朠ython鐗堟湰涓嬨€?br>
-<strong>瑙ｅ喅锛?/strong><br>
-鈶?<code>python --version</code> 纭鏄摢涓狿ython<br>
-鈶?<code>pip install pyserial</code> 閲嶆柊瀹夎<br>
-鈶?濡傛灉瑁呬簡澶氫釜Python锛屾寚瀹歱ip璺緞锛?br><code>C:\Users\LYS\AppData\Local\Python\pythoncore-3.14-64\Scripts\pip install pyserial</code></div>
+<div class="trouble">🔍 <b>错误4：python -m serial.tools.miniterm 报"No module named serial"</b><br>
+<strong>原因：</strong>pyserial没有安装，或装在了其他Python版本下。<br>
+<strong>解决：</strong><br>
+① <code>python --version</code> 确认是哪个Python<br>
+② <code>pip install pyserial</code> 重新安装<br>
+③ 如果装了多个Python，指定pip路径：<br><code>C:\Users\LYS\AppData\Local\Python\pythoncore-3.14-64\Scripts\pip install pyserial</code></div>
 
-<div class="trouble">馃攳 <b>閿欒5锛歐indows 缁堢涓枃涔辩爜</b><br>
-<strong>瑙ｅ喅锛?/strong>
-PowerShell涓緭鍏ワ細<br><code>[System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8</code><br>
-鎴栧湪PowerShell Profile涓姞鍏ワ細<br><code>$OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::UTF8</code><br>
-濡傛灉杩樹笉琛岋紝鎹㈢敤Windows Terminal鈥斺€斿畠瀵筓TF-8鏀寔姣旀棫cmd濂藉緱澶氥€?/div>
+<div class="trouble">🔍 <b>错误5：Windows 终端中文乱码</b><br>
+<strong>解决：</strong>
+PowerShell中输入：<br><code>[System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8</code><br>
+或在PowerShell Profile中加入：<br><code>$OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::UTF8</code><br>
+如果还不行，换用Windows Terminal——它对UTF-8支持比旧cmd好得多。</div>
 
-<h3>馃弸锔?瀹炴垬缁冧範锛氶獙璇佷綘鐨勫紑鍙戠幆澧?/h3>
+<h3>🏋️ 实战练习：验证你的开发环境</h3>
 
-<div class="tip">馃挕 <b>缁冧範1锛氱紪璇戝櫒鑷</b><br>
-鎵撳紑PowerShell锛屼緷娆¤繍琛屼互涓嬪懡浠わ紝鎶婅緭鍑烘埅鍥句繚瀛橈細<br><br>
-鈶?<code>arm-none-eabi-gcc --version</code>  鈫?搴旀樉绀虹増鏈彿14.2浠ヤ笂<br>
-鈶?<code>cmake --version</code>              鈫?搴旀樉绀虹増鏈彿3.20浠ヤ笂<br>
-鈶?<code>make --version</code>               鈫?搴旀樉绀篏NU Make 3.81浠ヤ笂<br>
-鈶?<code>python --version</code>             鈫?搴旀樉绀?.13浠ヤ笂<br>
-鈶?<code>python -c "import serial; print('pyserial OK')"</code> 鈫?搴旀墦鍗?pyserial OK<br><br>
-濡傛灉5椤瑰叏閮ㄩ€氳繃锛屼綘鐨勭幆澧冨凡缁忓氨缁紝鍙互寮€濮嬪啓宓屽叆寮忎唬鐮佷簡锛?/div>
+<div class="tip">💡 <b>练习1：编译器自检</b><br>
+打开PowerShell，依次运行以下命令，把输出截图保存：<br><br>
+① <code>arm-none-eabi-gcc --version</code>  → 应显示版本号14.2以上<br>
+② <code>cmake --version</code>              → 应显示版本号3.20以上<br>
+③ <code>make --version</code>               → 应显示GNU Make 3.81以上<br>
+④ <code>python --version</code>             → 应显示3.13以上<br>
+⑤ <code>python -c "import serial; print('pyserial OK')"</code> → 应打印 pyserial OK<br><br>
+如果5项全部通过，你的环境已经就绪，可以开始写嵌入式代码了！</div>
 
-<div class="tip">馃挕 <b>缁冧範2锛氭渶灏忕紪璇戞祴璇?/b><br>
-鍒涘缓涓€涓┖鐩綍锛屽啓鍏ヤ竴涓渶绠€鍗曠殑C鏂囦欢锛岀敤ARM GCC缂栬瘧涓€涓嬬湅鐪嬪伐鍏烽摼鏄惁姝ｅ父宸ヤ綔锛?br><br>
+<div class="tip">💡 <b>练习2：最小编译测试</b><br>
+创建一个空目录，写入一个最简单的C文件，用ARM GCC编译一下看看工具链是否正常工作：<br><br>
 <pre><code>mkdir C:\test-arm-gcc
 cd C:\test-arm-gcc
-# 鍒涘缓娴嬭瘯鏂囦欢
+# 创建测试文件
 @"
 int main(void) {
     volatile int x = 42;
@@ -447,135 +447,591 @@ int main(void) {
     return 0;
 }
 "@ | Out-File -Encoding utf8 test.c
-# 缂栬瘧锛堝彧缂栬瘧涓嶉摼鎺ワ紝-c鍙傛暟锛?
+# 编译（只编译不链接，-c参数）
 arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -c test.c -o test.o
-# 鏌ョ湅鏂囦欢淇℃伅
+# 查看文件信息
 arm-none-eabi-objdump -h test.o
-# 杈撳嚭涓寘鍚?.text 娈典俊鎭?= 缂栬瘧鎴愬姛锛?/code></pre>
-濡傛灉鐪嬪埌 <code>.text</code> 娈典俊鎭紝璇存槑缂栬瘧鍣ㄥ伐浣滄甯搞€?/div>
+# 输出中包含 .text 段信息 = 编译成功！</code></pre>
+如果看到 <code>.text</code> 段信息，说明编译器工作正常。</div>
 
-<div class="tip">馃挕 <b>缁冧範3锛氱儳褰曞伐鍏烽妫€</b><br>
-鎻掍笂ST-Link鎴朌AP-Link鍚庯紝杩愯锛?br>
-<pre><code># 妫€鏌T-Link锛堥渶瑕佸畨瑁匰T-Link椹卞姩锛?
+<div class="tip">💡 <b>练习3：烧录工具预检</b><br>
+插上ST-Link或DAP-Link后，运行：<br>
+<pre><code># 检查ST-Link（需要安装ST-Link驱动）
 python -m stlink.stlink --help 2>&1
-# 鎴栬€呮鏌penOCD锛堝鏋滃凡瀹夎锛?
+# 或者检查OpenOCD（如果已安装）
 # openocd --version
 
-# 妫€鏌ヤ覆鍙ｈ澶?
+# 检查串口设备
 python -m serial.tools.list_ports
-# 杈撳嚭绫讳技锛欳OM3 - STMicroelectronics STLink Virtual COM Port (COM3)</code></pre>
-濡傛灉鑳界湅鍒拌澶囧垪琛紝璇存槑鐑у綍鍣ㄥ拰涓插彛妯″潡閮藉凡琚郴缁熻瘑鍒€?/div>
+# 输出类似：COM3 - STMicroelectronics STLink Virtual COM Port (COM3)</code></pre>
+如果能看到设备列表，说明烧录器和串口模块都已被系统识别。</div>
 
-<h3>馃殌 杩涢樁璇濋锛氬鐗堟湰宸ュ叿閾惧叡瀛?/h3>
+<h3>🚀 进阶话题：多版本工具链共存</h3>
 
 <div class="card">
-<div class="h"><span class="name">澶氱増鏈珹RM GCC绠＄悊</span><span class="tag p">杩涢樁</span></div>
+<div class="h"><span class="name">多版本ARM GCC管理</span><span class="tag p">进阶</span></div>
 <div class="b">
-<div class="desc">瀹為檯寮€鍙戜腑浣犲彲鑳介渶瑕佸悓鏃朵娇鐢ㄤ笉鍚岀増鏈殑ARM GCC鈥斺€旀瘮濡傝€侀」鐩敤10.x锛屾柊椤圭洰鐢?4.x銆備互涓嬫槸鍦╓indows涓婄鐞嗗鐗堟湰鐨勬渶浣冲疄璺碉細</div>
-<pre><code># 鏂规1锛氬湪PATH涓彧淇濈暀涓€涓粯璁ょ増鏈紝鍏朵粬鐢ㄧ粷瀵硅矾寰?
-# 榛樿鐗堟湰锛圥ATH涓級锛?4.2
-arm-none-eabi-gcc --version  # 鈫?14.2
+<div class="desc">实际开发中你可能需要同时使用不同版本的ARM GCC——比如老项目用10.x，新项目用14.x。以下是在Windows上管理多版本的最佳实践：</div>
+<pre><code># 方案1：在PATH中只保留一个默认版本，其他用绝对路径
+# 默认版本（PATH中）：14.2
+arm-none-eabi-gcc --version  # → 14.2
 
-# 鍏朵粬鐗堟湰鐢ㄥ畬鏁磋矾寰勶細
+# 其他版本用完整路径：
 "C:\Program Files (x86)\Arm GNU Toolchain arm-none-eabi\10.3 rel1\bin\arm-none-eabi-gcc" --version
 
-# 鏂规2锛氬垱寤虹増鏈垏鎹㈠嚱鏁帮紙鏀惧叆PowerShell Profile锛?
+# 方案2：创建版本切换函数（放入PowerShell Profile）
 function use-arm-gcc-10 {
     $env:PATH = "C:\tools\arm-gcc-10\bin;$([Environment]::GetEnvironmentVariable('PATH','User'));$([Environment]::GetEnvironmentVariable('PATH','Machine'))"
     arm-none-eabi-gcc --version
 }
 
-# 鏂规3锛氬湪Makefile/CMake涓樉寮忔寚瀹氱紪璇戝櫒璺緞
+# 方案3：在Makefile/CMake中显式指定编译器路径
 # Makefile:
 CC := C:/tools/arm-gcc-10/bin/arm-none-eabi-gcc
 
 # CMake toolchain file:
 set(CMAKE_C_COMPILER "C:/tools/arm-gcc-10/bin/arm-none-eabi-gcc.exe")</code></pre>
-<div class="note">鈿狅笍 <b>娉ㄦ剰锛?/b>涓嶅悓鐗堟湰鐨凙RM GCC缂栬瘧鍑烘潵鐨勫簱涓嶅吋瀹癸紒濡傛灉椤圭洰渚濊禆浜嗛缂栬瘧搴擄紙.a鏂囦欢锛夛紝蹇呴』浣跨敤鍚屼竴鐗堟湰缂栬瘧銆傞亣鍒伴摼鎺ユ姤"undefined reference"鏃讹紝浼樺厛鎬€鐤戠増鏈笉鍖归厤銆?/div>
+<div class="note">⚠️ <b>注意：</b>不同版本的ARM GCC编译出来的库不兼容！如果项目依赖了预编译库（.a文件），必须使用同一版本编译。遇到链接报"undefined reference"时，优先怀疑版本不匹配。</div>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">WSL2宓屽叆寮忓紑鍙戠幆澧?/span><span class="tag p">杩涢樁</span></div>
+<div class="h"><span class="name">WSL2嵌入式开发环境</span><span class="tag p">进阶</span></div>
 <div class="b">
-<div class="desc">Windows Subsystem for Linux (WSL2) 璁╀綘鍦╓indows閲岃窇鐪熸鐨凩inux鐜銆傛湁浜涘紑婧愬祵鍏ュ紡宸ュ叿鍦↙inux涓嬫洿濂界敤锛堟瘮濡備竴浜涜剼鏈伐鍏枫€丏FU鐑у綍宸ュ叿绛夛級銆?/div>
-<pre><code># 瀹夎WSL2锛堢鐞嗗憳PowerShell杩愯涓€娆★級
+<div class="desc">Windows Subsystem for Linux (WSL2) 让你在Windows里跑真正的Linux环境。有些开源嵌入式工具在Linux下更好用（比如一些脚本工具、DFU烧录工具等）。</div>
+<pre><code># 安装WSL2（管理员PowerShell运行一次）
 wsl --install -d Ubuntu-24.04
 
-# WSL2閲岀殑宓屽叆寮忓伐鍏烽摼瀹夎
+# WSL2里的嵌入式工具链安装
 sudo apt update
-sudo apt install gcc-arm-none-eabi   # ARM GCC缂栬瘧鍣?
+sudo apt install gcc-arm-none-eabi   # ARM GCC编译器
 sudo apt install cmake                # CMake
 sudo apt install make                 # GNU Make
-sudo apt install python3-pip          # Python鍖呯鐞?
-pip3 install pyserial stlink-tools   # 涓插彛鍜孲T-Link宸ュ叿
+sudo apt install python3-pip          # Python包管理
+pip3 install pyserial stlink-tools   # 串口和ST-Link工具
 
-# USB璁惧鐩撮€氾紙鍦╓SL2閲屾搷浣滅墿鐞嗙‖浠讹級
-# 闇€瑕佸畨瑁?usbipd-win锛圵indows渚э級
+# USB设备直通（在WSL2里操作物理硬件）
+# 需要安装 usbipd-win（Windows侧）
 # winget install usbipd
-# usbipd wsl list        # 鍒楀嚭USB璁惧
-# usbipd wsl attach -b 1-2  # 鎶婅澶囬檮鍒癢SL2</code></pre>
-<div class="note">馃挕 <b>浣曟椂鐢╓SL2锛?/b>濡傛灉浣犱富瑕佸湪Windows宸ヤ綔锛學SL2浣滆ˉ鍏呭氨澶熶簡鈥斺€斿ぇ閮ㄥ垎宓屽叆寮忓伐鍏稺indows鐗堥兘鍙敤銆傚彧鏈夊湪闇€瑕佹煇浜汱inux涓撳睘宸ュ叿閾炬垨鑴氭湰鐨勬椂鍊欏啀鍒囪繃鍘汇€傛棩甯稿紑鍙戠敤Windows鍘熺敓宸ュ叿鏁堢巼鏇撮珮銆?/div>
+# usbipd wsl list        # 列出USB设备
+# usbipd wsl attach -b 1-2  # 把设备附到WSL2</code></pre>
+<div class="note">💡 <b>何时用WSL2：</b>如果你主要在Windows工作，WSL2作补充就够了——大部分嵌入式工具Windows版都可用。只有在需要某些Linux专属工具链或脚本的时候再切过去。日常开发用Windows原生工具效率更高。</div>
 </div></div>
 
 <div class="card">
-<div class="h"><span class="name">鍖呯鐞嗗櫒涓€閿鐜</span><span class="tag p">杩涢樁</span></div>
+<div class="h"><span class="name">包管理器一键装环境</span><span class="tag p">进阶</span></div>
 <div class="b">
-<div class="desc">鍘屽€︿簡鎵嬪姩涓嬭浇瀹夎锛熺敤Windows鍖呯鐞嗗櫒涓€琛屽懡浠ゆ悶瀹氬叏閮ㄥ伐鍏凤細</div>
-<pre><code># 妫€鏌ユ槸鍚﹀凡瀹夎 winget锛圵in11鑷甫锛?
+<div class="desc">厌倦了手动下载安装？用Windows包管理器一行命令搞定全部工具：</div>
+<pre><code># 检查是否已安装 winget（Win11自带）
 winget --version
 
-# 涓€閿畨瑁呭祵鍏ュ紡鍏ㄥ宸ュ叿锛堢鐞嗗憳缁堢杩愯锛?
+# 一键安装嵌入式全套工具（管理员终端运行）
 winget install -e --id Arm.GnuArmEmbeddedToolchain   # ARM GCC
 winget install -e --id Kitware.CMake                   # CMake
 winget install -e --id Ezwinports.Make                 # GNU Make
-winget install -e --id GnuWin32.Make                   # 鏇夸唬鐗?
+winget install -e --id GnuWin32.Make                   # 替代版
 winget install -e --id Python.Python.3.14              # Python
 winget install -e --id PuTTY.PuTTY                     # PuTTY
 winget install -e --id Microsoft.VisualStudioCode      # VS Code
 winget install -e --id Git.Git                         # Git
 
-# 瑁呭畬楠岃瘉锛堟墍鏈塸ackages鍒楄〃锛?
+# 装完验证（所有packages列表）
 winget list</code></pre>
-<div class="note">鈿狅笍 winget鐗堟湰鍙兘婊炲悗锛孉RM GCC寤鸿杩樻槸鎵嬪姩鍘诲畼缃戜笅杞芥渶鏂扮増銆備絾瀵逛簬CMake/Python/Git绛夊伐鍏凤紝winget鐨勭増鏈冻澶熺敤銆?/div>
+<div class="note">⚠️ winget版本可能滞后，ARM GCC建议还是手动去官网下载最新版。但对于CMake/Python/Git等工具，winget的版本足够用。</div>
 </div></div>
 
-<h3>馃搵 鐭ヨ瘑鐐瑰洖椤?/h3>
+<h3>🖥️ VS Code 嵌入式开发深度配置</h3>
 
-<div class="summary">
-<b>馃幆 鏈珷鏍稿績瑕佺偣锛?/b><br><br>
-<b>1. 宸ュ叿閾惧繀瑁?浠跺锛?/b><br>
-鈥?ARM GCC 14.2 鈥?浜ゅ弶缂栬瘧鍣紙.c 鈫?.elf锛?br>
-鈥?CMake 4.3 鈥?鐜颁唬鏋勫缓绯荤粺<br>
-鈥?Make 3.81 鈥?缁忓吀鏋勫缓宸ュ叿<br>
-鈥?PuTTY 鈥?涓插彛缁堢<br>
-鈥?VS Code + 鎻掍欢 鈥?浠ｇ爜缂栬緫涓庤皟璇?br>
-鈥?Python + pyserial 鈥?鑴氭湰宸ュ叿涓庝覆鍙?br><br>
-<b>2. PATH鐜鍙橀噺锛?/b><br>
-鈥?鎶婂伐鍏风殑bin鐩綍鍔犲叆PATH鎵嶈兘鍦ㄤ换鎰忕洰褰曡皟鐢?br>
-鈥?淇敼PATH鍚庡繀椤婚噸鏂版墦寮€鍛戒护琛岀獥鍙ｆ墠鐢熸晥<br>
-鈥?鐢?check_env.ps1 鑴氭湰涓€閿獙璇佹墍鏈夊伐鍏?br><br>
-<b>3. 鍏ラ棬纭欢涓変欢濂楋紙绾β?5锛夛細</b><br>
-鈥?STM32F103C8T6 鏈€灏忕郴缁熸澘锛埪?-10锛?br>
-鈥?ST-Link V2 鐑у綍鍣紙楼10-15锛?br>
-鈥?CH340G USB杞琓TL 妯″潡锛埪?锛?br><br>
-<b>4. 鐗堟湰绠＄悊锛?/b><br>
-鈥?瑁匞it锛岄厤缃?user.name 鍜?user.email<br>
-鈥?鍒涘缓 .gitignore锛屽彧鎻愪氦婧愮爜锛屼笉鎻愪氦缂栬瘧浜х墿<br>
-鈥?git status / git add / git commit 鏄瘡鏃ヤ笁杩?br><br>
-<b>5. 鎺掗敊鎬濊矾锛?/b><br>
-鈥?鍛戒护鎵句笉鍒?鈫?妫€鏌ATH 鈫?閲嶆柊鎵撳紑缁堢<br>
-鈥?CMake鎵句笉鍒扮紪璇戝櫒 鈫?鎸囧畾 toolchain file<br>
-鈥?涓插彛涓嶈瘑鍒?鈫?瑁呴┍鍔紙CH340/ST-Link椹卞姩锛?br>
+<p>VS Code 是目前嵌入式开发的事实标准IDE。但默认安装后只是代码编辑器——需要正确配置才能获得智能提示、一键编译、断点调试的完整体验。</p>
+
+<h4>必装扩展清单</h4>
+
+<table>
+<tr><th>扩展</th><th>用途</th><th>必须？</th></tr>
+<tr><td>C/C++ (Microsoft)</td><td>C/C++ 语法高亮、IntelliSense、代码导航</td><td>✅ 必须</td></tr>
+<tr><td>Cortex-Debug (marus25)</td><td>ARM Cortex-M GDB 调试前端，支持ST-Link/J-Link/DAPLink</td><td>✅ 必须</td></tr>
+<tr><td>CMake Tools (Microsoft)</td><td>CMakeLists.txt 语法高亮、一键配置构建</td><td>✅ 必须</td></tr>
+<tr><td>LinkerScript (ZixuanWang)</td><td>.ld 链接脚本语法高亮</td><td>⭕ 推荐</td></tr>
+<tr><td>ARM Assembly (dan-c-underwood)</td><td>.s/.S 汇编语法高亮和跳转</td><td>⭕ 推荐</td></tr>
+<tr><td>Serial Monitor (Microsoft)</td><td>VS Code 内置串口终端，不用切到PuTTY</td><td>⭕ 推荐</td></tr>
+<tr><td>GitLens (GitKraken)</td><td>行级 Git blame、历史浏览</td><td>⭕ 可选</td></tr>
+<tr><td>Hex Editor (ms-vscode)</td><td>查看 .bin/.hex 二进制文件</td><td>⭕ 可选</td></tr>
+</table>
+
+<div class="tip">💡 <b>一键安装命令：</b>把下面代码保存为 <code>install-extensions.ps1</code>，右键"使用PowerShell运行"：
+<pre><code>code --install-extension ms-vscode.cpptools
+code --install-extension marus25.cortex-debug
+code --install-extension ms-vscode.cmake-tools
+code --install-extension zixuanwang.linkerscript
+code --install-extension dan-c-underwood.arm
+code --install-extension ms-vscode.vscode-serial-monitor
+code --install-extension eamodio.gitlens
+Write-Host "✅ 所有嵌入式扩展安装完成！请重启 VS Code" -ForegroundColor Green</code></pre></div>
+
+<h4>settings.json：让 IntelliSense 认识 ARM GCC</h4>
+
+<p>新手最常遇到的 VS Code 问题：打开 STM32 项目后满屏红色波浪线 —— <code>#include "stm32f1xx.h"</code> 报"无法打开源文件"。这是因为 IntelliSense 的默认编译器是 x86 gcc，不知道 ARM 头文件在哪。</p>
+
+<div class="example">📝 <b>.vscode/settings.json — 嵌入式项目工作区配置</b>
+<pre><code>{
+  // === IntelliSense 配置（解决红色波浪线） ===
+  "C_Cpp.default.compilerPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2/bin/arm-none-eabi-gcc.exe",
+  "C_Cpp.default.compilerArgs": [
+    "-mcpu=cortex-m3",     // 你的MCU核心
+    "-mthumb",             // Thumb指令集
+    "-specs=nosys.specs"   // 无系统调用
+  ],
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}/**",
+    "${workspaceFolder}/bsp/**",
+    "${workspaceFolder}/lib/CMSIS/Include"  // CMSIS头文件路径
+  ],
+  // 让IntelliSense知道ARM GCC预定义宏
+  "C_Cpp.default.defines": [
+    "STM32F103xB",  // 你的MCU型号宏
+    "USE_HAL_DRIVER"
+  ],
+  "C_Cpp.default.intelliSenseMode": "gcc-arm",
+  "C_Cpp.default.cStandard": "c11",
+  "C_Cpp.default.cppStandard": "c++17",
+
+  // === 文件关联 ===
+  "files.associations": {
+    "*.s": "arm",       // 启动文件用ARM汇编语法
+    "*.ld": "linkerscript"  // 链接脚本有专用语法高亮
+  },
+
+  // === 排除编译产物（加快搜索） ===
+  "search.exclude": {
+    "build/**": true,
+    "**/*.o": true,
+    "**/*.elf": true,
+    "**/*.bin": true
+  },
+
+  // === Cortex-Debug 使用arm-none-eabi-gdb ===
+  "cortex-debug.armToolchainPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2/bin",
+  "cortex-debug.openocdPath": "C:/Program Files/OpenOCD/bin/openocd.exe"
+}</code></pre>
 </div>
 
-<!-- ====== 绗?绔?====== -->
+<div class="trouble">
+<b>⚡ 踩坑：改完 settings.json 红色波浪线还在？</b><br>
+不要只按 <code>Ctrl+S</code>！做完以下操作：<br>
+① 确认路径里没有中文字符（ARM GCC装在Program Files没问题，但不要装在"我的文档"下）<br>
+② 按 <code>Ctrl+Shift+P</code> → 输入 <code>C/C++: Reset IntelliSense Database</code> → 回车<br>
+③ 按 <code>Ctrl+Shift+P</code> → 输入 <code>Developer: Reload Window</code> → 回车<br>
+④ 在 .c 文件里看一下状态栏右下角显示的是不是 "Win32" 而不是 "Linux" 或 "Mac"——ARM GCC 在 Windows 上 IntelliSense 模式应显示为 Win32<br>
+如果第四步显示了Linux，去 settings.json 把 <code>"intelliSenseMode"</code> 改为 <code>"gcc-arm"</code>
+</div>
+
+<h4>tasks.json：一键编译快捷键</h4>
+
+<p>虽然可以在终端手动打 <code>cmake --build build</code>，但配置 tasks.json 后可以按 <code>Ctrl+Shift+B</code> 直接编译，编译错误自动跳转到对应行。</p>
+
+<div class="example">📝 <b>.vscode/tasks.json — 编译任务配置</b>
+<pre><code>{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🔨 编译 (CMake + Make)",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "build", "-j8"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": "$gcc",  // 自动解析编译错误
+      "presentation": {
+        "reveal": "always",       // 编译时自动显示终端
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "🧹 清理",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "build", "--target", "clean"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "📦 重新配置CMake",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-B", "build",
+        "-G", "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=toolchain-arm.cmake",
+        "-DCMAKE_BUILD_TYPE=Debug"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    }
+  ]
+}</code></pre>
+<p><b>关键配置说明：</b><br>
+• <code>"problemMatcher": "$gcc"</code> — VS Code内置的GCC错误解析器，编译输出中的 <code>main.c:42:5: error:</code> 会被自动识别为可点击的错误链接<br>
+• <code>"isDefault": true</code> — 设为默认构建任务，<code>Ctrl+Shift+B</code> 直接触发，不需要选任务<br>
+• <code>"cwd"</code> — 设为 <code>${workspaceFolder}</code>，确保相对路径正确</p>
+</div>
+
+<h4>launch.json：断点调试配置</h4>
+
+<p>Cortex-Debug 扩展配合 launch.json 实现 VS Code 内的断点调试：设断点、单步执行、查看变量、看寄存器，和 Keil/IAR 一样好用。</p>
+
+<div class="example">📝 <b>.vscode/launch.json — ST-Link V2 调试配置</b>
+<pre><code>{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🐞 STM32F103 (ST-Link + OpenOCD)",
+      "cwd": "${workspaceFolder}",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "openocd",
+      "device": "STM32F103C8",                // MCU型号
+      "executable": "build/stm32-blink.elf",   // 要调试的ELF
+      "configFiles": [
+        "interface/stlink.cfg",                 // 调试器接口
+        "target/stm32f1x.cfg"                   // 目标MCU
+      ],
+      "svdFile": "STM32F103.svd",               // 外设寄存器定义文件
+      "runToEntryPoint": "main",                // 烧录后自动停在main
+      "preLaunchTask": "🔨 编译 (CMake + Make)", // 调试前先编译
+      "postDebugTask": ""
+    },
+    {
+      "name": "🐞 STM32F103 (J-Link)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "jlink",
+      "device": "STM32F103C8",
+      "executable": "build/stm32-blink.elf",
+      "svdFile": "STM32F103.svd",
+      "runToEntryPoint": "main",
+      "interface": "swd"                       // J-Link用SWD接口
+    }
+  ]
+}</code></pre>
+<div class="note">💡 <b>SVD文件是什么？</b>SVD（System View Description）是ARM定义的XML格式文件，描述了MCU所有外设寄存器的地址、位域和含义。有了SVD文件，Cortex-Debug可以在调试时显示 <code>GPIOA->ODR</code> 每个位的实时值。STM32全系列的SVD文件在 <a href="https://github.com/posborne/cmsis-svd" target="_blank" style="color:var(--a)">github.com/posborne/cmsis-svd</a> 可以下载。下载后放到项目根目录，在 launch.json 里指定路径即可。</div>
+</div>
+
+<h3>🔌 调试探针选型与实战接线</h3>
+
+<p>调试探针（Debug Probe）是把你的PC和MCU连接起来的桥梁。选择不对，调试体验会非常痛苦。以下是主流选择：</p>
+
+<table>
+<tr><th>探针</th><th>价格</th><th>支持MCU</th><th>速度</th><th>优点</th><th>缺点</th></tr>
+<tr><td>ST-Link V2 仿版</td><td>¥10-15</td><td>STM32全系列</td><td>4MHz SWD</td><td>便宜、够用、资料多</td><td>只支持STM32；仿版偶尔掉固件</td></tr>
+<tr><td>ST-Link V3 MINI</td><td>¥70-90</td><td>STM32全系列</td><td>24MHz SWD</td><td>速度快、有虚拟串口、正品质量好</td><td>贵、淘宝不好买正品</td></tr>
+<tr><td>J-Link EDU Mini</td><td>¥150-200</td><td>几乎所有ARM Cortex-M</td><td>12MHz SWD</td><td>兼容性最好、软件生态最成熟</td><td>贵、教育版不可商用</td></tr>
+<tr><td>DAPLink (CMSIS-DAP)</td><td>¥20-30</td><td>所有ARM Cortex-M</td><td>1MHz SWD</td><td>开源、支持拖拽烧录、跨平台</td><td>速度慢、占空间大</td></tr>
+<tr><td>J-Link OB (板载)</td><td>包含在开发板中</td><td>同品牌</td><td>4MHz SWD</td><td>开发板自带、零额外成本</td><td>部分板载OB不能对外调试</td></tr>
+</table>
+
+<div class="tip">💡 <b>新手推荐：</b>先买 ST-Link V2 仿版（¥10），功能完全够用。等真的需要高速调试（比如调试RTOS任务切换、频繁设断点）再升级 J-Link EDU Mini。</div>
+
+<h4>OpenOCD 配置文件详解</h4>
+
+<p>OpenOCD 是连接调试探针和 GDB 的中间层，在 VS Code + Cortex-Debug 方案中必不可少。</p>
+
+<div class="example">📝 <b>openocd-stlink.cfg — 为STM32F103C8T6定制</b>
+<pre><code># ===== 调试器接口配置 =====
+source [find interface/stlink.cfg]    # 使用ST-Link V2
+# 也可以换成:
+# source [find interface/cmsis-dap.cfg]  # DAPLink
+# source [find interface/jlink.cfg]      # J-Link
+
+# ===== 传输协议 =====
+transport select hla_swd     # ST-Link用HLA+SWD模式
+# transport select swd        # DAPLink用这个
+
+# ===== 目标芯片配置 =====
+source [find target/stm32f1x.cfg]   # STM32F103
+
+# ===== 连接参数 =====
+adapter speed 4000      # SWD时钟 4MHz (稳定值，不要调更高)
+
+# ===== 复位配置 =====
+# reset_config srst_only      # 仅复位芯片
+reset_config srst_nogate     # 推荐：连接时自动复位
+# reset_config none           # 不自动复位(调试低功耗唤醒时用)
+
+# ===== Flash保护配置 =====
+# 如果不加这行，STM32F103的option bytes保护可能导致擦除失败
+# 请确认 flash bank 在 stm32f1x.cfg 中已声明</code></pre>
+</div>
+
+<h4>SWD接线：4根线就够了</h4>
+
+<p>不管是ST-Link还是DAPLink，SWD只需要接4根线（标准20pin JTAG口里大部分脚都是空的）：</p>
+
+<table>
+<tr><th>ST-Link引脚</th><th>颜色（常规）</th><th>接STM32F103引脚</th><th>说明</th></tr>
+<tr><td>GND</td><td>黑色</td><td>GND</td><td>共地</td></tr>
+<tr><td>SWCLK</td><td>黄色</td><td>PA14 (SWCLK)</td><td>时钟线</td></tr>
+<tr><td>SWDIO</td><td>绿色</td><td>PA13 (SWDIO)</td><td>数据线</td></tr>
+<tr><td>3.3V</td><td>红色</td><td>3.3V</td><td>目标板供电（可选：可让ST-Link给板子供电，但最大100mA）</td></tr>
+</table>
+
+<div class="warn">⚠️ <b>接线禁忌：</b><br>
+• <b>不要把ST-Link的5V接到3.3V引脚！</b> 虽然ST-Link上有5V引脚，但那是给5V目标板用的（如STM32F407 Discovery）。蓝色小板是3.3V的。<br>
+• 如果目标板已有独立供电（USB线），只接 GND + SWCLK + SWDIO 三根线，不要接3.3V！两个电源打架可能烧坏ST-Link。<br>
+• SWCLK 和 SWDIO 不需要上拉电阻，ST-Link内部已有。</div>
+
+<h3>🐛 环境搭建踩坑实录</h3>
+
+<p>以下每个坑都是真实踩过的，按发生频率排序：</p>
+
+<div class="trouble">🔍 <b>坑1：arm-none-eabi-gcc 命令找不到，但确实装了</b><br><br>
+❌ <b>现象：</b>安装完 ARM GCC 后，在 PowerShell 里输入 <code>arm-none-eabi-gcc --version</code> 提示 "无法识别为 cmdlet..."<br>
+✅ <b>根因：</b>ARM GCC 安装器默认<b>不勾选</b>"Add to PATH"选项！（这个设计非常坑）<br>
+✅ <b>解决：</b><br>
+① 重新运行安装器，在最后一个界面<b>必须手动勾选</b> "Add path to environment variable"<br>
+② 或者手动添加：<br>
+<code>[Environment]::SetEnvironmentVariable('Path', 'C:\Program Files (x86)\Arm GNU Toolchain arm-none-eabi\14.2\bin;' + [Environment]::GetEnvironmentVariable('Path','User'), 'User')</code><br>
+③ 关键一步：<b>注销或重启，或至少关闭并重新打开所有终端窗口</b> —— PATH 变更不会实时传播到已打开的进程<br>
+④ <b>终极排错：</b>用 <code>Get-Command arm-none-eabi-gcc</code> 确认系统能找到它，如果找不到，用 <code>echo $env:Path -split ';'</code> 检查PATH内容
+</div>
+
+<div class="trouble">🔍 <b>坑2：OpenOCD 提示 "Error: libusb_open() failed with LIBUSB_ERROR_NOT_SUPPORTED"</b><br><br>
+❌ <b>现象：</b>VS Code 调试启动时，OpenOCD 输出一片红字，核心是 <code>LIBUSB_ERROR_NOT_SUPPORTED</code><br>
+✅ <b>根因：</b>Windows 没有给 ST-Link 装 WinUSB 驱动，默认装的是 ST 官方 ST-Link 驱动或 Windows 自动装的 HID 驱动，而 OpenOCD 需要 WinUSB（通过 Zadig 安装）<br>
+✅ <b>解决：</b><br>
+① 下载 <a href="https://zadig.akeo.ie/" target="_blank" style="color:var(--a)">Zadig</a>（USB驱动替换工具）<br>
+② 插上 ST-Link，打开 Zadig → Options → List All Devices<br>
+③ 下拉列表里找到 "ST-Link Debug"（或 "STM32 STLink"）<br>
+④ 在 Driver 那一栏，选择 <b>WinUSB</b>（不是 libusb-win32，不是 libusbK）<br>
+⑤ 点击 Replace Driver，等10秒完成<br>
+⑥ 再次尝试 OpenOCD 连接<br>
+⚠️ 注意：装了 WinUSB 后，STM32CubeProgrammer 的 ST-Link 模式<b>可能无法识别</b>。需要时候再换回原驱动（设备管理器→ST-Link→更新驱动→从列表选取→ST官方驱动）
+</div>
+
+<div class="trouble">🔍 <b>坑3：CMake配置时找不到 Python3</b><br><br>
+❌ <b>现象：</b>CMake 配置阶段报错 <code>Could NOT find Python3 (missing: Python3_EXECUTABLE)</code><br>
+✅ <b>根因：</b>Python 安装时没有勾选 "Add Python to PATH"，或者安装后没有重启终端<br>
+✅ <b>解决：</b><br>
+① 在终端输入 <code>python --version</code>（或 <code>python3 --version</code>）—— 如果也报错，说明 Python 确实没在 PATH 里<br>
+② 重新安装 Python：从 <a href="https://python.org" target="_blank" style="color:var(--a)">python.org</a> 下载，安装界面<b>必须勾选</b>底部的 "Add Python to PATH"<br>
+③ 或者在 CMake 命令中手动指定：<br>
+<code>cmake -DPython3_EXECUTABLE="C:/Users/你的用户名/AppData/Local/Programs/Python/Python314/python.exe" ..</code><br>
+④ 如果 Python 在 PATH 里但 CMake 仍然找不到，检查是否是 Microsoft Store 版 Python（app execution alias）—— 在 "应用执行别名" 设置里关掉 Python 的别名，装官网版
+</div>
+
+<div class="trouble">🔍 <b>坑4：VS Code 终端里 make 正常，Ctrl+Shift+B 编译失败</b><br><br>
+❌ <b>现象：</b>在 VS Code 内置终端手动 <code>cmake --build build</code> 成功，但按 <code>Ctrl+Shift+B</code> 报 "make is not recognized"<br>
+✅ <b>根因：</b>VS Code 的 tasks.json 使用了一个<b>不同的环境</b>——它不读取你在 PowerShell Profile 里修改的 PATH<br>
+✅ <b>解决：</b><br>
+① 在 tasks.json 里给每个 task 添加 <code>"options": { "env": { "Path": "..." } }</code> 显式设置 PATH<br>
+② 更彻底的方案：把 make 的路径加到<b>系统环境变量</b>（而非用户环境变量）：<br>
+Win+R → sysdm.cpl → 高级 → 环境变量 → 系统变量 → Path → 添加 <code>C:\Program Files (x86)\GnuWin32\bin</code><br>
+③ 重启 VS Code（完全关闭再打开，不是 Reload Window）
+</div>
+
+<div class="trouble">🔍 <b>坑5：STM32F103蓝色小板通过ST-Link能烧录，但复位后程序不运行</b><br><br>
+❌ <b>现象：</b>烧录成功（Verify OK），但板子上的LED不亮，跟没烧一样<br>
+✅ <b>根因：</b>BOOT0 跳线帽位置错误。蓝色小板上有两组跳线：BOOT0 和 BOOT1。如果 BOOT0=1，芯片从系统存储器（System Memory）启动，不会运行你烧进去的程序<br>
+✅ <b>解决：</b><br>
+① 把 BOOT0 的跳线帽拔下来，接到标记为 0 的一侧（通常是下方位置）<br>
+② 把 BOOT1 也接到 0 侧<br>
+③ 按一下板上的 RESET 按钮，或者重新上电<br>
+④ 核心原则：<b>正常运行时 BOOT0=0，BOOT1=0</b>；烧录时 BOOT0=1(串口烧录) 或者 0(ST-Link烧录)\n<br>
+⑤ <b>另一个可能：</b>链接脚本写错了，程序入口地址不在 0x08000000。检查 .ld 文件里 <code>FLASH (rx) : ORIGIN = 0x08000000</code>
+</div>
+
+<h3>🐳 Docker 容器化开发环境（可选进阶）</h3>
+
+<p>如果你在多台电脑之间切换（公司台式机 + 家里笔记本），或者想让新人快速上手不用装一堆工具，Docker 容器化的开发环境是个好选择。</p>
+
+<div class="example">📝 <b>Dockerfile — ARM GCC 交叉编译环境</b>
+<pre><code># Dockerfile-embedded
+FROM ubuntu:24.04
+
+# 避免安装时区选择交互
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 安装构建工具链
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # ARM GCC 交叉编译器
+    gcc-arm-none-eabi=15:14.2* \
+    binutils-arm-none-eabi \
+    # 构建系统
+    cmake \
+    ninja-build \
+    make \
+    # Python (构建脚本用)
+    python3 \
+    python3-pip \
+    # 工具
+    git \
+    curl \
+    # 清理APT缓存减小镜像体积
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# 验证工具链是否可用
+RUN arm-none-eabi-gcc --version && cmake --version
+
+# 设置工作目录
+WORKDIR /workspace
+
+# 默认命令：bash
+CMD ["/bin/bash"]</code></pre>
+
+<pre><code># 使用方式（在项目根目录执行）
+# 1. 构建镜像
+docker build -t arm-gcc-dev -f Dockerfile-embedded .
+
+# 2. 启动容器（挂载当前项目目录）
+docker run -it --rm -v ${PWD}:/workspace arm-gcc-dev
+
+# 3. 在容器内编译
+mkdir build && cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-arm.cmake ..
+cmake --build . -j$(nproc)
+
+# 4. 烧录（需要 USB 直通到容器，需额外配置 --device 参数）
+# docker run -it --rm -v ${PWD}:/workspace --device=/dev/ttyUSB0 arm-gcc-dev</code></pre>
+</div>
+
+<div class="note">💡 <b>Docker 的局限性：</b>容器内无法直接访问 Windows 的 USB 设备（如 ST-Link），所以烧录和调试需要在宿主机上做。但编译完全可以在容器里跑，CI/CD 流水线也推荐用这种方式保证环境一致性。如果确实需要容器内烧录，Windows 上需要用 WSL2 + usbipd 做USB转发，比较折腾。</div>
+
+<h3>🐧 WSL2 + 嵌入式开发（Windows 上的 Linux 体验）</h3>
+
+<p>WSL2 是 Windows 上运行 Linux 的最佳方式，对于习惯 Linux 命令行的开发者来说体验极佳。关键是可以直接用 Linux 版的 ARM GCC + OpenOCD。</p>
+
+<pre><code># 1. 安装 WSL2（需要管理员 PowerShell）
+wsl --install -d Ubuntu-24.04
+# 首次启动设置用户名/密码
+
+# 2. 在 WSL2 内安装嵌入式工具链（一条命令搞定）
+sudo apt update && sudo apt install -y \
+    gcc-arm-none-eabi \     # ARM GCC (Ubuntu 24.04自带14.2)
+    binutils-arm-none-eabi \  # binutils
+    cmake \                  # CMake
+    ninja-build \            # Ninja
+    make \                   # GNU Make
+    gdb-multiarch \          # GDB支持多架构
+    openocd \                # OpenOCD调试服务器
+    python3 \                # Python
+    python3-serial           # pyserial
+
+# 3. 验证安装
+arm-none-eabi-gcc --version
+openocd --version
+
+# 4. USB设备直通到WSL2（编译在WSL2，烧录也需要在WSL2）
+# 安装 usbipd（在 Windows 管理员 PowerShell 中）：
+winget install dorssel.usbipd-win
+
+# 连接 ST-Link 到 WSL2：
+usbipd list                     # 找到 ST-Link 的 BUSID
+usbipd bind --busid <BUSID>     # 绑定
+usbipd attach --wsl --busid <BUSID>  # 挂载到WSL2
+
+# 在 WSL2 内验证设备：
+lsusb                           # 应看到 "STMicroelectronics ST-LINK"
+openocd -f interface/stlink.cfg -f target/stm32f1x.cfg  # 测试连接
+
+# 5. VS Code 的 WSL2 集成（推荐工作流）
+# 在 VS Code 中安装 "WSL" 扩展
+# 在 WSL2 终端里 cd 到项目目录 → code .
+# VS Code 会自动在 WSL2 中运行，IntelliSense 用 WSL2 里的 ARM GCC</code></pre>
+
+<div class="tip">💡 <b>WSL2 vs 原生 Windows 开发对比：</b><br>
+• <b>优势：</b>Linux原生工具链（apt一条命令全装）、文件系统性能好（ext4）、与树莓派/服务器开发体验一致、CI/CD直接复用Docker<br>
+• <b>劣势：</b>USB直通配置稍繁琐（usbipd偶尔需要重新attach）、GUI调试不如原生Windows流畅<br>
+• <b>建议：</b>如果你未来要开发Linux嵌入式（树莓派/Buildroot/Yocto），WSL2是必选项。纯MCU开发选原生Windows或WSL2都可以
+</div>
+
+<h3>🔌 USB转串口驱动深度排错</h3>
+
+<p>串口是嵌入式开发的命脉，但 Windows 的串口驱动问题是新手第一道坎。</p>
+
+<table>
+<tr><th>芯片</th><th>识别名</th><th>驱动来源</th><th>常见坑</th></tr>
+<tr><td>CH340G/C/E</td><td>USB-SERIAL CH340 (COMx)</td><td>wch.cn 官方驱动</td><td>Win11需手动禁用驱动签名；部分山寨芯片不稳定</td></tr>
+<tr><td>CP2102/CP2104</td><td>Silicon Labs CP210x</td><td>silabs.com 官方驱动</td><td>Windows Update 自动装驱动可能版本过旧</td></tr>
+<tr><td>FT232RL</td><td>USB Serial Port (COMx)</td><td>ftdichip.com 官方驱动</td><td>山寨FT232很多——设备管理器显示"FT232R USB UART"但驱动装不上</td></tr>
+<tr><td>PL2303</td><td>Prolific USB-to-Serial</td><td>prolific.com.tw</td><td>Win10/11可能被系统禁用(驱动签名问题)；不推荐</td></tr>
+</table>
+
+<div class="trouble">🔍 <b>CH340 在 Win11 上装不上驱动（驱动签名错误）</b><br><br>
+❌ <b>现象：</b>设备管理器里 CH340 显示黄色感叹号，属性显示"驱动程序签名强制"错误<br>
+✅ <b>解决：</b><br>
+① 按住 Shift → 重启 → 疑难解答 → 高级选项 → 启动设置 → 重启 → 按 7（禁用驱动程序强制签名），这是临时方案<br>
+② 去 <a href="https://www.wch.cn/downloads/CH341SER_EXE.html" target="_blank" style="color:var(--a)">wch.cn</a> 下载<b>最新</b>版驱动(2024年后的)，新版驱动有微软签名<br>
+③ 设备管理器 → 右键CH340 → 卸载设备（勾选"删除此设备的驱动程序软件"）→ 重新安装新版驱动<br>
+④ <b>终极方案：</b>换 CP2102 模块（¥8），Silicon Labs 的驱动签名从未出过问题
+</div>
+
+<div class="trouble">🔍 <b>串口能识别但 PuTTY/serial monitor 打不开（"Access Denied"）</b><br><br>
+❌ <b>现象：</b>设备管理器里串口正常，但任何串口工具打开都报"Access Denied"或"端口被占用"<br>
+✅ <b>根因：</b>另一个程序正在占用串口（前一个PuTTY没关、Arduino IDE打开了串口监视器、ST-Link Utility占用了虚拟串口）<br>
+✅ <b>解决：</b><br>
+① 关闭所有串口工具（包括系统托盘里的）<br>
+② 设备管理器 → 右键串口 → 禁用 → 重新启用<br>
+③ <b>查谁占用了串口（PowerShell管理员）：</b><br>
+<code>Get-Process | Where-Object { $_.Modules.FileName -like '*Serial*' }</code><br>
+④ 如果是 Windows 10/11 的"快速启动"导致，<b>重启电脑</b>（不是关机再开机——Win10/11的关机是"混合休眠"！）
+</div>
+
+<h3>📦 Vcpkg：C/C++ 包管理器用于嵌入式工具</h3>
+
+<p>Vcpkg 是微软维护的 C/C++ 包管理器，虽然主要用于桌面开发，但可以方便地安装嵌入式辅助工具：</p>
+
+<pre><code># 安装 vcpkg
+git clone https://github.com/Microsoft/vcpkg.git C:\dev\vcpkg
+cd C:\dev\vcpkg
+.\bootstrap-vcpkg.bat
+
+# 安装嵌入式相关工具
+.\vcpkg install protobuf:x64-windows       # 序列化库（IoT通信用）
+.\vcpkg install nlohmann-json:x64-windows   # JSON解析（解析设备配置）
+.\vcpkg install spdlog:x64-windows          # 日志库（仿真/测试用）
+.\vcpkg install benchmark:x64-windows       # 性能测试（算法验证）
+
+# 注意：vcpkg 目前不直接支持 arm-none-eabi 的交叉编译包
+# 嵌入式MCU库还是用 git submodule / FetchContent 管理</code></pre>
+
+<p style="margin-top:10px;color:var(--t2);font-size:.82em">💡 <b>关联章节：</b>装了环境还不知道怎么用？接着看 <a onclick="window.parent.loadPage('guide-ch01')" style="color:var(--a);cursor:pointer">第1章 ARM GCC工具链</a> 了解编译四阶段；要配CMake项目看 <a onclick="window.parent.loadPage('guide-ch02')" style="color:var(--a);cursor:pointer">第2章 CMake构建系统</a>。VS Code调试配合OpenOCD的详细用法见 <a onclick="window.parent.loadPage('guide-ch12')" style="color:var(--a);cursor:pointer">第12章 调试技术</a>。</p>
+
+<h3>📋 知识点回顾</h3>
+
+<div class="summary">
+<b>🎯 本章核心要点：</b><br><br>
+<b>1. 工具链必装6件套：</b><br>
+• ARM GCC 14.2 — 交叉编译器（.c → .elf）<br>
+• CMake 4.3 — 现代构建系统<br>
+• Make 3.81 — 经典构建工具<br>
+• PuTTY — 串口终端<br>
+• VS Code + 插件 — 代码编辑与调试<br>
+• Python + pyserial — 脚本工具与串口<br><br>
+<b>2. PATH环境变量：</b><br>
+• 把工具的bin目录加入PATH才能在任意目录调用<br>
+• 修改PATH后必须重新打开命令行窗口才生效<br>
+• 用 check_env.ps1 脚本一键验证所有工具<br><br>
+<b>3. 入门硬件三件套（约¥25）：</b><br>
+• STM32F103C8T6 最小系统板（¥5-10）<br>
+• ST-Link V2 烧录器（¥10-15）<br>
+• CH340G USB转TTL 模块（¥5）<br><br>
+<b>4. 版本管理：</b><br>
+• 装Git，配置 user.name 和 user.email<br>
+• 创建 .gitignore，只提交源码，不提交编译产物<br>
+• git status / git add / git commit 是每日三连<br><br>
+<b>5. 排错思路：</b><br>
+• 命令找不到 → 检查PATH → 重新打开终端<br>
+• CMake找不到编译器 → 指定 toolchain file<br>
+• 串口不识别 → 装驱动（CH340/ST-Link驱动）<br>
+</div>
+
+<!-- ====== 第1章 ====== -->
 <a id="ch1"></a>
-<div class="summary">馃摉 <b>绗?绔犲瀹屼綘鑳藉共鍟ワ細</b>鐞嗚ВARM GCC宸ュ叿閾句腑姣忎釜宸ュ叿鐨勪綔鐢紝鐭ラ亾缂栬瘧鐨勫洓涓樁娈碉紝鑳芥墜鍔ㄧ紪璇戜竴涓?c鏂囦欢鍒?bin/.hex锛岃兘鐪嬫噦.map鍜?lst鏂囦欢銆?/div>
+<div class="summary">📖 <b>第1章学完你能干啥：</b>理解ARM GCC工具链中每个工具的作用，知道编译的四个阶段，能手动编译一个.c文件到.bin/.hex，能看懂.map和.lst文件。</div>
 
 <div class="chnav">
 <span></span>
-<a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 鐩綍</a>
-<a onclick="window.parent.loadPage('guide-ch01')">绗?绔?鈫?/a>
+<a class="toc-link" onclick="window.parent.loadPage('guide')">📑 目录</a>
+<a onclick="window.parent.loadPage('guide-ch01')">第1章 →</a>
 </div>
 
 <script>
@@ -595,13 +1051,13 @@ document.querySelectorAll('pre').forEach(pre => {
 </script>
 <div class="chnav">
   <span></span>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
-  <a onclick="window.parent.loadPage('guide-ch01')">ARM GCC 锛氫笅涓€绔?鈻?/a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
+  <a onclick="window.parent.loadPage('guide-ch01')">ARM GCC ：下一章 ▶</a>
 </div>
 <div class="chnav">
   <span></span>
-  <a class="toc-link" onclick="window.parent.loadPage('guide')">馃搼 绔犺妭鐩綍</a>
-  <a onclick="window.parent.loadPage('guide-ch01')">ARM GCC 锛氫笅涓€绔?鈻?/a>
+  <a class="toc-link" onclick="window.parent.loadPage('guide')">📑 章节目录</a>
+  <a onclick="window.parent.loadPage('guide-ch01')">ARM GCC ：下一章 ▶</a>
 </div>
 </body>
 </html>
